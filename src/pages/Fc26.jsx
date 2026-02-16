@@ -3,16 +3,75 @@ import { useMemo, useState } from "react";
 export default function Fc26() {
   const packages = useMemo(
     () => [
-      { id: "100k", label: "100K Coins", eta: "< 30 mins" },
-      { id: "300k", label: "300K Coins", eta: "< 60 mins" },
-      { id: "500k", label: "500K Coins", eta: "1–2 hours" },
-      { id: "1m", label: "1M Coins", eta: "2–4 hours" },
+      {
+        id: "300k",
+        coins: 300_000,
+        gift: 30_000,
+        price: 5.39,
+        eta: "< 60 mins",
+      },
+      {
+        id: "400k",
+        coins: 400_000,
+        gift: 40_000,
+        price: 7.19,
+        eta: "< 90 mins",
+      },
+      {
+        id: "500k",
+        coins: 500_000,
+        gift: 50_000,
+        price: 8.99,
+        eta: "1–2 hours",
+      },
+      {
+        id: "700k",
+        coins: 700_000,
+        gift: 70_000,
+        price: 12.59,
+        eta: "2–4 hours",
+      },
+      {
+        id: "800k",
+        coins: 800_000,
+        gift: 80_000,
+        price: 14.39,
+        eta: "3–5 hours",
+      },
+      {
+        id: "1000k",
+        coins: 1_000_000,
+        gift: 100_000,
+        price: 17.99,
+        eta: "4–8 hours",
+      },
+      {
+        id: "1200k",
+        coins: 1_200_000,
+        gift: 120_000,
+        price: 21.59,
+        eta: "6–12 hours",
+      },
     ],
     []
   );
 
   const [platform, setPlatform] = useState("PlayStation");
-  const [pack, setPack] = useState(packages[1].id);
+  const [pack, setPack] = useState(packages[0].id);
+
+  const selectedPack = packages.find((p) => p.id === pack);
+
+  const fmtCoins = (n) => {
+    // 300000 -> 300K, 1000000 -> 1,000K
+    const k = Math.round(n / 1000);
+    return k.toLocaleString("en-US") + "K";
+  };
+
+  const fmtPrice = (n) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(n);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
@@ -20,7 +79,8 @@ export default function Fc26() {
         <div>
           <h1 className="text-3xl font-extrabold">FC26 Ultimate Team Coins</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#9AA7BD]">
-            MVP ordering flow (no payment yet). Bank gateway will be added after approval.
+            Choose your coin package and submit your order. Payment will be enabled after gateway
+            approval.
           </p>
         </div>
         <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 px-4 py-2 text-sm text-[#9AA7BD]">
@@ -62,17 +122,24 @@ export default function Fc26() {
                 }
               >
                 <div>
-                  <div className="text-sm font-semibold">{x.label}</div>
+                  <div className="text-sm font-semibold">
+                    {fmtCoins(x.coins)} Coins{" "}
+                    <span className="text-[#00FF9A]">+ {fmtCoins(x.gift)} Gift</span>
+                  </div>
                   <div className="mt-1 text-xs text-[#9AA7BD]">ETA: {x.eta}</div>
                 </div>
-                <div className="text-xs text-[#9AA7BD]">Price: —</div>
+                <div className="text-sm font-semibold">{fmtPrice(x.price)}</div>
               </button>
             ))}
           </div>
 
           <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-[#9AA7BD]">
-            Safety note: avoid sharing sensitive account details. Only provide necessary info once
-            the final delivery method is confirmed.
+            <div className="font-semibold text-[#E7EDF7]">Security & 72-hour guarantee</div>
+            <ul className="mt-2 list-disc space-y-1 pl-4">
+              <li>All deliveries are handled manually using safe transfer methods.</li>
+              <li>Your account security is our top priority.</li>
+              <li>Every order is covered by a 72-hour service guarantee after delivery.</li>
+            </ul>
           </div>
         </div>
 
@@ -102,15 +169,22 @@ export default function Fc26() {
             />
 
             <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#9AA7BD]">
-              Selected: <span className="text-[#E7EDF7] font-semibold">{platform}</span> •{" "}
+              Selected:{" "}
+              <span className="text-[#E7EDF7] font-semibold">{platform}</span> •{" "}
               <span className="text-[#E7EDF7] font-semibold">
-                {packages.find((p) => p.id === pack)?.label}
+                {selectedPack
+                  ? `${fmtCoins(selectedPack.coins)} + ${fmtCoins(selectedPack.gift)} Gift`
+                  : "—"}
+              </span>{" "}
+              •{" "}
+              <span className="text-[#00FF9A] font-semibold">
+                {selectedPack ? fmtPrice(selectedPack.price) : "—"}
               </span>
             </div>
 
             <textarea
               className="min-h-[110px] rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/30"
-              placeholder="Notes (optional): preferred delivery time, etc."
+              placeholder="Notes (optional): preferred delivery time, player auction/comfort trade, etc."
             />
 
             <button className="rounded-2xl bg-[#00FF9A] px-5 py-3 text-sm font-semibold text-[#070A0F] hover:bg-[#00D47E]">
@@ -119,7 +193,8 @@ export default function Fc26() {
           </form>
 
           <div className="mt-6 rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4 text-xs text-[#9AA7BD]">
-            Next step: when the bank gateway is ready, this will redirect to real checkout.
+            Next step: when the Lava gateway is ready, this will redirect to a real checkout and
+            mark the order as paid automatically.
           </div>
         </div>
       </div>
