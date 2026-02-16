@@ -9,6 +9,7 @@ export default function Fc26() {
         gift: 30_000,
         price: 5.39,
         eta: "< 60 mins",
+        widgetUrl: "https://widget.lava.top/8ab2f75a-da9d-4c72-9cb0-963eac636284",
       },
       {
         id: "400k",
@@ -16,6 +17,7 @@ export default function Fc26() {
         gift: 40_000,
         price: 7.19,
         eta: "< 90 mins",
+        widgetUrl: "", // وقتی لینک این محصول رو گرفتی اینجا بذار
       },
       {
         id: "500k",
@@ -23,6 +25,7 @@ export default function Fc26() {
         gift: 50_000,
         price: 8.99,
         eta: "1–2 hours",
+        widgetUrl: "",
       },
       {
         id: "700k",
@@ -30,6 +33,7 @@ export default function Fc26() {
         gift: 70_000,
         price: 12.59,
         eta: "2–4 hours",
+        widgetUrl: "",
       },
       {
         id: "800k",
@@ -37,6 +41,7 @@ export default function Fc26() {
         gift: 80_000,
         price: 14.39,
         eta: "3–5 hours",
+        widgetUrl: "",
       },
       {
         id: "1000k",
@@ -44,6 +49,7 @@ export default function Fc26() {
         gift: 100_000,
         price: 17.99,
         eta: "4–8 hours",
+        widgetUrl: "",
       },
       {
         id: "1200k",
@@ -51,6 +57,7 @@ export default function Fc26() {
         gift: 120_000,
         price: 21.59,
         eta: "6–12 hours",
+        widgetUrl: "",
       },
     ],
     []
@@ -79,12 +86,11 @@ export default function Fc26() {
         <div>
           <h1 className="text-3xl font-extrabold">FC26 Ultimate Team Coins</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#9AA7BD]">
-            Choose your coin package and submit your order. Payment will be enabled after gateway
-            approval.
+            Choose your coin package and submit your order. Payment is handled via Lava widget.
           </p>
         </div>
         <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 px-4 py-2 text-sm text-[#9AA7BD]">
-          Payment: <span className="text-[#00FF9A] font-semibold">Coming soon</span>
+          Payment: <span className="text-[#00FF9A] font-semibold">Lava Widget</span>
         </div>
       </div>
 
@@ -144,16 +150,16 @@ export default function Fc26() {
         </div>
 
         <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
-          <h2 className="text-lg font-bold">Place Order (MVP)</h2>
+          <h2 className="text-lg font-bold">Place Order</h2>
           <p className="mt-2 text-sm text-[#9AA7BD]">
-            This form collects order details. Payment is disabled for now.
+            Fill details, then pay using the Lava widget (when available for your package).
           </p>
 
           <form
             className="mt-5 grid gap-3"
             onSubmit={(e) => {
               e.preventDefault();
-              alert("MVP: Order submitted (no payment). Connect this to your backend later.");
+              alert("Order submitted. (Next: connect this to your backend to save orders.)");
             }}
           >
             <input
@@ -182,19 +188,47 @@ export default function Fc26() {
               </span>
             </div>
 
+            {/* Lava Widget */}
+            {selectedPack?.widgetUrl ? (
+              <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4">
+                <div className="mb-2 text-xs text-[#9AA7BD]">
+                  Pay securely with Lava —{" "}
+                  <span className="text-[#E7EDF7] font-semibold">
+                    {selectedPack ? fmtPrice(selectedPack.price) : "—"}
+                  </span>
+                </div>
+
+                <iframe
+                  title="lava.top"
+                  style={{ border: "none" }}
+                  width="250"
+                  height="80"
+                  src={selectedPack.widgetUrl}
+                />
+                <div className="mt-2 text-[11px] text-[#9AA7BD]">
+                  If the widget doesn’t load, refresh the page or try again in a few minutes.
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-[#9AA7BD]">
+                Payment widget for this package is not added yet. (Send me the iframe/widget link and
+                I’ll plug it in.)
+              </div>
+            )}
+
             <textarea
               className="min-h-[110px] rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/30"
               placeholder="Notes (optional): preferred delivery time, player auction/comfort trade, etc."
             />
 
             <button className="rounded-2xl bg-[#00FF9A] px-5 py-3 text-sm font-semibold text-[#070A0F] hover:bg-[#00D47E]">
-              Submit Order (No payment yet)
+              Submit Order
             </button>
           </form>
 
           <div className="mt-6 rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4 text-xs text-[#9AA7BD]">
-            Next step: when the Lava gateway is ready, this will redirect to a real checkout and
-            mark the order as paid automatically.
+            Next step: connect this form to your backend so orders + payments get tracked
+            automatically.
           </div>
         </div>
       </div>
