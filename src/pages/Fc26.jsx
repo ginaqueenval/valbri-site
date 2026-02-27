@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Fc26() {
+  const navigate = useNavigate();
+
   const packages = useMemo(
     () => [
       {
@@ -17,7 +20,7 @@ export default function Fc26() {
         gift: 40_000,
         price: 7.19,
         eta: "< 90 mins",
-        widgetUrl: "", // وقتی لینک این محصول رو گرفتی اینجا بذار
+        widgetUrl: "",
       },
       {
         id: "500k",
@@ -64,12 +67,8 @@ export default function Fc26() {
   );
 
   const [platform, setPlatform] = useState("PlayStation");
-  const [pack, setPack] = useState(packages[0].id);
-
-  const selectedPack = packages.find((p) => p.id === pack);
 
   const fmtCoins = (n) => {
-    // 300000 -> 300K, 1000000 -> 1,000K
     const k = Math.round(n / 1000);
     return k.toLocaleString("en-US") + "K";
   };
@@ -80,21 +79,39 @@ export default function Fc26() {
       currency: "USD",
     }).format(n);
 
+  const goCheckout = (pkg) => {
+    // میره به صفحه checkout و دیتای محصول رو می‌فرسته
+    navigate("/checkout", {
+      state: {
+        platform,
+        packId: pkg.id,
+        // اینا رو هم می‌فرستیم که checkout راحت‌تر باشه و لازم نباشه دوباره لیست رو اونجا تعریف کنی
+        coins: pkg.coins,
+        gift: pkg.gift,
+        price: pkg.price,
+        eta: pkg.eta,
+        widgetUrl: pkg.widgetUrl,
+      },
+    });
+  };
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
         <div>
           <h1 className="text-3xl font-extrabold">FC26 Ultimate Team Coins</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#9AA7BD]">
-            Choose your coin package and submit your order. Payment is handled via Lava widget.
+            Select your platform and package. Click <span className="text-[#00FF9A] font-semibold">Buy</span> to checkout.
           </p>
         </div>
+
         <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 px-4 py-2 text-sm text-[#9AA7BD]">
-          Payment: <span className="text-[#00FF9A] font-semibold">Lava Widget</span>
+          Payment: <span className="text-[#00FF9A] font-semibold">Lava</span>
         </div>
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
+        {/* Left: Platform + Packages */}
         <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
           <h2 className="text-lg font-bold">Select Platform</h2>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -114,18 +131,12 @@ export default function Fc26() {
             ))}
           </div>
 
-          <h2 className="mt-8 text-lg font-bold">Choose Package</h2>
+          <h2 className="mt-8 text-lg font-bold">Packages</h2>
           <div className="mt-4 grid gap-3">
             {packages.map((x) => (
-              <button
+              <div
                 key={x.id}
-                onClick={() => setPack(x.id)}
-                className={
-                  "flex items-center justify-between rounded-2xl border p-4 text-left " +
-                  (pack === x.id
-                    ? "border-[#00FF9A]/35 bg-[#00FF9A]/5"
-                    : "border-white/10 bg-black/20 hover:border-[#00FF9A]/25")
-                }
+                className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 hover:border-[#00FF9A]/25"
               >
                 <div>
                   <div className="text-sm font-semibold">
@@ -134,101 +145,35 @@ export default function Fc26() {
                   </div>
                   <div className="mt-1 text-xs text-[#9AA7BD]">ETA: {x.eta}</div>
                 </div>
-                <div className="text-sm font-semibold">{fmtPrice(x.price)}</div>
-              </button>
-            ))}
-          </div>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-[#9AA7BD]">
-            <div className="font-semibold text-[#E7EDF7]">Security & 72-hour guarantee</div>
-            <ul className="mt-2 list-disc space-y-1 pl-4">
-              <li>All deliveries are handled manually using safe transfer methods.</li>
-              <li>Your account security is our top priority.</li>
-              <li>Every order is covered by a 72-hour service guarantee after delivery.</li>
-            </ul>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="text-sm font-semibold">{fmtPrice(x.price)}</div>
+
+                  <button
+                    onClick={() => goCheckout(x)}
+                    className="rounded-xl bg-[#00FF9A] px-4 py-2 text-xs font-semibold text-[#070A0F] hover:bg-[#00D47E]"
+                  >
+                    Buy
+                  </button>
+
+                  {!x.widgetUrl ? (
+                    <div className="text-[11px] text-[#9AA7BD]">Widget not set</div>
+                  ) : null}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Right: simple info card (بدون فرم/بدون متن‌های اضافی پایین) */}
         <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
-          <h2 className="text-lg font-bold">Place Order</h2>
-          <p className="mt-2 text-sm text-[#9AA7BD]">
-            Fill details, then pay using the Lava widget (when available for your package).
+          <h2 className="text-lg font-bold">Checkout</h2>
+          <p className="mt-2 text-sm text-[#9AA7BD] leading-7">
+            Click <span className="text-[#00FF9A] font-semibold">Buy</span> on any package to go to the checkout page for that product.
           </p>
 
-          <form
-            className="mt-5 grid gap-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Order submitted. (Next: connect this to your backend to save orders.)");
-            }}
-          >
-            <input
-              className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/30"
-              placeholder="Your name"
-              required
-            />
-            <input
-              className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/30"
-              placeholder="Email"
-              type="email"
-              required
-            />
-
-            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#9AA7BD]">
-              Selected:{" "}
-              <span className="text-[#E7EDF7] font-semibold">{platform}</span> •{" "}
-              <span className="text-[#E7EDF7] font-semibold">
-                {selectedPack
-                  ? `${fmtCoins(selectedPack.coins)} + ${fmtCoins(selectedPack.gift)} Gift`
-                  : "—"}
-              </span>{" "}
-              •{" "}
-              <span className="text-[#00FF9A] font-semibold">
-                {selectedPack ? fmtPrice(selectedPack.price) : "—"}
-              </span>
-            </div>
-
-            {/* Lava Widget */}
-            {selectedPack?.widgetUrl ? (
-              <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4">
-                <div className="mb-2 text-xs text-[#9AA7BD]">
-                  Pay securely with Lava —{" "}
-                  <span className="text-[#E7EDF7] font-semibold">
-                    {selectedPack ? fmtPrice(selectedPack.price) : "—"}
-                  </span>
-                </div>
-
-                <iframe
-                  title="lava.top"
-                  style={{ border: "none" }}
-                  width="250"
-                  height="80"
-                  src={selectedPack.widgetUrl}
-                />
-                <div className="mt-2 text-[11px] text-[#9AA7BD]">
-                  If the widget doesn’t load, refresh the page or try again in a few minutes.
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-[#9AA7BD]">
-                Payment widget for this package is not added yet. (Send me the iframe/widget link and
-                I’ll plug it in.)
-              </div>
-            )}
-
-            <textarea
-              className="min-h-[110px] rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/30"
-              placeholder="Notes (optional): preferred delivery time, player auction/comfort trade, etc."
-            />
-
-            <button className="rounded-2xl bg-[#00FF9A] px-5 py-3 text-sm font-semibold text-[#070A0F] hover:bg-[#00D47E]">
-              Submit Order
-            </button>
-          </form>
-
-          <div className="mt-6 rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4 text-xs text-[#9AA7BD]">
-            Next step: connect this form to your backend so orders + payments get tracked
-            automatically.
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-[#9AA7BD]">
+            Tip: If a package shows <span className="text-[#E7EDF7] font-semibold">Widget not set</span>, paste its Lava widget URL into the list.
           </div>
         </div>
       </div>
