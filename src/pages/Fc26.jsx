@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Fc26() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const packages = useMemo(
     () => [
@@ -99,21 +101,20 @@ export default function Fc26() {
     <main className="mx-auto max-w-6xl px-4 py-12">
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <h1 className="text-3xl font-extrabold">FC26 Ultimate Team Coins</h1>
+          <h1 className="text-3xl font-extrabold">{t('fc26.title')}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#9AA7BD]">
-            Select your platform and package. Click <span className="text-[#00FF9A] font-semibold">Buy</span> to checkout.
+            {t('fc26.description')} <span className="text-[#00FF9A] font-semibold">{t('fc26.descriptionHighlight')}</span>{t('fc26.descriptionEnd')}
           </p>
         </div>
 
         <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 px-4 py-2 text-sm text-[#9AA7BD]">
-          Payment: <span className="text-[#00FF9A] font-semibold">Lava</span>
+          {t('fc26.payment')} <span className="text-[#00FF9A] font-semibold">{t('fc26.paymentProvider')}</span>
         </div>
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
-        {/* Left: Platform + Packages */}
         <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
-          <h2 className="text-lg font-bold">Select Platform</h2>
+          <h2 className="text-lg font-bold">{t('fc26.selectPlatform')}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {["PlayStation", "Xbox", "PC"].map((p) => (
               <button
@@ -131,7 +132,7 @@ export default function Fc26() {
             ))}
           </div>
 
-          <h2 className="mt-8 text-lg font-bold">Packages</h2>
+          <h2 className="mt-8 text-lg font-bold">{t('fc26.packages')}</h2>
           <div className="mt-4 grid gap-3">
             {packages.map((x) => (
               <div
@@ -140,10 +141,10 @@ export default function Fc26() {
               >
                 <div>
                   <div className="text-sm font-semibold">
-                    {fmtCoins(x.coins)} Coins{" "}
-                    <span className="text-[#00FF9A]">+ {fmtCoins(x.gift)} Gift</span>
+                    {fmtCoins(x.coins)} {t('fc26.coins')}{" "}
+                    <span className="text-[#00FF9A]">+ {fmtCoins(x.gift)} {t('fc26.gift')}</span>
                   </div>
-                  <div className="mt-1 text-xs text-[#9AA7BD]">ETA: {x.eta}</div>
+                  <div className="mt-1 text-xs text-[#9AA7BD]">{t('fc26.eta', { eta: x.eta })}</div>
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
@@ -153,11 +154,11 @@ export default function Fc26() {
                     onClick={() => goCheckout(x)}
                     className="rounded-xl bg-[#00FF9A] px-4 py-2 text-xs font-semibold text-[#070A0F] hover:bg-[#00D47E]"
                   >
-                    Buy
+                    {t('fc26.buy')}
                   </button>
 
                   {!x.widgetUrl ? (
-                    <div className="text-[11px] text-[#9AA7BD]">Widget not set</div>
+                    <div className="text-[11px] text-[#9AA7BD]">{t('fc26.widgetNotSet')}</div>
                   ) : null}
                 </div>
               </div>
@@ -165,15 +166,14 @@ export default function Fc26() {
           </div>
         </div>
 
-        {/* Right: simple info card (بدون فرم/بدون متن‌های اضافی پایین) */}
         <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
-          <h2 className="text-lg font-bold">Checkout</h2>
+          <h2 className="text-lg font-bold">{t('fc26.checkoutTitle')}</h2>
           <p className="mt-2 text-sm text-[#9AA7BD] leading-7">
-            Click <span className="text-[#00FF9A] font-semibold">Buy</span> on any package to go to the checkout page for that product.
+            {t('fc26.checkoutDesc')} <span className="text-[#00FF9A] font-semibold">{t('fc26.checkoutDescHighlight')}</span>{t('fc26.checkoutDescEnd')}
           </p>
 
           <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-[#9AA7BD]">
-            Tip: If a package shows <span className="text-[#E7EDF7] font-semibold">Widget not set</span>, paste its Lava widget URL into the list.
+            {t('fc26.tip')} <span className="text-[#E7EDF7] font-semibold">{t('fc26.tipHighlight')}</span>{t('fc26.tipEnd')}
           </div>
         </div>
       </div>

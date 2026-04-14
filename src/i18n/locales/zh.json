@@ -1,0 +1,157 @@
+{
+  "header": {
+    "brand": "valbri",
+    "brandSubtitle": "游戏交易平台",
+    "nav": {
+      "fc26": "FC26 金币",
+      "about": "关于我们",
+      "contact": "联系我们"
+    },
+    "buyBtn": "购买 FC26 金币",
+    "checkout": "结算"
+  },
+  "footer": {
+    "copyright": "© {{year}} valbri",
+    "terms": "服务条款",
+    "privacy": "隐私政策"
+  },
+  "home": {
+    "badge": "FC26 套餐已上线 — 支付集成即将完成",
+    "title": "FC26 Ultimate Team 金币 —",
+    "titleHighlight": " 快速安全",
+    "titleEnd": " 交付",
+    "description": "Valbri 是一个专注于 FC26 金币和精选游戏服务的游戏交易平台。结账和支付网关将在最终批准后启用。",
+    "viewPackages": "查看 FC26 套餐",
+    "browseGames": "浏览游戏",
+    "features": {
+      "guarantee": {
+        "title": "72小时保障",
+        "desc": "交付后支持"
+      },
+      "safe": {
+        "title": "安全方式",
+        "desc": "仅手动转移"
+      },
+      "pricing": {
+        "title": "透明定价",
+        "desc": "套餐 + 赠送礼物"
+      },
+      "gateway": {
+        "title": "网关即将上线",
+        "desc": "结算在最终步骤"
+      }
+    },
+    "featuredTitle": "精选套餐",
+    "featuredSubtitle": "FC26 Ultimate Team 金币",
+    "live": "在线",
+    "coins": "金币",
+    "gift": "礼物",
+    "eta": "预计交付时间: {{eta}}",
+    "usd": "美元",
+    "paymentNotice": "支付功能目前正在禁用中，支付网关正在最终确定。您仍可以从 FC26 页面提交订单详情。",
+    "gamesTitle": "游戏",
+    "gamesDesc": "我们目前专注于 FC26，同时也支持以下游戏。",
+    "comingSoon": "页面和定价：即将推出"
+  },
+  "fc26": {
+    "title": "FC26 Ultimate Team 金币",
+    "description": "选择您的平台和套餐。点击",
+    "descriptionHighlight": "购买",
+    "descriptionEnd": "进行结算。",
+    "payment": "支付方式：",
+    "paymentProvider": "Lava",
+    "selectPlatform": "选择平台",
+    "packages": "套餐",
+    "coins": "金币",
+    "gift": "礼物",
+    "eta": "预计时间: {{eta}}",
+    "buy": "购买",
+    "widgetNotSet": "小工具未设置",
+    "checkoutTitle": "结算",
+    "checkoutDesc": "点击任意套餐的",
+    "checkoutDescHighlight": "购买",
+    "checkoutDescEnd": "按钮，前往该产品的结算页面。",
+    "tip": "提示：如果套餐显示",
+    "tipHighlight": "小工具未设置",
+    "tipEnd": "，请将其 Lava 小工具 URL 粘贴到列表中。"
+  },
+  "checkout": {
+    "title": "结算",
+    "description": "MVP 阶段目前禁用支付功能。银行支付网关将在网站最终确定和批准后集成。",
+    "status": "状态",
+    "bankGateway": "银行网关：",
+    "comingSoon": "即将推出",
+    "orderSummary": "订单摘要",
+    "platform": "平台",
+    "coins": "金币",
+    "gift": "礼物",
+    "eta": "预计时间",
+    "total": "总价",
+    "noOrder": "暂无订单数据。请从",
+    "noOrderLink": "FC26 页面",
+    "noOrderEnd": "选择套餐。"
+  },
+  "about": {
+    "title": "关于 Valbri",
+    "description1": "Valbri 是一个专注于 FC26 Ultimate Team 金币和精选游戏服务的在线游戏交易平台。我们的目标是提供快速、可靠、用户友好的交付体验和透明的订单流程。",
+    "description2": "本网站目前处于 MVP 模式运行。支付功能已禁用，银行支付网关将在网站最终确定和批准后集成。",
+    "notice": "公司详情和法律信息将在最终上线阶段添加。"
+  },
+  "contact": {
+    "title": "联系我们",
+    "description": "如有业务咨询、支持或合作请求，请使用以下信息联系我们。",
+    "email": "电子邮箱",
+    "responseTime": "支持响应时间：24小时内"
+  },
+  "terms": {
+    "title": "服务条款",
+    "intro": "欢迎使用 Valbri。访问或使用本网站即表示您同意受以下条款和条件的约束。",
+    "serviceScope": {
+      "title": "服务范围",
+      "content": "Valbri 作为游戏交易平台运营，专注于 FC26 Ultimate Team 金币和精选游戏相关服务。本网站目前处于 MVP 模式运行。"
+    },
+    "payments": {
+      "title": "支付",
+      "content": "目前支付功能已禁用。银行支付网关将在网站最终确定和批准后集成。"
+    },
+    "userResponsibilities": {
+      "title": "用户责任",
+      "content": "用户有责任在提交订单时提供准确的信息，并且不得分享不必要或敏感的账户详情。"
+    },
+    "changes": {
+      "title": "变更",
+      "content": "Valbri 保留随时更新或修改这些条款的权利。"
+    },
+    "lastUpdated": "最后更新：{{date}}"
+  },
+  "privacy": {
+    "title": "隐私政策",
+    "intro": "Valbri 尊重您的隐私，并致力于保护您的个人信息。",
+    "collect": {
+      "title": "我们收集的信息",
+      "content": "在 MVP 阶段，我们可能会在用户提交订单或咨询时收集基本的联系信息，如姓名和电子邮件地址。"
+    },
+    "use": {
+      "title": "信息使用",
+      "content": "收集的信息仅用于沟通、订单处理和服务改进目的。"
+    },
+    "security": {
+      "title": "支付与安全",
+      "content": "此阶段不收集支付信息。安全的银行支付处理将在批准后推出。"
+    },
+    "sharing": {
+      "title": "数据共享",
+      "content": "Valbri 不会向第三方出售或共享个人数据。"
+    },
+    "lastUpdated": "最后更新：{{date}}"
+  },
+  "notes": {
+    "bestSeller": "热销",
+    "popular": "人气推荐",
+    "bestValue": "超值",
+    "fastDelivery": "快速交付",
+    "highVolume": "大额",
+    "vip": "VIP",
+    "maxPack": "最大套餐"
+  }
+}

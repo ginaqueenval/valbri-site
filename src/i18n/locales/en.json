@@ -1,0 +1,157 @@
+{
+  "header": {
+    "brand": "valbri",
+    "brandSubtitle": "Gaming Marketplace",
+    "nav": {
+      "fc26": "FC26 Coins",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "buyBtn": "Buy FC26 Coins",
+    "checkout": "Checkout"
+  },
+  "footer": {
+    "copyright": "© {{year}} valbri",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "home": {
+    "badge": "FC26 packages live — payment integration next",
+    "title": "FC26 Ultimate Team Coins —",
+    "titleHighlight": " fast & secure",
+    "titleEnd": " delivery",
+    "description": "Valbri is a gaming marketplace focused on FC26 coins and selected game services. Checkout and payment gateway will be enabled after final approval.",
+    "viewPackages": "View FC26 Packages",
+    "browseGames": "Browse Games",
+    "features": {
+      "guarantee": {
+        "title": "72h Guarantee",
+        "desc": "Support after delivery"
+      },
+      "safe": {
+        "title": "Safe Methods",
+        "desc": "Manual transfer only"
+      },
+      "pricing": {
+        "title": "Clear Pricing",
+        "desc": "Packages + bonus gift"
+      },
+      "gateway": {
+        "title": "Gateway Soon",
+        "desc": "Checkout in final step"
+      }
+    },
+    "featuredTitle": "Featured Packages",
+    "featuredSubtitle": "FC26 Ultimate Team Coins",
+    "live": "Live",
+    "coins": "Coins",
+    "gift": "Gift",
+    "eta": "Delivery ETA: {{eta}}",
+    "usd": "USD",
+    "paymentNotice": "Payment is currently disabled while the gateway is being finalized. You can still submit your order details from the FC26 page.",
+    "gamesTitle": "Games",
+    "gamesDesc": "We currently focus on FC26, and also support the following games.",
+    "comingSoon": "Page & pricing: coming soon"
+  },
+  "fc26": {
+    "title": "FC26 Ultimate Team Coins",
+    "description": "Select your platform and package. Click",
+    "descriptionHighlight": "Buy",
+    "descriptionEnd": "to checkout.",
+    "payment": "Payment:",
+    "paymentProvider": "Lava",
+    "selectPlatform": "Select Platform",
+    "packages": "Packages",
+    "coins": "Coins",
+    "gift": "Gift",
+    "eta": "ETA: {{eta}}",
+    "buy": "Buy",
+    "widgetNotSet": "Widget not set",
+    "checkoutTitle": "Checkout",
+    "checkoutDesc": "Click",
+    "checkoutDescHighlight": "Buy",
+    "checkoutDescEnd": "on any package to go to the checkout page for that product.",
+    "tip": "Tip: If a package shows",
+    "tipHighlight": "Widget not set",
+    "tipEnd": ", paste its Lava widget URL into the list."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "description": "Payments are currently disabled in the MVP. A bank payment gateway will be integrated after the website is finalized and approved.",
+    "status": "Status",
+    "bankGateway": "Bank gateway:",
+    "comingSoon": "Coming soon",
+    "orderSummary": "Order Summary",
+    "platform": "Platform",
+    "coins": "Coins",
+    "gift": "Gift",
+    "eta": "ETA",
+    "total": "Total",
+    "noOrder": "No order data. Please select a package from",
+    "noOrderLink": "FC26 page",
+    "noOrderEnd": "."
+  },
+  "about": {
+    "title": "About Valbri",
+    "description1": "Valbri is an online gaming marketplace focused on FC26 Ultimate Team coins and selected game services. Our goal is to provide fast, reliable, and user-friendly delivery with a transparent ordering process.",
+    "description2": "This website is currently operating in MVP mode. Payments are disabled, and a bank payment gateway will be integrated after the website is finalized and approved.",
+    "notice": "Company details and legal information will be added during the final launch phase."
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "For business inquiries, support, or partnership requests, please contact us using the information below.",
+    "email": "Email",
+    "responseTime": "Support response time: within 24 hours"
+  },
+  "terms": {
+    "title": "Terms & Conditions",
+    "intro": "Welcome to Valbri. By accessing or using this website, you agree to be bound by the following terms and conditions.",
+    "serviceScope": {
+      "title": "Service Scope",
+      "content": "Valbri operates as a gaming marketplace focused on FC26 Ultimate Team coins and selected game-related services. This website is currently operating in MVP mode."
+    },
+    "payments": {
+      "title": "Payments",
+      "content": "Payments are currently disabled. A bank payment gateway will be integrated after the website is finalized and approved."
+    },
+    "userResponsibilities": {
+      "title": "User Responsibilities",
+      "content": "Users are responsible for providing accurate information when submitting orders and must not share unnecessary or sensitive account details."
+    },
+    "changes": {
+      "title": "Changes",
+      "content": "Valbri reserves the right to update or modify these terms at any time."
+    },
+    "lastUpdated": "Last updated: {{date}}"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "Valbri respects your privacy and is committed to protecting your personal information.",
+    "collect": {
+      "title": "Information We Collect",
+      "content": "During the MVP phase, we may collect basic contact information such as name and email address when users submit an order or inquiry."
+    },
+    "use": {
+      "title": "Use of Information",
+      "content": "Collected information is used solely for communication, order processing, and service improvement purposes."
+    },
+    "security": {
+      "title": "Payments & Security",
+      "content": "No payment information is collected at this stage. Secure bank payment processing will be introduced after approval."
+    },
+    "sharing": {
+      "title": "Data Sharing",
+      "content": "Valbri does not sell or share personal data with third parties."
+    },
+    "lastUpdated": "Last updated: {{date}}"
+  },
+  "notes": {
+    "bestSeller": "Best Seller",
+    "popular": "Popular",
+    "bestValue": "Best Value",
+    "fastDelivery": "Fast Delivery",
+    "highVolume": "High Volume",
+    "vip": "VIP",
+    "maxPack": "Max Pack"
+  }
+}
