@@ -1,10 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'zh', label: '中文' },
-];
+import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { LANGUAGES } from "../utils/languages.js";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -13,7 +9,7 @@ export default function LanguageSwitcher() {
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
-    localStorage.setItem('language', lng);
+    localStorage.setItem("language", lng);
     setOpen(false);
   };
 
@@ -23,11 +19,12 @@ export default function LanguageSwitcher() {
         setOpen(false);
       }
     };
-    if (open) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
-  const current = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
+  const current =
+    LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
 
   return (
     <div className="relative" ref={ref}>
@@ -48,13 +45,13 @@ export default function LanguageSwitcher() {
             clipRule="evenodd"
           />
         </svg>
-        <span>{current.code === 'zh' ? '中文' : 'EN'}</span>
+        <span>{current.code === "zh" ? "中文" : "EN"}</span>
         {/* Chevron */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
-          className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
         >
           <path
             fillRule="evenodd"
@@ -72,16 +69,29 @@ export default function LanguageSwitcher() {
               onClick={() => changeLanguage(lang.code)}
               className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors ${
                 i18n.language === lang.code
-                  ? 'text-[#00FF9A] bg-[#00FF9A]/10'
-                  : 'text-[#9AA7BD] hover:bg-white/5 hover:text-[#E7EDF7]'
+                  ? "text-[#00FF9A] bg-[#00FF9A]/10"
+                  : "text-[#9AA7BD] hover:bg-white/5 hover:text-[#E7EDF7]"
               }`}
             >
               {i18n.language === lang.code && (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
-                  <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-3.5 w-3.5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               )}
-              <span className={i18n.language === lang.code ? 'ml-0' : 'ml-[1.375rem]'}>
+              <span
+                className={
+                  i18n.language === lang.code ? "ml-0" : "ml-[1.375rem]"
+                }
+              >
                 {lang.label}
               </span>
             </button>

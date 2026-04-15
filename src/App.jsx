@@ -9,6 +9,7 @@ import Contact from "./pages/Contact.jsx";
 import Terms from "./pages/Terms.jsx";
 import Privacy from "./pages/Privacy.jsx";
 import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
+import { LANGUAGES } from "./utils/languages.js";
 
 const NAV_LINKS = [
   { to: "/fc26-coins", key: "header.nav.fc26" },
@@ -30,7 +31,7 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -69,7 +70,9 @@ export default function App() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSwitcher />
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <Link
               to="/fc26-coins"
               className="rounded-xl bg-[#00FF9A] px-3 py-2 text-sm font-semibold text-[#070A0F] sm:px-4"
@@ -120,6 +123,44 @@ export default function App() {
                     >
                       {t(l.key)}
                     </Link>
+                  ))}
+                  <div className="my-1 border-t border-white/10" />
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        i18n.changeLanguage(lang.code);
+                        localStorage.setItem("language", lang.code);
+                        setMenuOpen(false);
+                      }}
+                      className={`flex w-full items-center gap-2 px-4 py-3 text-sm transition-colors ${
+                        i18n.language === lang.code
+                          ? "text-[#00FF9A] bg-[#00FF9A]/10"
+                          : "text-[#9AA7BD] hover:bg-white/5 hover:text-[#E7EDF7]"
+                      }`}
+                    >
+                      {i18n.language === lang.code && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-3.5 w-3.5"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                      <span
+                        className={
+                          i18n.language === lang.code ? "" : "ml-[1.375rem]"
+                        }
+                      >
+                        {lang.label}
+                      </span>
+                    </button>
                   ))}
                 </div>
               )}
