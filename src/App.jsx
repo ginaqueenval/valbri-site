@@ -1,5 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Home from "./pages/Home.jsx";
 import Fc26 from "./pages/Fc26.jsx";
@@ -8,6 +15,8 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Terms from "./pages/Terms.jsx";
 import Privacy from "./pages/Privacy.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
 import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
 import { LANGUAGES } from "./utils/languages.js";
 
@@ -32,8 +41,19 @@ function ScrollToTop() {
 
 export default function App() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("player_token"),
+  );
   const menuRef = useRef(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("player_token");
+    localStorage.removeItem("player_info");
+    setIsLoggedIn(false);
+    navigate("/home");
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -85,6 +105,21 @@ export default function App() {
             >
               {t("header.checkout")}
             </Link>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="hidden rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm md:inline-flex hover:text-red-400 transition-colors"
+              >
+                {t("auth.logout")}
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden rounded-xl border border-[#00FF9A]/30 px-4 py-2 text-sm text-[#00FF9A] md:inline-flex hover:bg-[#00FF9A]/10 transition-colors"
+              >
+                {t("auth.login")}
+              </Link>
+            )}
             <div className="relative md:hidden" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -124,6 +159,26 @@ export default function App() {
                       {t(l.key)}
                     </Link>
                   ))}
+                  <div className="my-1 border-t border-white/10" />
+                  {isLoggedIn ? (
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setMenuOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition-colors"
+                    >
+                      {t("auth.logout")}
+                    </button>
+                  ) : (
+                    <Link
+                      to="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-3 text-sm text-[#00FF9A] hover:bg-white/5 transition-colors"
+                    >
+                      {t("auth.login")}
+                    </Link>
+                  )}
                   <div className="my-1 border-t border-white/10" />
                   {LANGUAGES.map((lang) => (
                     <button
@@ -183,6 +238,8 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* ✅ هر مسیر اشتباه -> Home */}
         <Route path="*" element={<Navigate to="/home" replace />} />

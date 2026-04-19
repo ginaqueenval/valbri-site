@@ -1,76 +1,113 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { getPackageList } from "../api/package";
+import { getGameList } from "../api/game";
+
+const FALLBACK_PACKAGES = [
+  {
+    coins: 300000,
+    giftCoins: 30000,
+    price: 5.39,
+    eta: "< 60 mins",
+    noteTag: "bestSeller",
+  },
+  {
+    coins: 400000,
+    giftCoins: 40000,
+    price: 7.19,
+    eta: "< 90 mins",
+    noteTag: "popular",
+  },
+  {
+    coins: 500000,
+    giftCoins: 50000,
+    price: 8.99,
+    eta: "1–2 hours",
+    noteTag: "bestValue",
+  },
+  {
+    coins: 700000,
+    giftCoins: 70000,
+    price: 12.59,
+    eta: "2–4 hours",
+    noteTag: "fastDelivery",
+  },
+  {
+    coins: 800000,
+    giftCoins: 80000,
+    price: 14.39,
+    eta: "3–5 hours",
+    noteTag: "highVolume",
+  },
+  {
+    coins: 1000000,
+    giftCoins: 100000,
+    price: 17.99,
+    eta: "4–8 hours",
+    noteTag: "vip",
+  },
+  {
+    coins: 1200000,
+    giftCoins: 120000,
+    price: 21.59,
+    eta: "6–12 hours",
+    noteTag: "maxPack",
+  },
+];
+
+const FALLBACK_GAMES = [
+  "FC26 Ultimate Team Coins (FUT Coins)",
+  "World of Warcraft",
+  "Dune",
+  "PUBG",
+  "Valorant",
+  "Delta Force",
+  "COD Mobile",
+];
+
+const fmtK = (n) => {
+  if (!n) return "0";
+  if (n < 1000) return String(n);
+  const k = Math.round(n / 1000);
+  return k.toLocaleString("en-US") + "K";
+};
+
+const fmtPrice = (n, currency) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency || "USD",
+  }).format(n);
+
+const noteLabel = (tag, t) => {
+  if (!tag) return null;
+  const key = `notes.${tag}`;
+  const translated = t(key);
+  return translated === key ? tag : translated;
+};
 
 export default function Home() {
   const { t } = useTranslation();
+  const [packages, setPackages] = useState(FALLBACK_PACKAGES);
+  const [games, setGames] = useState(FALLBACK_GAMES);
 
-  const games = [
-    "FC26 Ultimate Team Coins (FUT Coins)",
-    "World of Warcraft",
-    "Dune",
-    "PUBG",
-    "Valorant",
-    "Delta Force",
-    "COD Mobile",
-  ];
+  useEffect(() => {
+    getPackageList({ gameId: 1 })
+      .then((res) => {
+        setPackages(
+          res.data && res.data.length > 0 ? res.data : FALLBACK_PACKAGES,
+        );
+      })
+      .catch(() => {});
 
-  const fcPackages = [
-    {
-      coins: "300K",
-      gift: "30K",
-      price: 5.39,
-      eta: "< 60 mins",
-      note: "bestSeller",
-    },
-    {
-      coins: "400K",
-      gift: "40K",
-      price: 7.19,
-      eta: "< 90 mins",
-      note: "popular",
-    },
-    {
-      coins: "500K",
-      gift: "50K",
-      price: 8.99,
-      eta: "1–2 hours",
-      note: "bestValue",
-    },
-    {
-      coins: "700K",
-      gift: "70K",
-      price: 12.59,
-      eta: "2–4 hours",
-      note: "fastDelivery",
-    },
-    {
-      coins: "800K",
-      gift: "80K",
-      price: 14.39,
-      eta: "3–5 hours",
-      note: "highVolume",
-    },
-    {
-      coins: "1,000K",
-      gift: "100K",
-      price: 17.99,
-      eta: "4–8 hours",
-      note: "vip",
-    },
-    {
-      coins: "1,200K",
-      gift: "120K",
-      price: 21.59,
-      eta: "6–12 hours",
-      note: "maxPack",
-    },
-  ];
-
-  const fmtPrice = (n) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(n);
+    getGameList()
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setGames(res.data.map((g) => g.nameEn || g.name));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <main>
@@ -149,20 +186,24 @@ export default function Home() {
             </div>
 
             <div className="mt-5 grid gap-3">
-              {fcPackages.map((p) => (
+              {packages.map((p) => (
                 <div
-                  key={p.coins}
+                  key={p.id || p.coins}
                   className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-[#00FF9A]/25"
                 >
                   <div>
                     <div className="text-sm font-semibold">
-                      {p.coins} {t("home.coins")}{" "}
-                      <span className="text-[#00FF9A]">
-                        + {p.gift} {t("home.gift")}
-                      </span>{" "}
-                      <span className="ml-2 text-xs text-[#00FF9A]">
-                        {t(`notes.${p.note}`)}
-                      </span>
+                      {fmtK(p.coins)} {t("home.coins")}{" "}
+                      {p.giftCoins > 0 && (
+                        <span className="text-[#00FF9A]">
+                          + {fmtK(p.giftCoins)} {t("home.gift")}
+                        </span>
+                      )}
+                      {noteLabel(p.noteTag, t) && (
+                        <span className="ml-2 text-xs text-[#00FF9A]">
+                          {noteLabel(p.noteTag, t)}
+                        </span>
+                      )}
                     </div>
                     <div className="mt-1 text-xs text-[#9AA7BD]">
                       {t("home.eta", { eta: p.eta })}
@@ -170,10 +211,10 @@ export default function Home() {
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-semibold">
-                      {fmtPrice(p.price)}
+                      {fmtPrice(p.price, p.currency)}
                     </div>
                     <div className="mt-1 text-xs text-[#9AA7BD]">
-                      {t("home.usd")}
+                      {p.currency || "USD"}
                     </div>
                   </div>
                 </div>
@@ -194,12 +235,14 @@ export default function Home() {
         </p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {games.map((g) => (
+          {games.map((g, i) => (
             <div
-              key={g}
+              key={typeof g === "string" ? g : g.id || i}
               className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6"
             >
-              <div className="text-sm font-semibold">{g}</div>
+              <div className="text-sm font-semibold">
+                {typeof g === "string" ? g : g.name}
+              </div>
               <div className="mt-2 text-xs text-[#9AA7BD]">
                 {t("home.comingSoon")}
               </div>

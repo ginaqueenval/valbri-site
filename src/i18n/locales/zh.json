@@ -67,6 +67,7 @@
     "eta": "预计时间: {{eta}}",
     "buy": "购买",
     "widgetNotSet": "小工具未设置",
+    "noPackages": "该平台暂无可用套餐。",
     "checkoutTitle": "结算",
     "checkoutDesc": "点击任意套餐的",
     "checkoutDescHighlight": "购买",
@@ -89,7 +90,13 @@
     "total": "总价",
     "noOrder": "暂无订单数据。请从",
     "noOrderLink": "FC26 页面",
-    "noOrderEnd": "选择套餐。"
+    "noOrderEnd": "选择套餐。",
+    "package": "套餐",
+    "currency": "币种",
+    "submitOrder": "提交订单",
+    "payViaWidget": "通过 Widget 支付",
+    "orderCreated": "订单创建成功！",
+    "orderNo": "订单号"
   },
   "about": {
     "title": "关于 Valbri",
@@ -144,6 +151,27 @@
       "content": "Valbri 不会向第三方出售或共享个人数据。"
     },
     "lastUpdated": "最后更新：{{date}}"
+  },
+  "auth": {
+    "loginTitle": "玩家登录",
+    "registerTitle": "创建账号",
+    "username": "用户名",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "email": "邮箱",
+    "signIn": "登录",
+    "signUp": "注册",
+    "createAccount": "创建账号",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已有账号？",
+    "rememberMe": "记住我",
+    "loginSuccess": "登录成功！",
+    "registerSuccess": "注册成功！请登录。",
+    "passwordMismatch": "两次密码不一致",
+    "usernameTooShort": "用户名至少3个字符",
+    "passwordTooShort": "密码至少6个字符",
+    "logout": "退出登录",
+    "login": "登录"
   },
   "notes": {
     "bestSeller": "热销",

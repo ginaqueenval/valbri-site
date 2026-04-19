@@ -67,6 +67,7 @@
     "eta": "ETA: {{eta}}",
     "buy": "Buy",
     "widgetNotSet": "Widget not set",
+    "noPackages": "No packages available for this platform.",
     "checkoutTitle": "Checkout",
     "checkoutDesc": "Click",
     "checkoutDescHighlight": "Buy",
@@ -89,7 +90,13 @@
     "total": "Total",
     "noOrder": "No order data. Please select a package from",
     "noOrderLink": "FC26 page",
-    "noOrderEnd": "."
+    "noOrderEnd": ".",
+    "package": "Package",
+    "currency": "Currency",
+    "submitOrder": "Submit Order",
+    "payViaWidget": "Pay via Widget",
+    "orderCreated": "Order Created!",
+    "orderNo": "Order No"
   },
   "about": {
     "title": "About Valbri",
@@ -144,6 +151,27 @@
       "content": "Valbri does not sell or share personal data with third parties."
     },
     "lastUpdated": "Last updated: {{date}}"
+  },
+  "auth": {
+    "loginTitle": "Player Login",
+    "registerTitle": "Create Account",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "email": "Email",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "rememberMe": "Remember me",
+    "loginSuccess": "Login successful!",
+    "registerSuccess": "Registration successful! Please sign in.",
+    "passwordMismatch": "Passwords do not match",
+    "usernameTooShort": "Username must be at least 3 characters",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "logout": "Logout",
+    "login": "Login"
   },
   "notes": {
     "bestSeller": "Best Seller",
