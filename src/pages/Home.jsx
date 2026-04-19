@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPackageList } from "../api/package";
 import { getGameList } from "../api/game";
+import Announcement from "../components/Announcement";
 
 const FALLBACK_PACKAGES = [
   {
@@ -111,6 +112,7 @@ export default function Home() {
 
   return (
     <main>
+      <Announcement />
       <section className="mx-auto max-w-6xl px-4 pb-10 pt-10">
         <div className="grid gap-6 md:grid-cols-2 md:items-center">
           <div>

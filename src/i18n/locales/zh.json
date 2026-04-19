@@ -173,6 +173,9 @@
     "logout": "退出登录",
     "login": "登录"
   },
+  "announcement": {
+    "title": "公告"
+  },
   "notes": {
     "bestSeller": "热销",
     "popular": "人气推荐",

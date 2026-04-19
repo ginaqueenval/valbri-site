@@ -173,6 +173,9 @@
     "logout": "Logout",
     "login": "Login"
   },
+  "announcement": {
+    "title": "Announcements"
+  },
   "notes": {
     "bestSeller": "Best Seller",
     "popular": "Popular",
