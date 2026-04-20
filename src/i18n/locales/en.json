@@ -8,7 +8,9 @@
       "contact": "Contact"
     },
     "buyBtn": "Buy FC26 Coins",
-    "checkout": "Checkout"
+    "checkout": "My Orders",
+    "pendingCheckout": "Pending Checkout",
+    "back": "Back"
   },
   "footer": {
     "copyright": "© {{year}} valbri",
@@ -68,13 +70,33 @@
     "buy": "Buy",
     "widgetNotSet": "Widget not set",
     "noPackages": "No packages available for this platform.",
-    "checkoutTitle": "Checkout",
-    "checkoutDesc": "Click",
-    "checkoutDescHighlight": "Buy",
-    "checkoutDescEnd": "on any package to go to the checkout page for that product.",
-    "tip": "Tip: If a package shows",
-    "tipHighlight": "Widget not set",
-    "tipEnd": ", paste its Lava widget URL into the list."
+    "recentOrders": "Recent Orders",
+    "noRecentOrders": "No order history yet",
+    "viewAllOrders": "View All Orders →",
+    "orderStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "refunded": "Refunded"
+    },
+    "faqTitle": "Trust & Safety",
+    "faq": {
+      "security": {
+        "title": "72-Hour Guarantee",
+        "desc": "All orders are covered by a 72-hour after-delivery guarantee. Contact us anytime if issues arise."
+      },
+      "delivery": {
+        "title": "Fast Delivery",
+        "desc": "Once payment is confirmed, coins will be delivered to your account within the estimated time shown."
+      },
+      "payment": {
+        "title": "Secure Payment",
+        "desc": "Powered by Stripe with full encryption. We accept major credit cards for a safe checkout experience."
+      },
+      "privacy": {
+        "title": "Privacy Protection",
+        "desc": "Your personal information and transaction data are strictly protected and never shared with third parties."
+      }
+    }
   },
   "checkout": {
     "title": "Checkout",
@@ -96,7 +118,8 @@
     "submitOrder": "Submit Order",
     "payViaWidget": "Pay via Widget",
     "orderCreated": "Order Created!",
-    "orderNo": "Order No"
+    "orderNo": "Order No",
+    "quantity": "Quantity"
   },
   "about": {
     "title": "About Valbri",
@@ -171,7 +194,14 @@
     "usernameTooShort": "Username must be at least 3 characters",
     "passwordTooShort": "Password must be at least 6 characters",
     "logout": "Logout",
-    "login": "Login"
+    "logoutConfirmTitle": "Confirm Logout",
+    "logoutConfirm": "Are you sure you want to log out?",
+    "logoutConfirmBtn": "Logout",
+    "cancel": "Cancel",
+    "login": "Login",
+    "sessionExpiredTitle": "Session Expired",
+    "sessionExpiredDesc": "Your session has timed out. Please sign in again to continue.",
+    "reLogin": "Sign In Again"
   },
   "announcement": {
     "title": "Announcements"
@@ -184,5 +214,44 @@
     "highVolume": "High Volume",
     "vip": "VIP",
     "maxPack": "Max Pack"
+  },
+  "orders": {
+    "title": "My Orders",
+    "subtitle": "View your purchase history and order status.",
+    "loading": "Loading...",
+    "empty": "No orders yet. ",
+    "goBuy": "Go buy now",
+    "coins": "Coins",
+    "gift": "Gift",
+    "tab": {
+      "all": "All",
+      "pending": "Pending",
+      "paid": "Paid",
+      "refunded": "Refunded"
+    },
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "refunded": "Refunded"
+    },
+    "delivery": {
+      "pendingDelivery": "Pending",
+      "delivered": "Delivered",
+      "failed": "Failed"
+    }
+  },
+  "payment": {
+    "stripePay": "Stripe Payment",
+    "widgetPay": "Widget Payment",
+    "successTitle": "Payment Successful!",
+    "successDesc": "Your payment has been processed. We will deliver your coins shortly.",
+    "cancelTitle": "Payment Cancelled",
+    "cancelDesc": "Your payment was not completed. You can try again from your orders page.",
+    "orderNo": "Order No",
+    "viewOrders": "View My Orders",
+    "backHome": "Back to Home",
+    "creating": "Creating payment...",
+    "notConfigured": "Payment service is being configured. Please try again later.",
+    "failed": "Failed to create payment session"
   }
 }

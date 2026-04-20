@@ -21,7 +21,12 @@ export default function Login() {
       const res = await playerLogin({ username, password });
       localStorage.setItem("player_token", res.token);
       localStorage.setItem("player_info", JSON.stringify(res.player));
-      navigate("/home");
+      const pending = sessionStorage.getItem("pending_checkout");
+      if (pending) {
+        navigate("/checkout", { state: JSON.parse(pending) });
+      } else {
+        navigate("/home");
+      }
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || "Login failed");
     } finally {
@@ -57,7 +62,7 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.username")}
             />
           </div>
@@ -71,7 +76,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.password")}
             />
           </div>
