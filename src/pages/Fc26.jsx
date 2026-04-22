@@ -28,6 +28,9 @@ const noteLabel = (tag, t) => {
   return translated === key ? tag : translated;
 };
 
+const sortPackages = (list) =>
+  [...list].sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
+
 export default function Fc26() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -43,7 +46,7 @@ export default function Fc26() {
     setLoading(true);
     getPackageList({ gameId: 1, platform })
       .then((res) => {
-        setPackages(res.data || []);
+        setPackages(sortPackages(res.data || []));
         setQuantities({});
       })
       .catch(() => setPackages([]))
@@ -247,13 +250,15 @@ export default function Fc26() {
                               (o.payStatus === "1"
                                 ? "bg-[#00FF9A]/10 text-[#00FF9A]"
                                 : o.payStatus === "2"
+                                  ? "bg-slate-500/10 text-slate-300"
+                                  : o.payStatus === "3"
                                   ? "bg-red-500/10 text-red-400"
                                   : "bg-yellow-500/10 text-yellow-400")
                             }
                           >
                             {t(
                               `fc26.orderStatus.${
-                                { 0: "pending", 1: "paid", 2: "refunded" }[
+                                { 0: "pending", 1: "paid", 2: "cancelled", 3: "refunded" }[
                                   o.payStatus
                                 ] || "pending"
                               }`,

@@ -76,6 +76,7 @@
     "orderStatus": {
       "pending": "待支付",
       "paid": "已支付",
+      "cancelled": "已取消",
       "refunded": "已退款"
     },
     "faqTitle": "安全保障",
@@ -193,6 +194,10 @@
     "passwordMismatch": "两次密码不一致",
     "usernameTooShort": "用户名至少3个字符",
     "passwordTooShort": "密码至少6个字符",
+    "captcha": "验证码",
+    "captchaPlaceholder": "请输入验证码",
+    "captchaRequired": "请输入验证码",
+    "refreshCaptcha": "点击刷新验证码",
     "logout": "退出登录",
     "logoutConfirmTitle": "确认退出",
     "logoutConfirm": "确定要退出登录吗？",
@@ -227,17 +232,19 @@
       "all": "全部",
       "pending": "待支付",
       "paid": "已支付",
+      "cancelled": "已取消",
       "refunded": "已退款"
     },
     "status": {
       "pending": "待支付",
       "paid": "已支付",
+      "cancelled": "已取消",
       "refunded": "已退款"
     },
     "delivery": {
       "pendingDelivery": "待发货",
-      "delivered": "已发货",
-      "failed": "发货失败"
+      "delivering": "发货中",
+      "completed": "已完成"
     }
   },
   "payment": {

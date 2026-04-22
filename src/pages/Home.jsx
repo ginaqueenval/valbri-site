@@ -80,6 +80,9 @@ const fmtPrice = (n, currency) =>
     currency: currency || "USD",
   }).format(n);
 
+const sortPackages = (list) =>
+  [...list].sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
+
 const noteLabel = (tag, t) => {
   if (!tag) return null;
   const key = `notes.${tag}`;
@@ -96,7 +99,9 @@ export default function Home() {
     getPackageList({ gameId: 1 })
       .then((res) => {
         setPackages(
-          res.data && res.data.length > 0 ? res.data : FALLBACK_PACKAGES,
+          res.data && res.data.length > 0
+            ? sortPackages(res.data)
+            : sortPackages(FALLBACK_PACKAGES),
         );
       })
       .catch(() => {});

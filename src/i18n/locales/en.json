@@ -76,6 +76,7 @@
     "orderStatus": {
       "pending": "Pending",
       "paid": "Paid",
+      "cancelled": "Cancelled",
       "refunded": "Refunded"
     },
     "faqTitle": "Trust & Safety",
@@ -193,6 +194,10 @@
     "passwordMismatch": "Passwords do not match",
     "usernameTooShort": "Username must be at least 3 characters",
     "passwordTooShort": "Password must be at least 6 characters",
+    "captcha": "Captcha",
+    "captchaPlaceholder": "Enter captcha",
+    "captchaRequired": "Please enter the captcha",
+    "refreshCaptcha": "Refresh captcha",
     "logout": "Logout",
     "logoutConfirmTitle": "Confirm Logout",
     "logoutConfirm": "Are you sure you want to log out?",
@@ -227,17 +232,19 @@
       "all": "All",
       "pending": "Pending",
       "paid": "Paid",
+      "cancelled": "Cancelled",
       "refunded": "Refunded"
     },
     "status": {
       "pending": "Pending",
       "paid": "Paid",
+      "cancelled": "Cancelled",
       "refunded": "Refunded"
     },
     "delivery": {
       "pendingDelivery": "Pending",
-      "delivered": "Delivered",
-      "failed": "Failed"
+      "delivering": "Delivering",
+      "completed": "Completed"
     }
   },
   "payment": {
