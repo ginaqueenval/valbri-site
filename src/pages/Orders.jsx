@@ -28,11 +28,12 @@ const PAY_STATUS = [
   { value: "", label: "all" },
   { value: "0", label: "pending" },
   { value: "1", label: "paid" },
-  { value: "2", label: "refunded" },
+  { value: "2", label: "cancelled" },
+  { value: "3", label: "refunded" },
 ];
 
-const PAY_LABEL = { 0: "pending", 1: "paid", 2: "refunded" };
-const DELIVERY_LABEL = { 0: "pendingDelivery", 1: "delivered", 2: "failed" };
+const PAY_LABEL = { 0: "pending", 1: "paid", 2: "cancelled", 3: "refunded" };
+const DELIVERY_LABEL = { 0: "pendingDelivery", 1: "delivering", 2: "completed" };
 
 export default function Orders() {
   const { t } = useTranslation();
@@ -125,6 +126,8 @@ export default function Orders() {
                         (o.payStatus === "1"
                           ? "bg-[#00FF9A]/10 text-[#00FF9A]"
                           : o.payStatus === "2"
+                            ? "bg-slate-500/10 text-slate-300"
+                            : o.payStatus === "3"
                             ? "bg-red-500/10 text-red-400"
                             : "bg-yellow-500/10 text-yellow-400")
                       }
@@ -137,9 +140,9 @@ export default function Orders() {
                       className={
                         "rounded-md px-2 py-0.5 text-xs " +
                         (o.deliveryStatus === "1"
-                          ? "bg-[#00FF9A]/10 text-[#00FF9A]"
+                          ? "bg-yellow-500/10 text-yellow-400"
                           : o.deliveryStatus === "2"
-                            ? "bg-red-500/10 text-red-400"
+                            ? "bg-[#00FF9A]/10 text-[#00FF9A]"
                             : "bg-white/5 text-[#9AA7BD]")
                       }
                     >

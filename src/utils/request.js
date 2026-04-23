@@ -29,7 +29,8 @@ request.interceptors.response.use(
       const { status } = error.response;
       if (status === 401) {
         localStorage.removeItem("player_token");
-        window.location.href = "/login";
+        localStorage.removeItem("player_info");
+        window.dispatchEvent(new Event("player-session-expired"));
       }
     }
     return Promise.reject(error);

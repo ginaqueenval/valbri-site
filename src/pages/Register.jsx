@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { playerRegister } from "../api/auth";
+import { getPlayerCaptcha, playerRegister } from "../api/auth";
 
 export default function Register() {
   const { t } = useTranslation();
@@ -10,8 +10,36 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [captchaCode, setCaptchaCode] = useState("");
+  const [captchaUuid, setCaptchaUuid] = useState("");
+  const [captchaUrl, setCaptchaUrl] = useState("");
+  const [captchaEnabled, setCaptchaEnabled] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadCaptcha();
+  }, []);
+
+  const loadCaptcha = async () => {
+    try {
+      const res = await getPlayerCaptcha();
+      const enabled = res.captchaEnabled !== false;
+      setCaptchaEnabled(enabled);
+      if (enabled) {
+        setCaptchaUrl(`data:image/jpeg;base64,${res.img}`);
+        setCaptchaUuid(res.uuid || "");
+      } else {
+        setCaptchaUrl("");
+        setCaptchaUuid("");
+      }
+      setCaptchaCode("");
+    } catch (err) {
+      setCaptchaEnabled(false);
+      setCaptchaUrl("");
+      setCaptchaUuid("");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,16 +57,32 @@ export default function Register() {
       setError(t("auth.passwordMismatch"));
       return;
     }
+    if (captchaEnabled && !captchaCode.trim()) {
+      setError(t("auth.captchaRequired"));
+      return;
+    }
 
     setLoading(true);
 
     try {
-      await playerRegister({ username, password, email });
+      await playerRegister({
+        username,
+        password,
+        email,
+        code: captchaCode.trim(),
+        uuid: captchaUuid,
+      });
       navigate("/login", { state: { message: t("auth.registerSuccess") } });
     } catch (err) {
       setError(
-        err?.response?.data?.message || err?.message || "Registration failed",
+        err?.response?.data?.msg ||
+          err?.response?.data?.message ||
+          err?.message ||
+          "Registration failed",
       );
+      if (captchaEnabled) {
+        loadCaptcha();
+      }
     } finally {
       setLoading(false);
     }
@@ -72,7 +116,7 @@ export default function Register() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.username")}
             />
           </div>
@@ -86,7 +130,7 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.email")}
             />
           </div>
@@ -100,7 +144,7 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.password")}
             />
           </div>
@@ -114,10 +158,49 @@ export default function Register() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.confirmPassword")}
             />
           </div>
+
+          {captchaEnabled && (
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_152px]">
+              <div>
+                <label className="mb-1 block text-sm text-[#9AA7BD]">
+                  {t("auth.captcha")}
+                </label>
+                <input
+                  type="text"
+                  value={captchaCode}
+                  onChange={(e) => setCaptchaCode(e.target.value)}
+                  required={captchaEnabled}
+                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
+                  placeholder={t("auth.captchaPlaceholder")}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={loadCaptcha}
+                className="mt-[25px] flex h-[50px] items-center justify-center rounded-xl border border-[#00FF9A]/20 bg-[radial-gradient(circle_at_top,rgba(0,255,154,0.18),rgba(11,18,32,0.96)_65%)] p-[3px] shadow-[0_0_0_1px_rgba(255,255,255,0.04)] transition hover:border-[#00FF9A]/40"
+                aria-label={t("auth.refreshCaptcha")}
+              >
+                {captchaUrl ? (
+                  <span className="block h-full w-full overflow-hidden rounded-[10px] bg-[#09111d]">
+                    <img
+                      src={captchaUrl}
+                      alt={t("auth.captcha")}
+                      className="h-full w-full scale-x-110 object-cover object-center"
+                    />
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium text-[#9AA7BD]">
+                    {t("auth.refreshCaptcha")}
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"

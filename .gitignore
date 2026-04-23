@@ -43,3 +43,6 @@ ehthumbs.db
 
 # Vite cache
 .vite/
+
+# opencode
+.opencode/
