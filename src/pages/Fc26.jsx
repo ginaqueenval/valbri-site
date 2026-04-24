@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPackageList } from "../api/package";
 import { getOrderList } from "../api/order";
+import { addCartItem } from "../api/cart";
 import { getPlayerToken } from "../utils/request";
+import {
+  getPackageQuantity,
+  getDesktopOverlayStateClasses,
+  resetPackageQuantity,
+  updatePackageQuantity,
+} from "./fc26State";
 
 const PLATFORMS = ["PlayStation", "Xbox", "PC"];
-const MAX_QTY = 10;
 
 const fmtK = (n) => {
   if (!n) return "0";
@@ -33,11 +39,15 @@ const sortPackages = (list) =>
 
 export default function Fc26() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const [packages, setPackages] = useState([]);
   const [platform, setPlatform] = useState("PlayStation");
   const [loading, setLoading] = useState(true);
+  const [actionLoadingKey, setActionLoadingKey] = useState("");
+  const [feedbackState, setFeedbackState] = useState(null);
   const [quantities, setQuantities] = useState({});
+  const [hoveredPackageId, setHoveredPackageId] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
 
   const loggedIn = !!getPlayerToken();
@@ -48,6 +58,8 @@ export default function Fc26() {
       .then((res) => {
         setPackages(sortPackages(res.data || []));
         setQuantities({});
+        setHoveredPackageId(null);
+        setFeedbackState(null);
       })
       .catch(() => setPackages([]))
       .finally(() => setLoading(false));
@@ -63,36 +75,66 @@ export default function Fc26() {
       .catch(() => setRecentOrders([]));
   }, [loggedIn]);
 
-  const getQty = (id) => quantities[id] || 1;
+  useEffect(() => {
+    if (!feedbackState) return undefined;
+    const timeoutId = window.setTimeout(() => setFeedbackState(null), 2400);
+    return () => window.clearTimeout(timeoutId);
+  }, [feedbackState]);
+
+  const getQty = (id) => getPackageQuantity(quantities, id);
   const setQty = (id, val) => {
-    const n = Math.max(1, Math.min(MAX_QTY, val));
-    setQuantities((prev) => ({ ...prev, [id]: n }));
+    setQuantities((prev) => updatePackageQuantity(prev, id, val));
+  };
+  const resetQty = (id) => {
+    setQuantities((prev) => resetPackageQuantity(prev, id));
+  };
+  const handleDesktopCardEnter = (id) => {
+    setHoveredPackageId(id);
+  };
+  const handleDesktopCardLeave = (id) => {
+    setHoveredPackageId((currentId) => (currentId === id ? null : currentId));
+    resetQty(id);
   };
 
-  const goCheckout = (pkg) => {
-    const qty = getQty(pkg.id);
-    const state = {
-      platform,
-      packageId: pkg.id,
-      coins: pkg.coins * qty,
-      giftCoins: pkg.giftCoins * qty,
-      price: pkg.price * qty,
-      eta: pkg.eta,
-      widgetUrl: pkg.widgetUrl,
-      packageName: pkg.name,
-      currency: pkg.currency || "USD",
-      quantity: qty,
-      unitPrice: pkg.price,
-      unitCoins: pkg.coins,
-      unitGiftCoins: pkg.giftCoins,
-    };
-    sessionStorage.setItem("pending_checkout", JSON.stringify(state));
-    window.dispatchEvent(new Event("pending-checkout-changed"));
+  const requireLogin = () => {
+    navigate("/login", { state: { redirectTo: location.pathname } });
+  };
+
+  const handleCartAction = async (pkg, goToCheckout = false) => {
     if (!getPlayerToken()) {
-      navigate("/login");
+      requireLogin();
       return;
     }
-    navigate("/checkout", { state });
+    const qty = getQty(pkg.id);
+    const actionKey = `${pkg.id}:${goToCheckout ? "checkout" : "cart"}`;
+    setActionLoadingKey(actionKey);
+    setFeedbackState(null);
+    try {
+      const res = await addCartItem({
+        packageId: pkg.id,
+        platform,
+        quantity: qty,
+      });
+      window.dispatchEvent(new Event("cart-changed"));
+      if (goToCheckout) {
+        navigate(`/checkout?cartItemId=${res.data.id}`);
+        return;
+      }
+      setFeedbackState({
+        packageId: pkg.id,
+        type: "success",
+        message: t("fc26.addedToCart"),
+      });
+      window.dispatchEvent(new Event("cart-feedback"));
+    } catch (err) {
+      setFeedbackState({
+        packageId: pkg.id,
+        type: "error",
+        message: err.message || t("fc26.addToCartFailed"),
+      });
+    } finally {
+      setActionLoadingKey("");
+    }
   };
 
   return (
@@ -108,16 +150,9 @@ export default function Fc26() {
             {t("fc26.descriptionEnd")}
           </p>
         </div>
-
-        <div className="rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 px-4 py-2 text-sm text-[#9AA7BD]">
-          {t("fc26.payment")}{" "}
-          <span className="text-[#00FF9A] font-semibold">
-            {t("fc26.paymentProvider")}
-          </span>
-        </div>
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
+      <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
           <h2 className="text-lg font-bold">{t("fc26.selectPlatform")}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -138,7 +173,7 @@ export default function Fc26() {
           </div>
 
           <h2 className="mt-8 text-lg font-bold">{t("fc26.packages")}</h2>
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
             {loading ? (
               <div className="py-8 text-center text-sm text-[#9AA7BD]">
                 Loading...
@@ -150,12 +185,35 @@ export default function Fc26() {
             ) : (
               packages.map((x) => {
                 const qty = getQty(x.id);
+                const isDesktopHovered = hoveredPackageId === x.id;
+                const packageFeedback =
+                  feedbackState?.packageId === x.id ? feedbackState : null;
                 return (
                   <div
                     key={x.id}
-                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/20 p-4 hover:border-[#00FF9A]/25 sm:flex-row sm:items-center sm:justify-between"
+                    className="relative rounded-[28px] border border-[#00FF9A]/18 bg-[linear-gradient(180deg,rgba(8,12,20,0.96),rgba(11,18,32,0.88))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_0_0_1px_rgba(0,255,154,0.04),0_0_18px_rgba(0,255,154,0.08),0_18px_36px_rgba(0,0,0,0.14)] sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none"
                   >
-                    <div className="min-w-0 flex-1">
+                    {packageFeedback && (
+                      <div
+                        className={`pointer-events-none absolute inset-x-4 top-3 z-20 flex items-center justify-center gap-2 rounded-[18px] border px-3 py-2 text-center text-[11px] font-semibold shadow-[0_16px_30px_rgba(0,0,0,0.22)] backdrop-blur-md transition-all duration-300 sm:hidden ${
+                          packageFeedback.type === "success"
+                            ? "border-[#00FF9A]/24 bg-[linear-gradient(180deg,rgba(7,20,18,0.92),rgba(9,18,24,0.9))] text-[#DFF7EB]"
+                            : "border-red-400/24 bg-[linear-gradient(180deg,rgba(35,12,18,0.94),rgba(25,10,15,0.9))] text-[#FFD7DE]"
+                        }`}
+                      >
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-black ${
+                            packageFeedback.type === "success"
+                              ? "bg-[#00FF9A]/14 text-[#00FF9A]"
+                              : "bg-red-400/14 text-red-300"
+                          }`}
+                        >
+                          {packageFeedback.type === "success" ? "✓" : "!"}
+                        </span>
+                        <span>{packageFeedback.message}</span>
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-3 sm:hidden">
                       <div className="text-sm font-semibold">
                         {fmtK(x.coins)} {t("fc26.coins")}{" "}
                         {x.giftCoins > 0 && (
@@ -172,44 +230,184 @@ export default function Fc26() {
                       <div className="mt-1 text-xs text-[#9AA7BD]">
                         {t("fc26.eta", { eta: x.eta })}
                       </div>
-                    </div>
+                      <div className="grid grid-cols-[78px_minmax(72px,1fr)_118px] items-center gap-2">
+                        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-1">
+                          <button
+                            onClick={() => setQty(x.id, qty - 1)}
+                            className="px-1 py-1.5 text-sm text-[#9AA7BD] hover:text-[#E7EDF7]"
+                          >
+                            −
+                          </button>
+                          <span className="min-w-[24px] text-center text-sm font-semibold">
+                            {qty}
+                          </span>
+                          <button
+                            onClick={() => setQty(x.id, qty + 1)}
+                            className="px-1 py-1.5 text-sm text-[#9AA7BD] hover:text-[#E7EDF7]"
+                          >
+                            +
+                          </button>
+                        </div>
 
-                    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:gap-3">
-                      <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/5">
-                        <button
-                          onClick={() => setQty(x.id, qty - 1)}
-                          className="px-2.5 py-1.5 text-sm text-[#9AA7BD] hover:text-[#E7EDF7]"
-                        >
-                          −
-                        </button>
-                        <span className="min-w-[24px] text-center text-sm font-semibold">
-                          {qty}
-                        </span>
-                        <button
-                          onClick={() => setQty(x.id, qty + 1)}
-                          className="px-2.5 py-1.5 text-sm text-[#9AA7BD] hover:text-[#E7EDF7]"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="text-sm font-semibold whitespace-nowrap">
+                        <div className="min-w-[72px] justify-self-end text-right text-base font-black tracking-tight text-[#E7EDF7] whitespace-nowrap">
                           {fmtPrice(x.price * qty, x.currency)}
                         </div>
-                        {qty > 1 && (
-                          <div className="text-[10px] text-[#9AA7BD]">
-                            {fmtPrice(x.price, x.currency)} × {qty}
-                          </div>
-                        )}
+
+                        <button
+                          onClick={() => handleCartAction(x, false)}
+                          disabled={actionLoadingKey === `${x.id}:cart`}
+                          className="justify-self-end w-[118px] rounded-xl border border-[#00FF9A]/30 px-0 py-2 text-center text-[10px] font-semibold tracking-[0.01em] text-[#00FF9A] hover:bg-[#00FF9A]/10 disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {actionLoadingKey === `${x.id}:cart`
+                            ? "..."
+                            : t("fc26.addToCart")}
+                        </button>
                       </div>
 
-                      <button
-                        onClick={() => goCheckout(x)}
-                        className="flex-1 rounded-xl bg-[#00FF9A] px-4 py-2 text-center text-xs font-semibold text-[#070A0F] hover:bg-[#00D47E] whitespace-nowrap sm:flex-initial"
+                      <div>
+                        <button
+                          onClick={() => handleCartAction(x, true)}
+                          disabled={actionLoadingKey === `${x.id}:checkout`}
+                          className="w-full rounded-xl bg-[#00FF9A] px-4 py-2 text-center text-xs font-semibold text-[#070A0F] hover:bg-[#00D47E] disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {actionLoadingKey === `${x.id}:checkout`
+                            ? "..."
+                            : t("fc26.checkoutNow")}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      className="relative hidden min-h-[260px] w-full overflow-hidden rounded-[28px] border border-white/6 bg-[radial-gradient(circle_at_top_left,rgba(0,255,154,0.1),rgba(7,10,18,0.16)_38%,rgba(255,255,255,0)_74%)] px-5 py-5 sm:flex"
+                      onMouseEnter={() => handleDesktopCardEnter(x.id)}
+                      onMouseLeave={() => handleDesktopCardLeave(x.id)}
+                    >
+                      {packageFeedback && (
+                        <div
+                          className={`pointer-events-none absolute inset-x-5 top-5 z-20 flex items-center justify-center gap-2 rounded-[18px] border px-4 py-2.5 text-center text-xs font-semibold shadow-[0_18px_32px_rgba(0,0,0,0.24)] backdrop-blur-md transition-all duration-300 ${
+                            packageFeedback.type === "success"
+                              ? "border-[#00FF9A]/24 bg-[linear-gradient(180deg,rgba(7,20,18,0.92),rgba(9,18,24,0.9))] text-[#DFF7EB]"
+                              : "border-red-400/24 bg-[linear-gradient(180deg,rgba(35,12,18,0.94),rgba(25,10,15,0.9))] text-[#FFD7DE]"
+                          }`}
+                        >
+                          <span
+                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-black ${
+                              packageFeedback.type === "success"
+                                ? "bg-[#00FF9A]/14 text-[#00FF9A]"
+                                : "bg-red-400/14 text-red-300"
+                            }`}
+                          >
+                            {packageFeedback.type === "success" ? "✓" : "!"}
+                          </span>
+                          <span>{packageFeedback.message}</span>
+                        </div>
+                      )}
+                      <div
+                        className={
+                          "flex h-full w-full flex-col gap-6 transition duration-300 ease-out " +
+                          (isDesktopHovered ? "scale-[0.985] opacity-35" : "")
+                        }
                       >
-                        {t("fc26.buy")}
-                      </button>
+                        <div>
+                          <div className="flex min-h-6 items-start justify-between gap-3">
+                            {noteLabel(x.noteTag, t) ? (
+                              <span className="rounded-full border border-[#00FF9A]/18 bg-[#00FF9A]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#72FFBF]">
+                                {noteLabel(x.noteTag, t)}
+                              </span>
+                            ) : (
+                              <span />
+                            )}
+                            <span className="text-[11px] uppercase tracking-[0.18em] text-[#9AA7BD]">
+                              {t("fc26.eta", { eta: x.eta })}
+                            </span>
+                          </div>
+
+                          <div className="mt-4">
+                            <div className="text-[3.05rem] font-black leading-[0.88] tracking-[-0.07em] text-[#E7EDF7]">
+                              {fmtK(x.coins)}
+                            </div>
+                            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#AAB7CB]">
+                                {t("fc26.coins")}
+                              </span>
+                              {x.giftCoins > 0 && (
+                                <span className="rounded-full border border-[#00FF9A]/12 bg-[#00FF9A]/8 px-3 py-1 text-sm font-bold text-[#00FF9A]">
+                                  + {fmtK(x.giftCoins)} {t("fc26.gift")}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-end justify-between gap-4">
+                          <div>
+                            <div className="text-[2.1rem] font-black leading-none tracking-[-0.05em] text-[#E7EDF7]">
+                              {fmtPrice(x.price * qty, x.currency)}
+                            </div>
+                            <div className="mt-2 text-[11px] text-[#9AA7BD]">
+                              {x.currency || "USD"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className={
+                          "absolute inset-x-4 bottom-4 rounded-[22px] border border-[#00FF9A]/18 bg-[linear-gradient(180deg,rgba(8,13,22,0.94),rgba(9,16,28,0.98))] p-4 shadow-[0_24px_48px_rgba(0,0,0,0.26)] backdrop-blur-sm transition duration-300 ease-out " +
+                          getDesktopOverlayStateClasses(isDesktopHovered)
+                        }
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center justify-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-2 text-[#9AA7BD]">
+                            <button
+                              onClick={() => setQty(x.id, qty - 1)}
+                              className="text-lg hover:text-[#E7EDF7]"
+                            >
+                              −
+                            </button>
+                            <span className="min-w-[24px] text-center text-sm font-semibold text-[#E7EDF7]">
+                              {qty}
+                            </span>
+                            <button
+                              onClick={() => setQty(x.id, qty + 1)}
+                              className="text-lg hover:text-[#E7EDF7]"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <div className="text-right">
+                            <div className="text-[10px] uppercase tracking-[0.22em] text-[#72809A]">
+                              {t("fc26.total")}
+                            </div>
+                            <div className="mt-1 text-lg font-black text-[#E7EDF7]">
+                              {fmtPrice(x.price * qty, x.currency)}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => handleCartAction(x, false)}
+                            disabled={actionLoadingKey === `${x.id}:cart`}
+                            className="min-w-0 rounded-2xl border border-[#00FF9A]/30 px-3 py-3 text-center text-xs font-semibold leading-tight text-[#00FF9A] hover:bg-[#00FF9A]/10 disabled:opacity-50"
+                          >
+                            {actionLoadingKey === `${x.id}:cart`
+                              ? "..."
+                              : t("fc26.addToCart")}
+                          </button>
+
+                          <button
+                            onClick={() => handleCartAction(x, true)}
+                            disabled={actionLoadingKey === `${x.id}:checkout`}
+                            className="min-w-0 rounded-2xl bg-[#00FF9A] px-3 py-3 text-center text-xs font-black leading-tight text-[#070A0F] shadow-[0_14px_28px_rgba(0,255,154,0.14)] hover:bg-[#00D47E] disabled:opacity-50"
+                          >
+                            {actionLoadingKey === `${x.id}:checkout`
+                              ? "..."
+                              : t("fc26.checkoutNow")}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { getPackageList } from "../api/package";
 import { getGameList } from "../api/game";
 import Announcement from "../components/Announcement";
+import { resolveLocalizedGameName } from "../utils/contentLocale.js";
 
 const FALLBACK_PACKAGES = [
   {
@@ -58,14 +59,19 @@ const FALLBACK_PACKAGES = [
 ];
 
 const FALLBACK_GAMES = [
-  "FC26 Ultimate Team Coins (FUT Coins)",
-  "World of Warcraft",
-  "Dune",
-  "PUBG",
-  "Valorant",
-  "Delta Force",
-  "COD Mobile",
+  {
+    id: "fallback-fc26",
+    name: "FC26 Ultimate Team 金币",
+    nameEn: "FC26 Ultimate Team Coins (FUT Coins)",
+  },
+  { id: "fallback-wow", name: "魔兽世界", nameEn: "World of Warcraft" },
+  { id: "fallback-dune", name: "Dune", nameEn: "Dune" },
+  { id: "fallback-pubg", name: "PUBG", nameEn: "PUBG" },
+  { id: "fallback-valorant", name: "无畏契约", nameEn: "Valorant" },
+  { id: "fallback-delta", name: "三角洲行动", nameEn: "Delta Force" },
+  { id: "fallback-codm", name: "COD Mobile", nameEn: "COD Mobile" },
 ];
+const FEATURED_SKELETON_COUNT = FALLBACK_PACKAGES.length;
 
 const fmtK = (n) => {
   if (!n) return "0";
@@ -91,8 +97,9 @@ const noteLabel = (tag, t) => {
 };
 
 export default function Home() {
-  const { t } = useTranslation();
-  const [packages, setPackages] = useState(FALLBACK_PACKAGES);
+  const { t, i18n } = useTranslation();
+  const [packages, setPackages] = useState([]);
+  const [packagesLoading, setPackagesLoading] = useState(true);
   const [games, setGames] = useState(FALLBACK_GAMES);
 
   useEffect(() => {
@@ -104,12 +111,17 @@ export default function Home() {
             : sortPackages(FALLBACK_PACKAGES),
         );
       })
-      .catch(() => {});
+      .catch(() => {
+        setPackages(sortPackages(FALLBACK_PACKAGES));
+      })
+      .finally(() => {
+        setPackagesLoading(false);
+      });
 
     getGameList()
       .then((res) => {
         if (res.data && res.data.length > 0) {
-          setGames(res.data.map((g) => g.nameEn || g.name));
+          setGames(res.data);
         }
       })
       .catch(() => {});
@@ -193,39 +205,55 @@ export default function Home() {
             </div>
 
             <div className="mt-5 grid gap-3">
-              {packages.map((p) => (
-                <div
-                  key={p.id || p.coins}
-                  className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-[#00FF9A]/25"
-                >
-                  <div>
-                    <div className="text-sm font-semibold">
-                      {fmtK(p.coins)} {t("home.coins")}{" "}
-                      {p.giftCoins > 0 && (
-                        <span className="text-[#00FF9A]">
-                          + {fmtK(p.giftCoins)} {t("home.gift")}
-                        </span>
-                      )}
-                      {noteLabel(p.noteTag, t) && (
-                        <span className="ml-2 text-xs text-[#00FF9A]">
-                          {noteLabel(p.noteTag, t)}
-                        </span>
-                      )}
+              {packagesLoading
+                ? Array.from({ length: FEATURED_SKELETON_COUNT }).map((_, index) => (
+                    <div
+                      key={`featured-skeleton-${index}`}
+                      className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="h-5 w-40 animate-pulse rounded-full bg-white/8" />
+                        <div className="mt-3 h-4 w-28 animate-pulse rounded-full bg-white/6" />
+                      </div>
+                      <div className="ml-4 w-20 shrink-0 text-right">
+                        <div className="ml-auto h-5 w-16 animate-pulse rounded-full bg-white/8" />
+                        <div className="mt-3 ml-auto h-4 w-10 animate-pulse rounded-full bg-white/6" />
+                      </div>
                     </div>
-                    <div className="mt-1 text-xs text-[#9AA7BD]">
-                      {t("home.eta", { eta: p.eta })}
+                  ))
+                : packages.map((p) => (
+                    <div
+                      key={p.id || p.coins}
+                      className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-[#00FF9A]/25"
+                    >
+                      <div>
+                        <div className="text-sm font-semibold">
+                          {fmtK(p.coins)} {t("home.coins")}{" "}
+                          {p.giftCoins > 0 && (
+                            <span className="text-[#00FF9A]">
+                              + {fmtK(p.giftCoins)} {t("home.gift")}
+                            </span>
+                          )}
+                          {noteLabel(p.noteTag, t) && (
+                            <span className="ml-2 text-xs text-[#00FF9A]">
+                              {noteLabel(p.noteTag, t)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1 text-xs text-[#9AA7BD]">
+                          {t("home.eta", { eta: p.eta })}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold">
+                          {fmtPrice(p.price, p.currency)}
+                        </div>
+                        <div className="mt-1 text-xs text-[#9AA7BD]">
+                          {p.currency || "USD"}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold">
-                      {fmtPrice(p.price, p.currency)}
-                    </div>
-                    <div className="mt-1 text-xs text-[#9AA7BD]">
-                      {p.currency || "USD"}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  ))}
             </div>
 
             <div className="mt-6 rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4 text-xs text-[#9AA7BD]">
@@ -244,11 +272,11 @@ export default function Home() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {games.map((g, i) => (
             <div
-              key={typeof g === "string" ? g : g.id || i}
+              key={g.id || g.nameEn || g.name || i}
               className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6"
             >
               <div className="text-sm font-semibold">
-                {typeof g === "string" ? g : g.name}
+                {resolveLocalizedGameName(g, i18n.language)}
               </div>
               <div className="mt-2 text-xs text-[#9AA7BD]">
                 {t("home.comingSoon")}

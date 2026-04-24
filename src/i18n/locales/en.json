@@ -3,19 +3,24 @@
     "brand": "valbri",
     "brandSubtitle": "Gaming Marketplace",
     "nav": {
-      "fc26": "FC26 Coins",
-      "about": "About",
-      "contact": "Contact"
+    "fc26": "FC26 Coins",
+    "about": "About",
+    "contact": "Contact"
     },
     "buyBtn": "Buy FC26 Coins",
+    "accountLabel": "Player Account",
+    "cart": "Cart",
     "checkout": "My Orders",
-    "pendingCheckout": "Pending Checkout",
     "back": "Back"
   },
   "footer": {
     "copyright": "© {{year}} valbri",
     "terms": "Terms",
     "privacy": "Privacy"
+  },
+  "language": {
+    "english": "English",
+    "chinese": "中文"
   },
   "home": {
     "badge": "FC26 packages live — payment integration next",
@@ -68,6 +73,11 @@
     "gift": "Gift",
     "eta": "ETA: {{eta}}",
     "buy": "Buy",
+    "addToCart": "Add to Cart",
+    "checkoutNow": "Checkout Now",
+    "total": "Total",
+    "addedToCart": "Added to cart",
+    "addToCartFailed": "Failed to add to cart",
     "widgetNotSet": "Widget not set",
     "noPackages": "No packages available for this platform.",
     "recentOrders": "Recent Orders",
@@ -102,6 +112,8 @@
   "checkout": {
     "title": "Checkout",
     "description": "Payments are currently disabled in the MVP. A bank payment gateway will be integrated after the website is finalized and approved.",
+    "loading": "Loading cart item...",
+    "loadFailed": "Failed to load cart item",
     "status": "Status",
     "bankGateway": "Bank gateway:",
     "comingSoon": "Coming soon",
@@ -111,8 +123,8 @@
     "gift": "Gift",
     "eta": "ETA",
     "total": "Total",
-    "noOrder": "No order data. Please select a package from",
-    "noOrderLink": "FC26 page",
+    "noOrder": "No checkout item. Please select a package from",
+    "noOrderLink": "your cart",
     "noOrderEnd": ".",
     "package": "Package",
     "currency": "Currency",
@@ -120,7 +132,28 @@
     "payViaWidget": "Pay via Widget",
     "orderCreated": "Order Created!",
     "orderNo": "Order No",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "createOrderFailed": "Failed to create order"
+  },
+  "cart": {
+    "title": "Cart",
+    "subtitle": "Review selected packages and submit orders one by one with the current business flow.",
+    "loading": "Loading cart...",
+    "loadFailed": "Failed to load cart",
+    "updateFailed": "Failed to update cart",
+    "removeFailed": "Failed to remove item",
+    "empty": "Your cart is empty. Pick an FC26 package to get started.",
+    "goBuy": "Browse Packages",
+    "summary": "Cart Summary",
+    "summaryHint": "The cart only stores selections temporarily. Final order price, coins, and platform availability are revalidated at checkout.",
+    "totalItems": "Total quantity",
+    "coins": "Coins",
+    "gift": "Gift",
+    "bonusIncluded": "Bonus included",
+    "mergeReadyNote": "Reserved for future merged checkout while keeping this card compact.",
+    "eta": "ETA",
+    "checkout": "Checkout",
+    "remove": "Remove"
   },
   "about": {
     "title": "About Valbri",
@@ -191,6 +224,8 @@
     "rememberMe": "Remember me",
     "loginSuccess": "Login successful!",
     "registerSuccess": "Registration successful! Please sign in.",
+    "loginFailed": "Login failed",
+    "registerFailed": "Registration failed",
     "passwordMismatch": "Passwords do not match",
     "usernameTooShort": "Username must be at least 3 characters",
     "passwordTooShort": "Password must be at least 6 characters",
@@ -249,9 +284,22 @@
   },
   "payment": {
     "stripePay": "Stripe Payment",
+    "paypalPay": "PayPal Payment",
     "widgetPay": "Widget Payment",
     "successTitle": "Payment Successful!",
     "successDesc": "Your payment has been processed. We will deliver your coins shortly.",
+    "confirmingTitle": "Confirming Payment Status",
+    "confirmingDesc": "We received the return from Stripe and are waiting for the webhook to finalize the result. This usually takes 1 to 2 seconds.",
+    "confirmingShort": "Confirming",
+    "pendingTitle": "Payment Still Confirming",
+    "pendingDesc": "Your payment was submitted, but the final confirmation has not arrived yet. Please check your orders page shortly.",
+    "confirmFailedTitle": "Unable to Confirm Payment",
+    "confirmFailedDesc": "We could not fetch the latest payment result right now. Please check your orders page shortly.",
+    "confirmFailedShort": "Check Failed",
+    "confirmMissing": "Missing payment confirmation parameters",
+    "sessionId": "Stripe Session",
+    "realStatus": "Live Status",
+    "deliveryStatus": "Delivery Status",
     "cancelTitle": "Payment Cancelled",
     "cancelDesc": "Your payment was not completed. You can try again from your orders page.",
     "orderNo": "Order No",
@@ -259,6 +307,7 @@
     "backHome": "Back to Home",
     "creating": "Creating payment...",
     "notConfigured": "Payment service is being configured. Please try again later.",
-    "failed": "Failed to create payment session"
+    "failed": "Failed to create payment session",
+    "confirmFailed": "Failed to confirm payment status"
   }
 }

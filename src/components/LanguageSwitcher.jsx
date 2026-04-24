@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "../utils/languages.js";
 
 export default function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -45,7 +45,7 @@ export default function LanguageSwitcher() {
             clipRule="evenodd"
           />
         </svg>
-        <span>{current.code === "zh" ? "中文" : "EN"}</span>
+        <span>{current.shortLabel}</span>
         {/* Chevron */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ export default function LanguageSwitcher() {
                   i18n.language === lang.code ? "ml-0" : "ml-[1.375rem]"
                 }
               >
-                {lang.label}
+                {t(lang.labelKey)}
               </span>
             </button>
           ))}

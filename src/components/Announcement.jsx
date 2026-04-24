@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getContentList } from "../api/content";
+import { resolveLocalizedAnnouncement } from "../utils/contentLocale.js";
 
 export default function Announcement() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const fallbackText = t("home.badge");
 
   useEffect(() => {
     getContentList({ type: 1 })
@@ -13,14 +16,31 @@ export default function Announcement() {
           setAnnouncements(res.data);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  if (announcements.length === 0) return null;
+  if (loading) {
+    return (
+      <div className="border-b border-[#00FF9A]/10 bg-[#0B1220]/80">
+        <div className="mx-auto max-w-6xl overflow-hidden py-2 px-4">
+          <div className="flex items-center gap-2">
+            <span className="h-4 w-16 animate-pulse rounded-full bg-[#00FF9A]/14" />
+            <div className="min-w-0 flex-1">
+              <div className="h-4 w-full animate-pulse rounded-full bg-white/6" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const text = announcements
+  const joinedText = announcements
+    .map((a) => resolveLocalizedAnnouncement(a, i18n.language))
+    .filter((a) => a.title || a.content)
     .map((a) => (a.content ? `${a.title}: ${a.content}` : a.title))
     .join("   ●   ");
+  const text = joinedText || fallbackText;
 
   return (
     <>

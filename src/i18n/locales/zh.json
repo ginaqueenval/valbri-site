@@ -3,19 +3,24 @@
     "brand": "valbri",
     "brandSubtitle": "游戏交易平台",
     "nav": {
-      "fc26": "FC26 金币",
-      "about": "关于我们",
-      "contact": "联系我们"
+    "fc26": "FC26 金币",
+    "about": "关于我们",
+    "contact": "联系我们"
     },
     "buyBtn": "购买 FC26 金币",
+    "accountLabel": "玩家账号",
+    "cart": "购物车",
     "checkout": "我的订单",
-    "pendingCheckout": "待结算",
     "back": "返回"
   },
   "footer": {
     "copyright": "© {{year}} valbri",
     "terms": "服务条款",
     "privacy": "隐私政策"
+  },
+  "language": {
+    "english": "English",
+    "chinese": "中文"
   },
   "home": {
     "badge": "FC26 套餐已上线 — 支付集成即将完成",
@@ -68,6 +73,11 @@
     "gift": "礼物",
     "eta": "预计时间: {{eta}}",
     "buy": "购买",
+    "addToCart": "加入购物车",
+    "checkoutNow": "立即结算",
+    "total": "总价",
+    "addedToCart": "已加入购物车",
+    "addToCartFailed": "加入购物车失败",
     "widgetNotSet": "小工具未设置",
     "noPackages": "该平台暂无可用套餐。",
     "recentOrders": "最近订单",
@@ -102,6 +112,8 @@
   "checkout": {
     "title": "结算",
     "description": "MVP 阶段目前禁用支付功能。银行支付网关将在网站最终确定和批准后集成。",
+    "loading": "正在加载购物车商品...",
+    "loadFailed": "购物车商品加载失败",
     "status": "状态",
     "bankGateway": "银行网关：",
     "comingSoon": "即将推出",
@@ -111,8 +123,8 @@
     "gift": "礼物",
     "eta": "预计时间",
     "total": "总价",
-    "noOrder": "暂无订单数据。请从",
-    "noOrderLink": "FC26 页面",
+    "noOrder": "暂无可结算商品。请先从",
+    "noOrderLink": "购物车",
     "noOrderEnd": "选择套餐。",
     "package": "套餐",
     "currency": "币种",
@@ -120,7 +132,28 @@
     "payViaWidget": "通过 Widget 支付",
     "orderCreated": "订单创建成功！",
     "orderNo": "订单号",
-    "quantity": "数量"
+    "quantity": "数量",
+    "createOrderFailed": "创建订单失败"
+  },
+  "cart": {
+    "title": "购物车",
+    "subtitle": "管理您已选中的套餐，并按当前业务流程逐条提交订单。",
+    "loading": "正在加载购物车...",
+    "loadFailed": "购物车加载失败",
+    "updateFailed": "更新购物车失败",
+    "removeFailed": "移除购物车商品失败",
+    "empty": "购物车还是空的，去挑选一个合适的 FC26 套餐吧。",
+    "goBuy": "去选购",
+    "summary": "购物车汇总",
+    "summaryHint": "购物车仅用于暂存商品。实际订单价格、金币数和平台可用性以下单时最新套餐数据为准。",
+    "totalItems": "商品数量",
+    "coins": "金币",
+    "gift": "赠送",
+    "bonusIncluded": "含赠送加成",
+    "mergeReadyNote": "已预留后续合并支付位，当前仅保留必要信息。",
+    "eta": "预计时间",
+    "checkout": "去结算",
+    "remove": "移除"
   },
   "about": {
     "title": "关于 Valbri",
@@ -191,6 +224,8 @@
     "rememberMe": "记住我",
     "loginSuccess": "登录成功！",
     "registerSuccess": "注册成功！请登录。",
+    "loginFailed": "登录失败",
+    "registerFailed": "注册失败",
     "passwordMismatch": "两次密码不一致",
     "usernameTooShort": "用户名至少3个字符",
     "passwordTooShort": "密码至少6个字符",
@@ -249,9 +284,22 @@
   },
   "payment": {
     "stripePay": "Stripe 支付",
+    "paypalPay": "PayPal 支付",
     "widgetPay": "Widget 支付",
     "successTitle": "支付成功！",
     "successDesc": "您的支付已处理完成，我们将尽快为您发货。",
+    "confirmingTitle": "正在确认支付状态",
+    "confirmingDesc": "我们已收到支付完成回跳，正在等待 Stripe webhook 同步最终结果，通常只需 1 到 2 秒。",
+    "confirmingShort": "确认中",
+    "pendingTitle": "支付结果确认中",
+    "pendingDesc": "支付已提交，但系统暂未完成最终确认。请稍后前往订单页查看最新状态。",
+    "confirmFailedTitle": "支付状态确认失败",
+    "confirmFailedDesc": "当前无法拉取最新支付结果，请稍后前往订单页查看。",
+    "confirmFailedShort": "确认失败",
+    "confirmMissing": "缺少支付确认参数",
+    "sessionId": "Stripe Session",
+    "realStatus": "真实状态",
+    "deliveryStatus": "发货状态",
     "cancelTitle": "支付已取消",
     "cancelDesc": "您的支付未完成，可以从订单页面重新发起支付。",
     "orderNo": "订单号",
@@ -259,6 +307,7 @@
     "backHome": "返回首页",
     "creating": "正在创建支付...",
     "notConfigured": "支付服务正在配置中，请稍后再试。",
-    "failed": "创建支付会话失败"
+    "failed": "创建支付会话失败",
+    "confirmFailed": "支付状态确认失败"
   }
 }
