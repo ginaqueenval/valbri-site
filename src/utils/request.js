@@ -1,4 +1,8 @@
 import axios from "axios";
+import {
+  clearStoredPlayerSession,
+  getStoredPlayerToken,
+} from "./playerAuth.js";
 
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
@@ -7,7 +11,7 @@ const request = axios.create({
 
 request.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("player_token");
+    const token = getStoredPlayerToken();
     if (token) {
       config.headers["X-Player-Token"] = token;
     }
@@ -28,9 +32,10 @@ request.interceptors.response.use(
     if (error.response) {
       const { status } = error.response;
       if (status === 401) {
-        localStorage.removeItem("player_token");
-        localStorage.removeItem("player_info");
-        window.dispatchEvent(new Event("player-session-expired"));
+        clearStoredPlayerSession({
+          reason: "expired",
+          notifySessionExpired: error.config?.skipSessionExpiredPrompt !== true,
+        });
       }
     }
     return Promise.reject(error);
@@ -38,7 +43,7 @@ request.interceptors.response.use(
 );
 
 export function getPlayerToken() {
-  return localStorage.getItem("player_token");
+  return getStoredPlayerToken();
 }
 
 export default request;

@@ -50,17 +50,40 @@ export default function Orders() {
       navigate("/login");
       return;
     }
-    setLoading(true);
-    const params = { pageNum: page, pageSize };
-    if (activeTab) params.payStatus = activeTab;
-    getOrderList(params)
-      .then((res) => {
+    let cancelled = false;
+
+    const loadOrders = async () => {
+      setLoading(true);
+      const params = { pageNum: page, pageSize };
+      if (activeTab) {
+        params.payStatus = activeTab;
+      }
+      try {
+        const res = await getOrderList(params);
+        if (cancelled) {
+          return;
+        }
         setOrders(res.rows || []);
         setTotal(res.total || 0);
-      })
-      .catch(() => setOrders([]))
-      .finally(() => setLoading(false));
-  }, [activeTab, page]);
+      } catch {
+        if (cancelled) {
+          return;
+        }
+        setOrders([]);
+        setTotal(0);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadOrders();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, navigate, page]);
 
   const totalPages = Math.ceil(total / pageSize);
 

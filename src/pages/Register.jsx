@@ -34,7 +34,7 @@ export default function Register() {
         setCaptchaUuid("");
       }
       setCaptchaCode("");
-    } catch (err) {
+    } catch {
       setCaptchaEnabled(false);
       setCaptchaUrl("");
       setCaptchaUuid("");
@@ -78,7 +78,7 @@ export default function Register() {
         err?.response?.data?.msg ||
           err?.response?.data?.message ||
           err?.message ||
-          "Registration failed",
+          t("auth.registerFailed"),
       );
       if (captchaEnabled) {
         loadCaptcha();
@@ -92,7 +92,7 @@ export default function Register() {
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-8">
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="h-11 w-11 rounded-xl border border-[#00FF9A]/25 bg-[#0B1220] grid place-items-center">
+          <div className="grid h-11 w-11 place-items-center rounded-xl border border-[#00FF9A]/25 bg-[#0B1220]">
             <span className="text-base font-semibold text-[#00FF9A]">V</span>
           </div>
           <h1 className="text-xl font-semibold text-[#E7EDF7]">
@@ -101,11 +101,11 @@ export default function Register() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && (
+          {error ? (
             <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
               {error}
             </div>
-          )}
+          ) : null}
 
           <div>
             <label className="mb-1 block text-sm text-[#9AA7BD]">
@@ -163,7 +163,7 @@ export default function Register() {
             />
           </div>
 
-          {captchaEnabled && (
+          {captchaEnabled ? (
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_152px]">
               <div>
                 <label className="mb-1 block text-sm text-[#9AA7BD]">
@@ -186,12 +186,14 @@ export default function Register() {
                 aria-label={t("auth.refreshCaptcha")}
               >
                 {captchaUrl ? (
-                  <span className="block h-full w-full overflow-hidden rounded-[10px] bg-[#09111d]">
+                  <span className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#09111d] px-1.5">
                     <img
                       src={captchaUrl}
                       alt={t("auth.captcha")}
-                      className="h-full w-full scale-x-110 object-cover object-center"
+                      className="block h-[84%] w-full scale-[1.02] object-contain object-center"
                     />
+                    <span className="pointer-events-none absolute inset-y-1 left-0 w-1.5 bg-[#09111d]" />
+                    <span className="pointer-events-none absolute inset-y-1 right-0 w-1.5 bg-[#09111d]" />
                   </span>
                 ) : (
                   <span className="text-xs font-medium text-[#9AA7BD]">
@@ -200,7 +202,7 @@ export default function Register() {
                 )}
               </button>
             </div>
-          )}
+          ) : null}
 
           <button
             type="submit"
