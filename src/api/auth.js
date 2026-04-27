@@ -12,6 +12,6 @@ export function getPlayerCaptcha() {
   return request({ url: "/player/captchaImage", method: "get" });
 }
 
-export function getPlayerProfile() {
-  return request({ url: "/player/profile", method: "get" });
+export function getPlayerProfile(config = {}) {
+  return request({ url: "/player/profile", method: "get", ...config });
 }

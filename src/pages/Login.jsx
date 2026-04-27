@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPlayerCaptcha, playerLogin } from "../api/auth";
+import { setStoredPlayerSession } from "../utils/playerAuth.js";
 
 export default function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [captchaCode, setCaptchaCode] = useState("");
@@ -15,6 +17,8 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const successMessage =
+    typeof location.state?.message === "string" ? location.state.message : "";
 
   useEffect(() => {
     loadCaptcha();
@@ -33,7 +37,7 @@ export default function Login() {
         setCaptchaUuid("");
       }
       setCaptchaCode("");
-    } catch (err) {
+    } catch {
       setCaptchaEnabled(false);
       setCaptchaUrl("");
       setCaptchaUuid("");
@@ -58,20 +62,17 @@ export default function Login() {
         code: captchaCode.trim(),
         uuid: captchaUuid,
       });
-      localStorage.setItem("player_token", res.token);
-      localStorage.setItem("player_info", JSON.stringify(res.player));
-      const pending = sessionStorage.getItem("pending_checkout");
-      if (pending) {
-        navigate("/checkout", { state: JSON.parse(pending) });
-      } else {
-        navigate("/home");
-      }
+      setStoredPlayerSession(
+        { token: res.token, player: res.player },
+        { reason: "login" },
+      );
+      navigate(location.state?.redirectTo || "/home");
     } catch (err) {
       setError(
         err?.response?.data?.msg ||
           err?.response?.data?.message ||
           err?.message ||
-          "Login failed",
+          t("auth.loginFailed"),
       );
       if (captchaEnabled) {
         loadCaptcha();
@@ -85,7 +86,7 @@ export default function Login() {
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-8">
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="h-11 w-11 rounded-xl border border-[#00FF9A]/25 bg-[#0B1220] grid place-items-center">
+          <div className="grid h-11 w-11 place-items-center rounded-xl border border-[#00FF9A]/25 bg-[#0B1220]">
             <span className="text-base font-semibold text-[#00FF9A]">V</span>
           </div>
           <h1 className="text-xl font-semibold text-[#E7EDF7]">
@@ -94,11 +95,17 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && (
+          {successMessage ? (
+            <div className="rounded-xl border border-[#00FF9A]/20 bg-[#00FF9A]/10 p-3 text-sm text-[#7BFFCA]">
+              {successMessage}
+            </div>
+          ) : null}
+
+          {error ? (
             <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
               {error}
             </div>
-          )}
+          ) : null}
 
           <div>
             <label className="mb-1 block text-sm text-[#9AA7BD]">
@@ -128,7 +135,7 @@ export default function Login() {
             />
           </div>
 
-          {captchaEnabled && (
+          {captchaEnabled ? (
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_152px]">
               <div>
                 <label className="mb-1 block text-sm text-[#9AA7BD]">
@@ -151,12 +158,14 @@ export default function Login() {
                 aria-label={t("auth.refreshCaptcha")}
               >
                 {captchaUrl ? (
-                  <span className="block h-full w-full overflow-hidden rounded-[10px] bg-[#09111d]">
+                  <span className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#09111d] px-1.5">
                     <img
                       src={captchaUrl}
                       alt={t("auth.captcha")}
-                      className="h-full w-full scale-x-110 object-cover object-center"
+                      className="block h-[84%] w-full scale-[1.02] object-contain object-center"
                     />
+                    <span className="pointer-events-none absolute inset-y-1 left-0 w-1.5 bg-[#09111d]" />
+                    <span className="pointer-events-none absolute inset-y-1 right-0 w-1.5 bg-[#09111d]" />
                   </span>
                 ) : (
                   <span className="text-xs font-medium text-[#9AA7BD]">
@@ -165,7 +174,7 @@ export default function Login() {
                 )}
               </button>
             </div>
-          )}
+          ) : null}
 
           <label className="flex items-center gap-2 text-sm text-[#9AA7BD]">
             <input

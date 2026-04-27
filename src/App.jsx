@@ -21,9 +21,17 @@ import Register from "./pages/Register.jsx";
 import Orders from "./pages/Orders.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess.jsx";
 import PaymentCancel from "./pages/PaymentCancel.jsx";
+import CustomerService from "./components/CustomerService.jsx";
 import { LANGUAGES } from "./utils/languages.js";
 import { getCartCount } from "./api/cart";
 import { getPlayerDisplayName } from "./utils/playerProfile.js";
+import {
+  clearStoredPlayerSession,
+  getStoredPlayerSession,
+  getStoredPlayerToken,
+  PLAYER_AUTH_CHANGED_EVENT,
+  PLAYER_SESSION_EXPIRED_EVENT,
+} from "./utils/playerAuth.js";
 
 const NAV_LINKS = [
   { to: "/fc26-coins", key: "header.nav.fc26" },
@@ -102,21 +110,15 @@ export default function App() {
   const cartPulseTimeoutRef = useRef(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
-  const isLoggedIn = !!localStorage.getItem("player_token");
-  let playerInfo = null;
-
-  try {
-    playerInfo = JSON.parse(localStorage.getItem("player_info") || "null");
-  } catch {
-    playerInfo = null;
-  }
+  const [authSession, setAuthSession] = useState(() => getStoredPlayerSession());
+  const isLoggedIn = !!authSession.token;
+  const playerInfo = authSession.player;
 
   const playerDisplayName = getPlayerDisplayName(playerInfo);
   const currentLanguage =
     LANGUAGES.find((lang) => lang.code === i18n.language) || LANGUAGES[0];
-
   const syncCartCount = useCallback(async () => {
-    const token = localStorage.getItem("player_token");
+    const token = getStoredPlayerToken();
     if (!token) {
       setCartCount(0);
       return;
@@ -148,8 +150,7 @@ export default function App() {
   }, [menuOpen, closeMenu]);
 
   const handleLogout = () => {
-    localStorage.removeItem("player_token");
-    localStorage.removeItem("player_info");
+    clearStoredPlayerSession({ reason: "logout" });
     setCartCount(0);
     setShowLogoutConfirm(false);
     navigate("/home");
@@ -177,11 +178,23 @@ export default function App() {
   }, [menuOpen, closeMenu]);
 
   useEffect(() => {
+    const syncAuthSession = () => {
+      setAuthSession(getStoredPlayerSession());
+    };
+    window.addEventListener(PLAYER_AUTH_CHANGED_EVENT, syncAuthSession);
+    window.addEventListener("storage", syncAuthSession);
+    return () => {
+      window.removeEventListener(PLAYER_AUTH_CHANGED_EVENT, syncAuthSession);
+      window.removeEventListener("storage", syncAuthSession);
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = window.setTimeout(() => {
       syncCartCount();
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [location.pathname, syncCartCount]);
+  }, [location.pathname, isLoggedIn, syncCartCount]);
 
   useEffect(() => {
     const handler = () => syncCartCount();
@@ -219,8 +232,9 @@ export default function App() {
       setCartCount(0);
       setShowSessionExpired(true);
     };
-    window.addEventListener("player-session-expired", handler);
-    return () => window.removeEventListener("player-session-expired", handler);
+    window.addEventListener(PLAYER_SESSION_EXPIRED_EVENT, handler);
+    return () =>
+      window.removeEventListener(PLAYER_SESSION_EXPIRED_EVENT, handler);
   }, []);
 
   const menuPanelClass = isClosing
@@ -698,6 +712,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      <CustomerService />
       </div>
     </div>
   );

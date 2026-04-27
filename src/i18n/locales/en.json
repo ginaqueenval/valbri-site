@@ -246,6 +246,24 @@
   "announcement": {
     "title": "Announcements"
   },
+  "cs": {
+    "title": "Valbri Support",
+    "launch": "Open support",
+    "loading": "Connecting to support...",
+    "empty": "Start the conversation here. Guest users can also chat with support.",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "sending": "Sending",
+    "sendFailed": "Failed to send message",
+    "loadFailed": "Failed to load support session",
+    "sessionAccessDenied": "This support session expired. Please close it and open support again.",
+    "sessionClosed": "This support session has been closed.",
+    "connected": "Live support",
+    "polling": "Reconnect mode",
+    "viewHistory": "View message history",
+    "you": "You",
+    "support": "Support"
+  },
   "notes": {
     "bestSeller": "Best Seller",
     "popular": "Popular",

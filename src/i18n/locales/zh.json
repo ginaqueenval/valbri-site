@@ -246,6 +246,24 @@
   "announcement": {
     "title": "公告"
   },
+  "cs": {
+    "title": "Valbri 在线客服",
+    "launch": "打开客服",
+    "loading": "正在连接客服...",
+    "empty": "从这里开始对话，未登录游客也可以直接咨询。",
+    "placeholder": "请输入消息...",
+    "send": "发送",
+    "sending": "发送中",
+    "sendFailed": "消息发送失败",
+    "loadFailed": "客服会话加载失败",
+    "sessionAccessDenied": "当前客服会话已失效，请关闭后重新打开客服窗口",
+    "sessionClosed": "当前客服会话已关闭",
+    "connected": "在线客服",
+    "polling": "重连模式",
+    "viewHistory": "查看历史记录",
+    "you": "我",
+    "support": "客服"
+  },
   "notes": {
     "bestSeller": "热销",
     "popular": "人气推荐",
