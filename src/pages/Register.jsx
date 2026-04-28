@@ -182,7 +182,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={loadCaptcha}
-                className="mt-[25px] flex h-[50px] items-center justify-center rounded-xl border border-[#00FF9A]/20 bg-[radial-gradient(circle_at_top,rgba(0,255,154,0.18),rgba(11,18,32,0.96)_65%)] p-[3px] shadow-[0_0_0_1px_rgba(255,255,255,0.04)] transition hover:border-[#00FF9A]/40"
+                className="flex h-[50px] items-center justify-center rounded-xl border border-[#00FF9A]/25 bg-[#07101b] p-[3px] shadow-[0_0_18px_rgba(0,255,154,0.08)] transition hover:border-[#00FF9A]/45 sm:mt-[25px]"
                 aria-label={t("auth.refreshCaptcha")}
               >
                 {captchaUrl ? (

@@ -8,6 +8,8 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "http://localhost:8080",
+        // 后面替换域名地址
+        // 是否允许跨域
         changeOrigin: true,
       },
     },
