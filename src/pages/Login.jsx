@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPlayerCaptcha, playerLogin } from "../api/auth";
+import PlayerAuthLayout from "../components/PlayerAuthLayout.jsx";
 import { setStoredPlayerSession } from "../utils/playerAuth.js";
 
 export default function Login() {
@@ -15,6 +16,7 @@ export default function Login() {
   const [captchaUrl, setCaptchaUrl] = useState("");
   const [captchaEnabled, setCaptchaEnabled] = useState(true);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const successMessage =
@@ -83,32 +85,30 @@ export default function Login() {
   };
 
   return (
-    <div className="mx-auto max-w-md px-4 py-16">
-      <div className="rounded-3xl border border-white/5 bg-[#0B1220]/60 p-8">
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-xl border border-[#00FF9A]/25 bg-[#0B1220]">
-            <span className="text-base font-semibold text-[#00FF9A]">V</span>
-          </div>
-          <h1 className="text-xl font-semibold text-[#E7EDF7]">
-            {t("auth.loginTitle")}
-          </h1>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <PlayerAuthLayout
+      mode="login"
+      footer={
+        <p className="player-auth-foot">
+          {t("auth.noAccount")}{" "}
+          <Link to="/register">{t("auth.signUp")}</Link>
+        </p>
+      }
+    >
+        <form onSubmit={handleSubmit} className="player-auth-form">
           {successMessage ? (
-            <div className="rounded-xl border border-[#00FF9A]/20 bg-[#00FF9A]/10 p-3 text-sm text-[#7BFFCA]">
+            <div className="player-auth-alert player-auth-alert-success">
               {successMessage}
             </div>
           ) : null}
 
           {error ? (
-            <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
+            <div className="player-auth-alert player-auth-alert-error">
               {error}
             </div>
           ) : null}
 
-          <div>
-            <label className="mb-1 block text-sm text-[#9AA7BD]">
+          <div className="player-auth-field">
+            <label>
               {t("auth.username")}
             </label>
             <input
@@ -116,29 +116,35 @@ export default function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.username")}
             />
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm text-[#9AA7BD]">
+          <div className="player-auth-field">
+            <label>
               {t("auth.password")}
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
               placeholder={t("auth.password")}
             />
+            <button
+              type="button"
+              className="player-auth-eye"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
+            >
+              {showPassword ? "◌" : "◉"}
+            </button>
           </div>
 
           {captchaEnabled ? (
-            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_152px]">
-              <div>
-                <label className="mb-1 block text-sm text-[#9AA7BD]">
+            <div className="player-auth-captcha-grid">
+              <div className="player-auth-field">
+                <label>
                   {t("auth.captcha")}
                 </label>
                 <input
@@ -146,7 +152,6 @@ export default function Login() {
                   value={captchaCode}
                   onChange={(e) => setCaptchaCode(e.target.value)}
                   required={captchaEnabled}
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-base text-[#E7EDF7] placeholder-[#9AA7BD]/50 focus:border-[#00FF9A]/40 focus:outline-none"
                   placeholder={t("auth.captchaPlaceholder")}
                 />
               </div>
@@ -154,21 +159,18 @@ export default function Login() {
               <button
                 type="button"
                 onClick={loadCaptcha}
-                className="flex h-[50px] items-center justify-center rounded-xl border border-[#00FF9A]/25 bg-[#07101b] p-[3px] shadow-[0_0_18px_rgba(0,255,154,0.08)] transition hover:border-[#00FF9A]/45 sm:mt-[25px]"
+                className="player-auth-captcha"
                 aria-label={t("auth.refreshCaptcha")}
               >
                 {captchaUrl ? (
-                  <span className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#09111d] px-1.5">
+                  <span className="player-auth-captcha-image">
                     <img
                       src={captchaUrl}
                       alt={t("auth.captcha")}
-                      className="block h-[84%] w-full scale-[1.02] object-contain object-center"
                     />
-                    <span className="pointer-events-none absolute inset-y-1 left-0 w-1.5 bg-[#09111d]" />
-                    <span className="pointer-events-none absolute inset-y-1 right-0 w-1.5 bg-[#09111d]" />
                   </span>
                 ) : (
-                  <span className="text-xs font-medium text-[#9AA7BD]">
+                  <span>
                     {t("auth.refreshCaptcha")}
                   </span>
                 )}
@@ -176,12 +178,11 @@ export default function Login() {
             </div>
           ) : null}
 
-          <label className="flex items-center gap-2 text-sm text-[#9AA7BD]">
+          <label className="player-auth-remember">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 rounded border-white/10 bg-black/20 text-[#00FF9A] focus:ring-[#00FF9A]/40"
             />
             {t("auth.rememberMe")}
           </label>
@@ -189,19 +190,11 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-[#00FF9A] py-3 text-sm font-semibold text-[#070A0F] transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="player-auth-submit"
           >
-            {loading ? "..." : t("auth.signIn")}
+            {loading ? t("auth.signingIn") : t("auth.signIn")}
           </button>
         </form>
-
-        <p className="mt-6 text-center text-sm text-[#9AA7BD]">
-          {t("auth.noAccount")}{" "}
-          <Link to="/register" className="text-[#00FF9A] hover:underline">
-            {t("auth.signUp")}
-          </Link>
-        </p>
-      </div>
-    </div>
+    </PlayerAuthLayout>
   );
 }
