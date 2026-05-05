@@ -32,6 +32,17 @@ export function buildCustomerStreamUrl(
   return `${base}/cs/stream/player/${conversationId}?${params.toString()}`;
 }
 
+export function buildCustomerMediaUrl(apiBaseUrl, messageId, visitorToken) {
+  const base = (apiBaseUrl || "/api").replace(/\/$/, "");
+  const params = new URLSearchParams();
+  const normalizedVisitorToken = normalizeVisitorToken(visitorToken);
+  if (normalizedVisitorToken) {
+    params.set("visitorToken", normalizedVisitorToken);
+  }
+  const query = params.toString();
+  return `${base}/cs/media/${messageId}${query ? `?${query}` : ""}`;
+}
+
 export function resolveCustomerVisitorToken(localVisitorToken, session) {
   return (
     normalizeVisitorToken(session?.visitorToken) ||

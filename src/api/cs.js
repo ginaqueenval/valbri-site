@@ -24,6 +24,25 @@ export function sendCustomerMessage(data) {
   return request({ url: "/cs/message", method: "post", data });
 }
 
+export function sendCustomerImageMessage(data) {
+  return request({
+    url: "/cs/messages/image",
+    method: "post",
+    data,
+    headers: { "Content-Type": "multipart/form-data" },
+    timeout: 30000,
+  });
+}
+
+export function getCustomerMedia(messageId, visitorToken) {
+  return request({
+    url: `/cs/media/${messageId}`,
+    method: "get",
+    params: visitorToken ? { visitorToken } : {},
+    responseType: "blob",
+  });
+}
+
 export function createCustomerStreamToken(data) {
   return request({ url: "/cs/session/stream-token", method: "post", data });
 }

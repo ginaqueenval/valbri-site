@@ -86,7 +86,7 @@ test("customer service composer limits message length and keeps a fixed height",
   );
 });
 
-test("customer service wraps long message content and stretches the send button to match", () => {
+test("customer service wraps long message content and keeps stable composer actions", () => {
   assert.notEqual(
     source.indexOf("whitespace-pre-wrap break-words"),
     -1,
@@ -98,14 +98,14 @@ test("customer service wraps long message content and stretches the send button 
     "composer row should stretch children to the same height",
   );
   assert.notEqual(
-    source.indexOf("shrink-0 self-stretch"),
+    source.indexOf('w-[78px] min-w-[78px] shrink-0 flex-col gap-2'),
     -1,
-    "send button should stretch to the full composer height",
+    "composer action rail should keep a stable width while stacking controls",
   );
   assert.notEqual(
-    source.indexOf('w-[78px] min-w-[78px]'),
+    source.indexOf('h-[44px]'),
     -1,
-    "send button should keep a stable width while sending",
+    "send button should use the compact half-height treatment",
   );
   assert.notEqual(
     source.indexOf('t("cs.sending")'),
@@ -170,5 +170,66 @@ test("collapsed history affordance is rendered as a subtle system notice instead
     source.indexOf('h-4 w-4 text-[#9EFED1]'),
     -1,
     "view-history affordance should include a compact directional icon",
+  );
+});
+
+test("customer service can upload image messages and render image bubbles", () => {
+  assert.notEqual(
+    source.indexOf("sendCustomerImageMessage"),
+    -1,
+    "customer service should import and call the image message API",
+  );
+  assert.notEqual(
+    source.indexOf('accept="image/jpeg,image/png,image/webp"'),
+    -1,
+    "customer service file input should restrict selectable image types",
+  );
+  assert.notEqual(
+    source.indexOf('message.contentType === "image"'),
+    -1,
+    "customer service should branch image messages by contentType",
+  );
+  assert.notEqual(
+    source.indexOf("buildCustomerMediaUrl"),
+    -1,
+    "customer service should render images through backend media proxy URLs",
+  );
+  assert.notEqual(
+    source.indexOf("getCustomerMedia"),
+    -1,
+    "customer service should fetch protected media through axios for logged-in players",
+  );
+  assert.notEqual(
+    source.indexOf("URL.createObjectURL"),
+    -1,
+    "customer service should convert protected media blobs to image URLs",
+  );
+});
+
+test("customer service uses a compact action rail with a plus menu before opening image picker", () => {
+  assert.notEqual(
+    source.indexOf("showAttachmentMenu"),
+    -1,
+    "composer should keep attachment menu state",
+  );
+  assert.notEqual(
+    source.indexOf('aria-label={t("cs.addAttachment")'),
+    -1,
+    "composer should expose a plus button above send",
+  );
+  assert.notEqual(
+    source.indexOf('onClick={() => setShowAttachmentMenu'),
+    -1,
+    "plus button should toggle the attachment menu instead of opening the file picker directly",
+  );
+  assert.notEqual(
+    source.indexOf('h-[44px]'),
+    -1,
+    "send button should be about half the previous composer height",
+  );
+  assert.notEqual(
+    source.indexOf('t("cs.addImage")'),
+    -1,
+    "attachment menu should show an add image action",
   );
 });

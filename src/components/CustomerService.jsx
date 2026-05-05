@@ -3,14 +3,17 @@ import { useTranslation } from "react-i18next";
 import {
   bindCustomerPlayer,
   createCustomerStreamToken,
+  getCustomerMedia,
   getCustomerMessages,
   initCustomerSession,
   markCustomerRead,
+  sendCustomerImageMessage,
   sendCustomerMessage,
 } from "../api/cs";
 import { getPlayerToken } from "../utils/request";
 import {
   buildCustomerStreamUrl,
+  buildCustomerMediaUrl,
   isCustomerSessionAccessDenied,
   isCustomerSessionClosed,
   normalizeCustomerServiceNotice,
@@ -37,6 +40,7 @@ const DESKTOP_PADDING = 18;
 const MOBILE_PADDING = 14;
 const DESKTOP_PANEL_WIDTH = 400;
 const MAX_MESSAGE_LENGTH = 500;
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
 function getViewportSnapshot() {
   if (typeof window === "undefined") {
@@ -133,12 +137,33 @@ function HistoryChevronIcon() {
   );
 }
 
+function ImageIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <rect x="3" y="4" width="14" height="12" rx="2" />
+      <path d="m6 13 3.2-3.2 2.2 2.2 1.3-1.3L16 14" />
+      <circle cx="7.5" cy="7.5" r="1" />
+    </svg>
+  );
+}
+
 export default function CustomerService() {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [mediaUrls, setMediaUrls] = useState({});
   const [input, setInput] = useState("");
   const [session, setSession] = useState(null);
   const [visitorToken, setVisitorToken] = useState(() =>
@@ -147,6 +172,7 @@ export default function CustomerService() {
   const [unread, setUnread] = useState(0);
   const [notice, setNotice] = useState("");
   const [polling, setPolling] = useState(false);
+  const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [viewport, setViewport] = useState(() => getViewportSnapshot());
   const [launcherPosition, setLauncherPosition] = useState(() =>
     getInitialLauncherPosition(),
@@ -157,8 +183,10 @@ export default function CustomerService() {
   const streamRef = useRef(null);
   const pollingRef = useRef(null);
   const messageBoxRef = useRef(null);
+  const mediaUrlsRef = useRef({});
   const launcherRef = useRef(null);
   const panelRef = useRef(null);
+  const imageInputRef = useRef(null);
   const dragStateRef = useRef(null);
   const launcherPositionRef = useRef(launcherPosition);
   const viewportRef = useRef(viewport);
@@ -273,6 +301,10 @@ export default function CustomerService() {
   }, [open]);
 
   useEffect(() => {
+    mediaUrlsRef.current = mediaUrls;
+  }, [mediaUrls]);
+
+  useEffect(() => {
     if (visitorToken) {
       localStorage.setItem(VISITOR_TOKEN_KEY, visitorToken);
       return;
@@ -323,6 +355,11 @@ export default function CustomerService() {
         window.clearInterval(pollingRef.current);
         pollingRef.current = null;
       }
+      Object.values(mediaUrlsRef.current).forEach((url) => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointercancel", handlePointerUp);
@@ -345,6 +382,40 @@ export default function CustomerService() {
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [isMobile, open]);
+
+  useEffect(() => {
+    const imageIds = new Set(
+      messages
+        .filter((message) => message.contentType === "image" && message.id)
+        .map((message) => String(message.id)),
+    );
+    const staleEntries = Object.entries(mediaUrlsRef.current).filter(
+      ([messageId]) => !imageIds.has(messageId),
+    );
+    if (staleEntries.length) {
+      staleEntries.forEach(([, url]) => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      setMediaUrls((current) => {
+        const next = { ...current };
+        staleEntries.forEach(([messageId]) => delete next[messageId]);
+        return next;
+      });
+    }
+    messages
+      .filter((message) => message.contentType === "image" && message.id && !mediaUrlsRef.current[message.id])
+      .forEach(async (message) => {
+        try {
+          const blob = await getCustomerMedia(message.id, effectiveVisitorToken);
+          const objectUrl = URL.createObjectURL(blob);
+          setMediaUrls((current) => ({ ...current, [message.id]: objectUrl }));
+        } catch {
+          setMediaUrls((current) => ({ ...current, [message.id]: "" }));
+        }
+      });
+  }, [effectiveVisitorToken, messages]);
 
   useEffect(() => {
     if (!open || !session) {
@@ -597,6 +668,40 @@ export default function CustomerService() {
     }
   }
 
+  async function handleImageChange(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!session || !file) {
+      return;
+    }
+    setShowAttachmentMenu(false);
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setNotice(t("cs.imageTypeInvalid") || "仅支持 JPG、PNG、WEBP 图片");
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setNotice(t("cs.imageTooLarge") || "图片大小不能超过 5MB");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("conversationId", session.id || session.conversationId);
+    const nextVisitorToken = effectiveVisitorToken;
+    if (nextVisitorToken) {
+      formData.append("visitorToken", nextVisitorToken);
+    }
+    formData.append("file", file);
+    setUploadingImage(true);
+    try {
+      const res = await sendCustomerImageMessage(formData);
+      setMessages((prev) => upsertCustomerMessage(prev, res.data));
+      setNotice("");
+    } catch (error) {
+      handleCustomerServiceError(error.message, "cs.sendFailed");
+    } finally {
+      setUploadingImage(false);
+    }
+  }
+
   const launcherStyle = {
     left: `${launcherPosition.x}px`,
     top: `${launcherPosition.y}px`,
@@ -669,6 +774,7 @@ export default function CustomerService() {
             ) : (
               visibleMessages.map((message) => {
                 const isMine = message.senderType !== "admin";
+                const isImage = message.contentType === "image";
                 return (
                   <div
                     key={message.id || `${message.senderType}-${message.createTime}`}
@@ -684,7 +790,16 @@ export default function CustomerService() {
                       <div className="mb-1 text-[11px] uppercase tracking-[0.16em] text-[#8EA0B9]">
                         {isMine ? t("cs.you") : t("cs.support")}
                       </div>
-                      <div className="whitespace-pre-wrap break-words">{message.content}</div>
+                      {isImage ? (
+                        <img
+                          src={mediaUrls[message.id] || buildCustomerMediaUrl(API_BASE_URL, message.id, effectiveVisitorToken)}
+                          alt={t("cs.imageAlt") || "客服图片"}
+                          className="max-h-64 max-w-full rounded-xl border border-white/10 object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="whitespace-pre-wrap break-words">{message.content}</div>
+                      )}
                     </div>
                   </div>
                 );
@@ -701,6 +816,13 @@ export default function CustomerService() {
           </div>
         )}
         <div className="flex items-stretch gap-3">
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleImageChange}
+          />
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
@@ -709,14 +831,36 @@ export default function CustomerService() {
             maxLength={MAX_MESSAGE_LENGTH}
             className="h-[92px] max-h-[92px] flex-1 resize-none overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-[#E7EDF7] outline-none transition-colors placeholder:text-[#75839A] focus:border-[#00FF9A]/30"
           />
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={sending || !input.trim()}
-            className="shrink-0 self-stretch w-[78px] min-w-[78px] rounded-2xl bg-[#00FF9A] px-3 text-sm font-semibold text-[#071017] transition-colors hover:bg-[#00E48A] disabled:cursor-not-allowed disabled:opacity-45"
-          >
-            {sending ? t("cs.sending") : t("cs.send")}
-          </button>
+          <div className="relative flex w-[78px] min-w-[78px] shrink-0 flex-col gap-2">
+            {showAttachmentMenu && (
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                disabled={uploadingImage || !session}
+                className="absolute bottom-[100px] right-0 z-10 inline-flex items-center gap-2 whitespace-nowrap rounded-2xl border border-[#00FF9A]/22 bg-[#101826] px-3 py-2 text-xs font-semibold text-[#C6FFE6] shadow-[0_14px_30px_rgba(0,0,0,0.28)] transition-colors hover:border-[#00FF9A]/42 hover:bg-[#132A24] disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                <ImageIcon />
+                <span>{t("cs.addImage")}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowAttachmentMenu((current) => !current)}
+              disabled={!session}
+              className="inline-flex h-[44px] items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl font-semibold leading-none text-[#8EA0B9] transition-colors hover:border-[#00FF9A]/30 hover:text-[#9EFED1] disabled:cursor-not-allowed disabled:opacity-45"
+              aria-label={t("cs.addAttachment")}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={sending || !input.trim()}
+              className="h-[44px] rounded-2xl bg-[#00FF9A] px-3 text-sm font-semibold text-[#071017] transition-colors hover:bg-[#00E48A] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {sending || uploadingImage ? t("cs.sending") : t("cs.send")}
+            </button>
+          </div>
         </div>
       </div>
     </>

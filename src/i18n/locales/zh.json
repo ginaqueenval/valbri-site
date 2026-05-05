@@ -271,7 +271,13 @@
     "polling": "重连模式",
     "viewHistory": "查看历史记录",
     "you": "我",
-    "support": "客服"
+    "support": "客服",
+    "sendImage": "发送图片",
+    "addAttachment": "添加附件",
+    "addImage": "添加图片",
+    "imageAlt": "客服图片",
+    "imageTypeInvalid": "仅支持 JPG、PNG、WEBP 图片",
+    "imageTooLarge": "图片大小不能超过 5MB"
   },
   "notes": {
     "bestSeller": "热销",

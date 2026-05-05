@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  buildCustomerMediaUrl,
   buildCustomerStreamUrl,
   isCustomerSessionAccessDenied,
   isCustomerSessionClosed,
@@ -67,4 +68,12 @@ test("isCustomerSessionClosed matches the backend closed-session message", () =>
   assert.equal(isCustomerSessionClosed("会话已关闭"), true);
   assert.equal(isCustomerSessionClosed("  会话已关闭 "), true);
   assert.equal(isCustomerSessionClosed("会话无权访问"), false);
+});
+
+test("buildCustomerMediaUrl appends optional visitor token", () => {
+  assert.equal(
+    buildCustomerMediaUrl("/api", 88, "visitor-1"),
+    "/api/cs/media/88?visitorToken=visitor-1",
+  );
+  assert.equal(buildCustomerMediaUrl("/api", 88, null), "/api/cs/media/88");
 });

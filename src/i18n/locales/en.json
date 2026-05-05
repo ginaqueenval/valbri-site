@@ -271,7 +271,13 @@
     "polling": "Reconnect mode",
     "viewHistory": "View message history",
     "you": "You",
-    "support": "Support"
+    "support": "Support",
+    "sendImage": "Send image",
+    "addAttachment": "Add attachment",
+    "addImage": "Add image",
+    "imageAlt": "Support image",
+    "imageTypeInvalid": "Only JPG, PNG, and WEBP images are supported",
+    "imageTooLarge": "Image size cannot exceed 5MB"
   },
   "notes": {
     "bestSeller": "Best Seller",
