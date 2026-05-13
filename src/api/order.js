@@ -11,3 +11,7 @@ export function getOrderList(params) {
 export function getOrderDetail(id) {
   return request({ url: `/valbri/orders/${id}`, method: "get" });
 }
+
+export function saveOrderAccountInfo(id, data) {
+  return request({ url: `/valbri/orders/${id}/account-info`, method: "post", data });
+}

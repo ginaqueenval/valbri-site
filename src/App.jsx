@@ -21,6 +21,7 @@ import Register from "./pages/Register.jsx";
 import Orders from "./pages/Orders.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess.jsx";
 import PaymentCancel from "./pages/PaymentCancel.jsx";
+import MockPayment from "./pages/MockPayment.jsx";
 import CustomerService from "./components/CustomerService.jsx";
 import { LANGUAGES } from "./utils/languages.js";
 import { getCartCount } from "./api/cart";
@@ -690,6 +691,7 @@ export default function App() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment/cancel" element={<PaymentCancel />} />
+        <Route path="/mock-payment/:provider" element={<MockPayment />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />

@@ -313,6 +313,10 @@
       "pendingDelivery": "Pending",
       "delivering": "Delivering",
       "completed": "Completed"
+    },
+    "accountInfo": {
+      "missing": "Account Info Required",
+      "submitted": "Account Info Submitted"
     }
   },
   "payment": {
@@ -342,5 +346,28 @@
     "notConfigured": "Payment service is being configured. Please try again later.",
     "failed": "Failed to create payment session",
     "confirmFailed": "Failed to confirm payment status"
+  },
+  "orderAccount": {
+    "badge": "Delivery Info",
+    "title": "Enter Game Account Info",
+    "desc": "This order is paid. Please enter your game account, password, and backup codes so we can continue delivery.",
+    "encryptedNotice": "The account, password, and backup codes you enter are encrypted. You can fill them in with confidence.",
+    "gameAccount": "Game Account",
+    "gamePassword": "Game Password",
+    "backupCodes": "Backup Codes",
+    "required": "Game account, password, and backup codes are all required.",
+    "saveFailed": "Failed to save game account info. Please try again later.",
+    "saving": "Saving...",
+    "submit": "Submit Account Info",
+    "close": "Close account info prompt"
+  },
+  "mockPayment": {
+    "sandbox": "Mock payment environment",
+    "title": "{{provider}} Mock Checkout",
+    "provider": "Payment Provider",
+    "success": "Simulate Success",
+    "cancel": "Cancel Payment",
+    "missingOrder": "Order number is missing, so the mock payment cannot continue.",
+    "failed": "Failed to update mock payment status"
   }
 }

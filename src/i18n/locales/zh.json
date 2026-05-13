@@ -313,6 +313,10 @@
       "pendingDelivery": "待发货",
       "delivering": "发货中",
       "completed": "已完成"
+    },
+    "accountInfo": {
+      "missing": "待填写账号信息",
+      "submitted": "账号信息已提交"
     }
   },
   "payment": {
@@ -342,5 +346,28 @@
     "notConfigured": "支付服务正在配置中，请稍后再试。",
     "failed": "创建支付会话失败",
     "confirmFailed": "支付状态确认失败"
+  },
+  "orderAccount": {
+    "badge": "发货资料",
+    "title": "填写游戏账号信息",
+    "desc": "该订单已支付。请填写游戏账号、密码和备份代码，资料提交后我们才能继续为您发货。",
+    "encryptedNotice": "所填写的账号、密码和备份代码均已加密，请放心填写。",
+    "gameAccount": "游戏账号",
+    "gamePassword": "游戏密码",
+    "backupCodes": "备份代码",
+    "required": "游戏账号、密码和备份代码都必须填写。",
+    "saveFailed": "保存游戏账号信息失败，请稍后再试。",
+    "saving": "正在保存...",
+    "submit": "提交账号信息",
+    "close": "关闭账号信息弹窗"
+  },
+  "mockPayment": {
+    "sandbox": "模拟支付环境",
+    "title": "{{provider}} 模拟结账",
+    "provider": "支付渠道",
+    "success": "模拟支付成功",
+    "cancel": "取消支付",
+    "missingOrder": "缺少订单号，无法继续模拟支付。",
+    "failed": "模拟支付状态更新失败"
   }
 }

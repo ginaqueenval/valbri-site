@@ -15,3 +15,11 @@ export function getPaymentStatus(params) {
 export function getStripePaymentStatus(params) {
   return getPaymentStatus(params);
 }
+
+export function completeMockPayment(data) {
+  return request({ url: "/payment/mock/success", method: "post", data });
+}
+
+export function cancelMockPayment(data) {
+  return request({ url: "/payment/mock/cancel", method: "post", data });
+}
