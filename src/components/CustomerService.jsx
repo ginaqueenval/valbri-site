@@ -32,7 +32,6 @@ import {
 } from "../utils/customerServiceFloating.js";
 
 const VISITOR_TOKEN_KEY = "cs_visitor_token";
-const PLAYER_HISTORY_REVEALED_PREFIX = "cs_player_history_revealed:";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 const DESKTOP_BUTTON_SIZE = 60;
 const MOBILE_BUTTON_SIZE = 58;
@@ -41,6 +40,9 @@ const MOBILE_PADDING = 14;
 const DESKTOP_PANEL_WIDTH = 400;
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const CUSTOMER_MESSAGE_WINDOW_DAYS = 1;
+const CUSTOMER_HISTORY_SCROLL_THRESHOLD = 24;
+const CUSTOMER_TIME_SEPARATOR_MINUTES = 5;
 
 function getViewportSnapshot() {
   if (typeof window === "undefined") {
@@ -70,22 +72,72 @@ function getInitialLauncherPosition() {
   return normalizeFloatingPosition(stored, viewport, config);
 }
 
-function buildPlayerHistoryRevealedKey(playerToken) {
-  return `${PLAYER_HISTORY_REVEALED_PREFIX}${playerToken}`;
+function getMessageTime(message) {
+  const time = new Date(message?.createTime || 0).getTime();
+  return Number.isFinite(time) ? time : 0;
 }
 
-function shouldCollapsePlayerHistory(playerToken) {
-  if (!playerToken || typeof window === "undefined") {
-    return true;
+function normalizeMessageWindowPayload(payload) {
+  const nextBefore =
+    payload?.nextBefore == null
+      ? null
+      : Number.isFinite(Number(payload.nextBefore))
+        ? String(payload.nextBefore)
+        : String(new Date(payload.nextBefore).getTime());
+  if (Array.isArray(payload)) {
+    return { rows: payload, hasMore: false, nextBefore: null };
   }
-  return window.localStorage.getItem(buildPlayerHistoryRevealedKey(playerToken)) !== "1";
+  return {
+    rows: Array.isArray(payload?.rows) ? payload.rows : [],
+    hasMore: payload?.hasMore === true,
+    nextBefore: nextBefore && nextBefore !== "NaN" ? nextBefore : null,
+  };
 }
 
-function markPlayerHistoryRevealed(playerToken) {
-  if (!playerToken || typeof window === "undefined") {
-    return;
+function mergeCustomerMessages(current, incoming) {
+  return (incoming || []).reduce(upsertCustomerMessage, current || []);
+}
+
+function formatCustomerTimeSeparator(value, language) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) {
+    return "";
   }
-  window.localStorage.setItem(buildPlayerHistoryRevealedKey(playerToken), "1");
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startOfMessageDay = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const timeText = date.toLocaleTimeString(language, { hour: "2-digit", minute: "2-digit" });
+  if (startOfMessageDay === startOfToday) {
+    return timeText;
+  }
+  if (startOfMessageDay === startOfToday - 24 * 60 * 60 * 1000) {
+    return `${String(language || "").startsWith("zh") ? "昨天" : "Yesterday"} ${timeText}`;
+  }
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${timeText}`;
+}
+
+function buildCustomerDisplayItems(list, language) {
+  const items = [];
+  let previousTime = null;
+  (list || []).forEach((message) => {
+    const currentTime = getMessageTime(message);
+    if (
+      currentTime > 0 &&
+      (previousTime == null ||
+        currentTime - previousTime >= CUSTOMER_TIME_SEPARATOR_MINUTES * 60 * 1000)
+    ) {
+      items.push({
+        type: "time",
+        key: `time-${message.id || currentTime}`,
+        label: formatCustomerTimeSeparator(currentTime, language),
+      });
+    }
+    items.push({ type: "message", key: message.id || `${message.senderType}-${message.createTime}`, message });
+    if (currentTime > 0) {
+      previousTime = currentTime;
+    }
+  });
+  return items;
 }
 
 function SupportIcon({ className = "h-5 w-5" }) {
@@ -156,6 +208,24 @@ function ImageIcon() {
   );
 }
 
+function SendIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <path d="M17 3 8.2 11.8" />
+      <path d="m17 3-5.6 14-3.2-5.2L3 8.6 17 3Z" />
+    </svg>
+  );
+}
+
 export default function CustomerService() {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -178,11 +248,14 @@ export default function CustomerService() {
     getInitialLauncherPosition(),
   );
   const [dragging, setDragging] = useState(false);
-  const [historyCutoffId, setHistoryCutoffId] = useState(null);
+  const [historyBefore, setHistoryBefore] = useState(null);
+  const [hasMoreHistory, setHasMoreHistory] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const streamRef = useRef(null);
   const pollingRef = useRef(null);
   const messageBoxRef = useRef(null);
+  const previousMessageScrollHeightRef = useRef(null);
   const mediaUrlsRef = useRef({});
   const launcherRef = useRef(null);
   const panelRef = useRef(null);
@@ -191,19 +264,18 @@ export default function CustomerService() {
   const launcherPositionRef = useRef(launcherPosition);
   const viewportRef = useRef(viewport);
   const suppressToggleRef = useRef(false);
+  const ignoreNextLauncherClickRef = useRef(false);
+  const launcherClickIgnoreTimerRef = useRef(null);
+  const togglePanelRef = useRef(null);
   const openRef = useRef(open);
   const ignoreNextStreamErrorRef = useRef(false);
   const ensuringSessionRef = useRef(false);
+  const loadingHistoryRef = useRef(false);
+  const preserveHistoryScrollRef = useRef(false);
 
   const playerToken = getPlayerToken();
   const effectiveVisitorToken = resolveCustomerVisitorToken(visitorToken, session);
-  const visibleMessages =
-    historyCutoffId == null
-      ? messages
-      : messages.filter((message) => Number(message?.id || 0) > historyCutoffId);
-  const hasCollapsedHistory =
-    historyCutoffId != null &&
-    messages.some((message) => Number(message?.id || 0) <= historyCutoffId);
+  const displayItems = buildCustomerDisplayItems(messages, i18n.language);
   const launcherConfig = getLauncherConfig(viewport.width);
   const launcherSize = launcherConfig.buttonSize;
   const isMobile = launcherConfig.mobile;
@@ -250,9 +322,28 @@ export default function CustomerService() {
     }
     if (dragState.moved) {
       suppressToggleRef.current = true;
+      ignoreNextLauncherClickRef.current = true;
       window.setTimeout(() => {
         suppressToggleRef.current = false;
       }, 0);
+      if (launcherClickIgnoreTimerRef.current) {
+        window.clearTimeout(launcherClickIgnoreTimerRef.current);
+      }
+      launcherClickIgnoreTimerRef.current = window.setTimeout(() => {
+        ignoreNextLauncherClickRef.current = false;
+        launcherClickIgnoreTimerRef.current = null;
+      }, 350);
+    }
+    if (!dragState.moved) {
+      ignoreNextLauncherClickRef.current = true;
+      if (launcherClickIgnoreTimerRef.current) {
+        window.clearTimeout(launcherClickIgnoreTimerRef.current);
+      }
+      launcherClickIgnoreTimerRef.current = window.setTimeout(() => {
+        ignoreNextLauncherClickRef.current = false;
+        launcherClickIgnoreTimerRef.current = null;
+      }, 350);
+      togglePanelRef.current?.();
     }
     dragStateRef.current = null;
     setDragging(false);
@@ -332,15 +423,39 @@ export default function CustomerService() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  function scrollMessageBoxToBottom(behavior = "auto") {
+    const stage = messageBoxRef.current;
+    if (!stage) {
+      return;
+    }
+    stage.scrollTo({
+      top: stage.scrollHeight,
+      behavior,
+    });
+  }
+
   useEffect(() => {
     if (!open) {
       return undefined;
     }
+    if (previousMessageScrollHeightRef.current != null) {
+      const previousHeight = previousMessageScrollHeightRef.current;
+      previousMessageScrollHeightRef.current = null;
+      const stage = messageBoxRef.current;
+      if (stage) {
+        preserveHistoryScrollRef.current = true;
+        window.setTimeout(() => {
+          stage.scrollTop = stage.scrollHeight - previousHeight + stage.scrollTop;
+          window.setTimeout(() => {
+            preserveHistoryScrollRef.current = false;
+          }, 0);
+        }, 0);
+      }
+      return undefined;
+    }
     const timer = window.setTimeout(() => {
-      messageBoxRef.current?.scrollTo({
-        top: messageBoxRef.current.scrollHeight,
-        behavior: "smooth",
-      });
+      scrollMessageBoxToBottom("auto");
+      window.requestAnimationFrame(() => scrollMessageBoxToBottom("auto"));
     }, 40);
     return () => window.clearTimeout(timer);
   }, [messages, open]);
@@ -354,6 +469,10 @@ export default function CustomerService() {
       if (pollingRef.current) {
         window.clearInterval(pollingRef.current);
         pollingRef.current = null;
+      }
+      if (launcherClickIgnoreTimerRef.current) {
+        window.clearTimeout(launcherClickIgnoreTimerRef.current);
+        launcherClickIgnoreTimerRef.current = null;
       }
       Object.values(mediaUrlsRef.current).forEach((url) => {
         if (url) {
@@ -438,36 +557,11 @@ export default function CustomerService() {
   function resetSessionIdentity() {
     setSession(null);
     setMessages([]);
-    setHistoryCutoffId(null);
+    setHistoryBefore(null);
+    setHasMoreHistory(false);
+    setLoadingHistory(false);
     setVisitorToken(null);
     setInput("");
-  }
-
-  function collapseExistingHistory(nextSession, list) {
-    if (!Array.isArray(list) || list.length === 0) {
-      setHistoryCutoffId(null);
-      return;
-    }
-    const latestMessageId = list.reduce(
-      (maxId, message) => Math.max(maxId, Number(message?.id || 0)),
-      0,
-    );
-    const shouldCollapseGuestHistory = nextSession?.sourceType === "guest" && list.length > 0;
-    const shouldCollapsePlayerExistingHistory =
-      nextSession?.sourceType === "player" && list.length > 0 && shouldCollapsePlayerHistory(playerToken);
-
-    if (shouldCollapseGuestHistory || shouldCollapsePlayerExistingHistory) {
-      setHistoryCutoffId(latestMessageId);
-      return;
-    }
-    setHistoryCutoffId(null);
-  }
-
-  function revealHistory() {
-    if (session?.sourceType === "player") {
-      markPlayerHistoryRevealed(playerToken);
-    }
-    setHistoryCutoffId(null);
   }
 
   function handleCustomerServiceError(errorMessage, fallbackMessageKey) {
@@ -480,6 +574,63 @@ export default function CustomerService() {
         t,
       ),
     );
+  }
+
+  function applyMessageWindow(payload, mode = "replace") {
+    const windowPayload = normalizeMessageWindowPayload(payload);
+    setHistoryBefore(windowPayload.nextBefore);
+    setHasMoreHistory(windowPayload.hasMore);
+    setMessages((current) =>
+      mode === "prepend"
+        ? mergeCustomerMessages(windowPayload.rows, current)
+        : mergeCustomerMessages([], windowPayload.rows),
+    );
+    return windowPayload;
+  }
+
+  async function loadInitialMessages(conversationId, currentVisitorToken) {
+    const messageRes = await getCustomerMessages(conversationId, currentVisitorToken, {
+      days: CUSTOMER_MESSAGE_WINDOW_DAYS,
+    });
+    return applyMessageWindow(messageRes.data, "replace");
+  }
+
+  async function loadOlderMessages() {
+    if (!session || !hasMoreHistory || !historyBefore || loadingHistoryRef.current) {
+      return;
+    }
+    const stage = messageBoxRef.current;
+    previousMessageScrollHeightRef.current = stage ? stage.scrollHeight : null;
+    loadingHistoryRef.current = true;
+    setLoadingHistory(true);
+    try {
+      const conversationId = session.id || session.conversationId;
+      const messageRes = await getCustomerMessages(conversationId, effectiveVisitorToken, {
+        before: historyBefore,
+        days: CUSTOMER_MESSAGE_WINDOW_DAYS,
+      });
+      applyMessageWindow(messageRes.data, "prepend");
+      setNotice("");
+    } catch (error) {
+      previousMessageScrollHeightRef.current = null;
+      handleCustomerServiceError(error.message, "cs.loadFailed");
+    } finally {
+      loadingHistoryRef.current = false;
+      setLoadingHistory(false);
+    }
+  }
+
+  function handleMessageBoxScroll() {
+    if (messageBoxRef.current && messageBoxRef.current.scrollTop <= CUSTOMER_HISTORY_SCROLL_THRESHOLD) {
+      loadOlderMessages();
+    }
+  }
+
+  function handleMessageImageLoad() {
+    if (!openRef.current || preserveHistoryScrollRef.current) {
+      return;
+    }
+    window.requestAnimationFrame(() => scrollMessageBoxToBottom("auto"));
   }
 
   async function ensureSession() {
@@ -512,10 +663,7 @@ export default function CustomerService() {
 
       setSession(nextSession);
       const conversationId = nextSession.id || nextSession.conversationId;
-      const messageRes = await getCustomerMessages(conversationId, nextVisitorToken);
-      const list = Array.isArray(messageRes.data) ? messageRes.data : [];
-      setMessages(list);
-      collapseExistingHistory(nextSession, list);
+      await loadInitialMessages(conversationId, nextVisitorToken);
       setUnread(0);
       setNotice("");
       await markCustomerRead(conversationId, nextVisitorToken);
@@ -550,8 +698,10 @@ export default function CustomerService() {
     setPolling(true);
     pollingRef.current = window.setInterval(async () => {
       try {
-        const res = await getCustomerMessages(conversationId, currentVisitorToken);
-        const list = Array.isArray(res.data) ? res.data : [];
+        const res = await getCustomerMessages(conversationId, currentVisitorToken, {
+          days: CUSTOMER_MESSAGE_WINDOW_DAYS,
+        });
+        const list = normalizeMessageWindowPayload(res.data).rows;
         setMessages((prev) => list.reduce(upsertCustomerMessage, prev));
       } catch (error) {
         if (isCustomerSessionAccessDenied(error?.message)) {
@@ -646,6 +796,20 @@ export default function CustomerService() {
     await ensureSession();
   }
 
+  togglePanelRef.current = handleTogglePanel;
+
+  function handleLauncherClick() {
+    if (ignoreNextLauncherClickRef.current) {
+      ignoreNextLauncherClickRef.current = false;
+      if (launcherClickIgnoreTimerRef.current) {
+        window.clearTimeout(launcherClickIgnoreTimerRef.current);
+        launcherClickIgnoreTimerRef.current = null;
+      }
+      return;
+    }
+    handleTogglePanel();
+  }
+
   async function handleSend() {
     const nextContent = input.trim();
     if (!session || !nextContent) {
@@ -674,7 +838,6 @@ export default function CustomerService() {
     if (!session || !file) {
       return;
     }
-    setShowAttachmentMenu(false);
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setNotice(t("cs.imageTypeInvalid") || "仅支持 JPG、PNG、WEBP 图片");
       return;
@@ -744,8 +907,9 @@ export default function CustomerService() {
 
       <div
         ref={messageBoxRef}
-        className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4"
+        className="customer-service-scrollbar min-h-0 flex-1 space-y-2.5 overflow-y-auto px-4 py-4"
         style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
+        onScroll={handleMessageBoxScroll}
       >
         {loading ? (
           <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-[#9AA7BD]">
@@ -753,53 +917,75 @@ export default function CustomerService() {
           </div>
         ) : (
           <>
-            {hasCollapsedHistory && (
+            {hasMoreHistory && (
               <button
                 type="button"
-                onClick={revealHistory}
+                onClick={loadOlderMessages}
+                disabled={loadingHistory}
                 className="inline-flex w-full items-center justify-between rounded-2xl border border-[#00FF9A]/18 bg-[#00FF9A]/[0.06] px-4 py-3 text-left text-xs font-medium text-[#7BFFCA]/84 transition-colors hover:border-[#00FF9A]/28 hover:bg-[#00FF9A]/[0.1] hover:text-[#C6FFE6]"
               >
-                <span>{t("cs.viewHistory")}</span>
+                <span>{loadingHistory ? t("cs.loadingHistory") || "加载历史消息..." : t("cs.viewHistory")}</span>
                 <HistoryChevronIcon />
               </button>
             )}
-            {visibleMessages.length === 0 ? (
-              hasCollapsedHistory ? (
-                <div className="min-h-[108px] rounded-2xl border border-dashed border-white/8 bg-white/[0.02]" />
-              ) : (
-                <div className="rounded-2xl border border-dashed border-white/8 bg-white/[0.02] px-4 py-4 text-sm text-[#9AA7BD]">
-                  {t("cs.empty")}
-                </div>
-              )
+            {loadingHistory && (
+              <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-2 text-center text-xs text-[#8EA0B9]">
+                {t("cs.loadingHistory") || "加载历史消息..."}
+              </div>
+            )}
+            {!hasMoreHistory && messages.length > 0 && (
+              <div className="px-3 py-1 text-center text-[11px] text-[#6F8099]">
+                {t("cs.noMoreHistory") || "没有更多历史消息"}
+              </div>
+            )}
+            {messages.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-white/8 bg-white/[0.02] px-4 py-4 text-sm text-[#9AA7BD]">
+                {t("cs.empty")}
+              </div>
             ) : (
-              visibleMessages.map((message) => {
+              displayItems.map((item) => {
+                if (item.type === "time") {
+                  return (
+                    <div key={item.key} className="flex justify-center">
+                      <span className="rounded-full bg-white/[0.06] px-3 py-1 text-[11px] text-[#8EA0B9]">
+                        {item.label}
+                      </span>
+                    </div>
+                  );
+                }
+                const message = item.message;
                 const isMine = message.senderType !== "admin";
                 const isImage = message.contentType === "image";
                 return (
                   <div
-                    key={message.id || `${message.senderType}-${message.createTime}`}
+                    key={item.key}
                     className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-[0_14px_28px_rgba(0,0,0,0.18)] ${
-                        isMine
-                          ? "border border-[#00FF9A]/22 bg-[#00FF9A]/10 text-[#E9FFF4]"
-                          : "border border-white/8 bg-white/[0.05] text-[#E7EDF7]"
-                      }`}
+                      className={`flex max-w-[76%] flex-col ${isMine ? "items-end" : "items-start"}`}
                     >
-                      <div className="mb-1 text-[11px] uppercase tracking-[0.16em] text-[#8EA0B9]">
+                      <div className="mb-1 px-1 text-[10px] font-semibold text-[#8EA0B9]">
                         {isMine ? t("cs.you") : t("cs.support")}
                       </div>
-                      {isImage ? (
-                        <img
-                          src={mediaUrls[message.id] || buildCustomerMediaUrl(API_BASE_URL, message.id, effectiveVisitorToken)}
-                          alt={t("cs.imageAlt") || "客服图片"}
-                          className="max-h-64 max-w-full rounded-xl border border-white/10 object-contain"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="whitespace-pre-wrap break-words">{message.content}</div>
-                      )}
+                      <div
+                        className={`rounded-[10px] px-3.5 py-2 text-sm leading-5 shadow-[0_10px_20px_rgba(0,0,0,0.14)] ${
+                          isMine
+                            ? "border border-[#00FF9A]/24 bg-[#00FF9A]/10 text-[#E9FFF4]"
+                            : "border border-white/8 bg-white/[0.045] text-[#E7EDF7]"
+                      }`}
+                      >
+                        {isImage ? (
+                          <img
+                            src={mediaUrls[message.id] || buildCustomerMediaUrl(API_BASE_URL, message.id, effectiveVisitorToken)}
+                            alt={t("cs.imageAlt") || "客服图片"}
+                            className="max-h-64 max-w-full rounded-xl border border-white/10 object-contain"
+                            loading="lazy"
+                            onLoad={handleMessageImageLoad}
+                          />
+                        ) : (
+                          <div className="whitespace-pre-wrap break-words">{message.content}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -815,7 +1001,7 @@ export default function CustomerService() {
             {notice}
           </div>
         )}
-        <div className="flex items-stretch gap-3">
+        <div className="flex items-center gap-2.5">
           <input
             ref={imageInputRef}
             type="file"
@@ -826,42 +1012,52 @@ export default function CustomerService() {
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+            onFocus={() => setShowAttachmentMenu(false)}
             placeholder={t("cs.placeholder")}
-            rows={3}
+            rows={1}
             maxLength={MAX_MESSAGE_LENGTH}
-            className="h-[92px] max-h-[92px] flex-1 resize-none overflow-y-auto rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-[#E7EDF7] outline-none transition-colors placeholder:text-[#75839A] focus:border-[#00FF9A]/30"
+            className="customer-service-scrollbar h-[54px] max-h-[54px] flex-1 resize-none overflow-y-auto rounded-[18px] border border-white/10 bg-white/[0.04] px-4 py-4 text-sm leading-5 text-[#E7EDF7] outline-none transition-colors placeholder:text-[#75839A] focus:border-[#00FF9A]/30"
           />
-          <div className="relative flex w-[78px] min-w-[78px] shrink-0 flex-col gap-2">
-            {showAttachmentMenu && (
-              <button
-                type="button"
-                onClick={() => imageInputRef.current?.click()}
-                disabled={uploadingImage || !session}
-                className="absolute bottom-[100px] right-0 z-10 inline-flex items-center gap-2 whitespace-nowrap rounded-2xl border border-[#00FF9A]/22 bg-[#101826] px-3 py-2 text-xs font-semibold text-[#C6FFE6] shadow-[0_14px_30px_rgba(0,0,0,0.28)] transition-colors hover:border-[#00FF9A]/42 hover:bg-[#132A24] disabled:cursor-not-allowed disabled:opacity-45"
-              >
-                <ImageIcon />
-                <span>{t("cs.addImage")}</span>
-              </button>
-            )}
+          <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
               onClick={() => setShowAttachmentMenu((current) => !current)}
               disabled={!session}
-              className="inline-flex h-[44px] items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl font-semibold leading-none text-[#8EA0B9] transition-colors hover:border-[#00FF9A]/30 hover:text-[#9EFED1] disabled:cursor-not-allowed disabled:opacity-45"
+              className="inline-flex h-[54px] w-[54px] items-center justify-center rounded-[18px] border border-white/10 bg-white/[0.04] text-xl font-semibold leading-none text-[#8EA0B9] transition-colors hover:border-[#00FF9A]/30 hover:text-[#9EFED1] disabled:cursor-not-allowed disabled:opacity-45"
               aria-label={t("cs.addAttachment")}
             >
               +
             </button>
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={sending || !input.trim()}
-              className="h-[44px] rounded-2xl bg-[#00FF9A] px-3 text-sm font-semibold text-[#071017] transition-colors hover:bg-[#00E48A] disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              {sending || uploadingImage ? t("cs.sending") : t("cs.send")}
-            </button>
+            {input.trim() && (
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={sending}
+                className="inline-flex h-[54px] w-[54px] items-center justify-center rounded-[18px] bg-[#00FF9A] text-[#071017] transition-colors hover:bg-[#00E48A] disabled:cursor-not-allowed disabled:opacity-45"
+                aria-label={sending ? t("cs.sending") : t("cs.send")}
+              >
+                <SendIcon />
+              </button>
+            )}
           </div>
         </div>
+        {showAttachmentMenu && (
+          <div className="mt-3 grid grid-cols-1 gap-2 rounded-[18px] border border-white/8 bg-white/[0.035] px-4 py-3">
+            <button
+              type="button"
+              onClick={() => {
+                imageInputRef.current?.click();
+              }}
+              disabled={uploadingImage || !session}
+              className="inline-flex w-[64px] flex-col items-center justify-center gap-2 text-center text-xs font-semibold text-[#9AA7BD] transition-colors hover:text-[#C6FFE6] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-[#C6FFE6]">
+                <ImageIcon />
+              </span>
+              <span>{t("cs.addImage")}</span>
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
@@ -876,7 +1072,7 @@ export default function CustomerService() {
         <button
           type="button"
           onPointerDown={handleLauncherPointerDown}
-          onClick={handleTogglePanel}
+          onClick={handleLauncherClick}
           className={`group relative flex h-full w-full touch-none select-none items-center justify-center rounded-full border border-[#00FF9A]/30 bg-[radial-gradient(circle_at_30%_30%,rgba(6,30,23,0.98),rgba(7,10,16,0.96)_70%)] text-[#00FF9A] shadow-[0_0_0_1px_rgba(0,255,154,0.06),0_18px_34px_rgba(0,0,0,0.28),0_0_24px_rgba(0,255,154,0.18)] transition-all duration-200 hover:-translate-y-[1px] hover:border-[#00FF9A]/48 hover:text-[#94FFD0] ${
             open ? "border-[#00FF9A]/52 text-[#9DFFD3] shadow-[0_0_0_1px_rgba(0,255,154,0.08),0_24px_36px_rgba(0,0,0,0.3),0_0_32px_rgba(0,255,154,0.22)]" : ""
           } ${dragging ? "scale-[1.04] cursor-grabbing" : "cursor-grab"}`}

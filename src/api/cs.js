@@ -12,11 +12,18 @@ export function getCustomerSession(visitorToken) {
   });
 }
 
-export function getCustomerMessages(conversationId, visitorToken) {
+export function getCustomerMessages(conversationId, visitorToken, options = {}) {
+  const params = visitorToken ? { visitorToken } : {};
+  if (options.before) {
+    params.before = options.before;
+  }
+  if (options.days) {
+    params.days = options.days;
+  }
   return request({
     url: `/cs/messages/${conversationId}`,
     method: "get",
-    params: visitorToken ? { visitorToken } : {},
+    params,
   });
 }
 
