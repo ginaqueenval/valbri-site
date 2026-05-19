@@ -12,6 +12,18 @@ export function getOrderDetail(id) {
   return request({ url: `/valbri/orders/${id}`, method: "get" });
 }
 
+export function getOrderAccountInfo(id) {
+  return request({ url: `/valbri/orders/${id}/account-info`, method: "get" });
+}
+
 export function saveOrderAccountInfo(id, data) {
   return request({ url: `/valbri/orders/${id}/account-info`, method: "post", data });
+}
+
+export function createOrderStreamToken() {
+  return request({
+    url: "/valbri/orders/stream-token",
+    method: "post",
+    skipSessionExpiredPrompt: true,
+  });
 }

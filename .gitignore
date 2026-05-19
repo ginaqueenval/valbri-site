@@ -30,8 +30,12 @@ dist-ssr
 .env.*
 !.env.example
 
-# Test coverage
+# Test files and coverage
 coverage/
+**/*.test.js
+**/*.test.jsx
+**/*.spec.js
+**/*.spec.jsx
 
 # Temporary files
 *.tmp

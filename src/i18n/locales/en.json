@@ -55,6 +55,9 @@
     "gift": "Gift",
     "eta": "Delivery ETA: {{eta}}",
     "usd": "USD",
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added to cart!",
+    "addToCartFailed": "Failed to add",
     "paymentNotice": "Payment is currently disabled while the gateway is being finalized. You can still submit your order details from the FC26 page.",
     "gamesTitle": "Games",
     "gamesDesc": "We currently focus on FC26, and also support the following games.",
@@ -133,7 +136,9 @@
     "orderCreated": "Order Created!",
     "orderNo": "Order No",
     "quantity": "Quantity",
-    "createOrderFailed": "Failed to create order"
+    "createOrderFailed": "Failed to create order",
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "This order does not exist or you do not have permission to access it."
   },
   "cart": {
     "title": "Cart",
@@ -302,7 +307,12 @@
       "pending": "Pending",
       "paid": "Paid",
       "cancelled": "Cancelled",
-      "refunded": "Refunded"
+      "refunded": "Refunded",
+      "pendingPayment": "Pending Payment",
+      "accountRequired": "Account Info Required",
+      "processing": "Processing",
+      "completed": "Completed",
+      "closed": "Cancelled/Refunded"
     },
     "status": {
       "pending": "Pending",
@@ -315,9 +325,46 @@
       "delivering": "Delivering",
       "completed": "Completed"
     },
+    "progress": {
+      "percent": "{{percent}}%",
+      "steps": {
+        "submitted": "Order Submitted",
+        "paid": "Payment Complete",
+        "accountInfo": "Info Submitted",
+        "processing": "Processing",
+        "completed": "Completed"
+      },
+      "status": {
+        "pendingPayment": "Awaiting Payment",
+        "accountRequired": "Please Submit Transaction Account Info",
+        "waitingProcessing": "We Are Processing Your Order",
+        "processing": "We Are Processing Your Order",
+        "completed": "Transaction Completed",
+        "cancelled": "Order Cancelled",
+        "refunded": "Order Refunded"
+      },
+      "desc": {
+        "pendingPaymentDesc": "Please complete payment. After payment succeeds, we will continue processing your order.",
+        "accountRequiredDesc": "Payment is complete. Please submit transaction account info so the order can continue.",
+        "waitingProcessingDesc": "Your info has been submitted. We are processing your order, please watch the progress.",
+        "processingDesc": "We are processing your order. Please keep the account info available and watch the progress.",
+        "completedDesc": "The transaction is complete. Contact live support if you need help.",
+        "cancelledDesc": "This order was cancelled. You can choose a package and place a new order.",
+        "refundedDesc": "This order was refunded. Arrival time depends on the payment provider."
+      }
+    },
     "accountInfo": {
       "missing": "Account Info Required",
-      "submitted": "Account Info Submitted"
+      "submitted": "Account Info Submitted",
+      "fillAction": "Fill",
+      "viewAction": "View/Edit",
+      "loadingAction": "Loading",
+      "fillHint": "Click to enter transaction account info",
+      "viewHint": "Click to view or edit transaction account info",
+      "warning": "This order has no transaction account info yet. Please click Account Info Required to fill it in, otherwise the transaction cannot be completed.",
+      "bannerCount_one": "You have {{count}} paid order awaiting account info.",
+      "bannerCount_other": "You have {{count}} paid orders awaiting account info.",
+      "bannerGuide": "Click the \"Account Info Required\" button on each order to fill in."
     }
   },
   "payment": {
@@ -351,15 +398,25 @@
   "orderAccount": {
     "badge": "Delivery Info",
     "title": "Enter Game Account Info",
+    "viewTitle": "Transaction Account Info",
     "desc": "This order is paid. Please enter your game account, password, and backup codes so we can continue delivery.",
+    "viewDesc": "You have submitted transaction account info for this order. You can view it or edit and resubmit.",
     "encryptedNotice": "The account, password, and backup codes you enter are encrypted. You can fill them in with confidence.",
     "gameAccount": "Game Account",
     "gamePassword": "Game Password",
     "backupCodes": "Backup Codes",
+    "submittedTime": "Submitted/Updated Time",
     "required": "Game account, password, and backup codes are all required.",
+    "loadFailed": "Failed to load game account info. Please try again later.",
     "saveFailed": "Failed to save game account info. Please try again later.",
+    "loading": "Loading account info...",
     "saving": "Saving...",
     "submit": "Submit Account Info",
+    "resubmit": "Resubmit",
+    "edit": "Edit Account Info",
+    "cancelEdit": "Cancel Edit",
+    "showPassword": "Show full password",
+    "hidePassword": "Hide full password",
     "close": "Close account info prompt"
   },
   "mockPayment": {

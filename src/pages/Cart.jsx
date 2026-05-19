@@ -6,25 +6,12 @@ import {
   removeCartItem,
   updateCartItemQuantity,
 } from "../api/cart";
-import { getPlayerToken } from "../utils/request";
 import {
   MAX_CART_QTY,
   clampCartQuantity,
   updateCartItemsQuantity,
 } from "./cartState.js";
-
-const fmtK = (n) => {
-  if (!n) return "0";
-  if (n < 1000) return String(n);
-  const k = Math.round(n / 1000);
-  return k.toLocaleString("en-US") + "K";
-};
-
-const fmtPrice = (n, currency) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency || "USD",
-  }).format(n || 0);
+import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
 
 export default function Cart() {
   const { t } = useTranslation();
@@ -34,8 +21,6 @@ export default function Cart() {
   const [error, setError] = useState("");
   const [updatingQuantityId, setUpdatingQuantityId] = useState(null);
   const [removingId, setRemovingId] = useState(null);
-
-  const loggedIn = !!getPlayerToken();
 
   const currencySummary = useMemo(() => {
     const summary = new Map();
@@ -76,17 +61,15 @@ export default function Cart() {
   );
 
   useEffect(() => {
-    if (!loggedIn) {
-      navigate("/login", { state: { redirectTo: "/cart" } });
-      return;
-    }
     loadCart();
-  }, [loadCart, loggedIn, navigate]);
+  }, [loadCart]);
 
   const handleQuantityChange = async (item, nextQuantity) => {
+    if (updatingQuantityId === item.id) {
+      return;
+    }
     const quantity = clampCartQuantity(nextQuantity);
-    const previousQuantity = Number(item.quantity || 1);
-    if (quantity === previousQuantity) {
+    if (quantity === Number(item.quantity || 1)) {
       return;
     }
 
@@ -98,10 +81,8 @@ export default function Cart() {
       await updateCartItemQuantity(item.id, { quantity });
       window.dispatchEvent(new Event("cart-changed"));
     } catch (err) {
-      setItems((currentItems) =>
-        updateCartItemsQuantity(currentItems, item.id, previousQuantity),
-      );
       setError(err.message || t("cart.updateFailed"));
+      await loadCart({ silent: true });
     } finally {
       setUpdatingQuantityId(null);
     }
@@ -173,32 +154,32 @@ export default function Cart() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
-                          <span className="text-[2rem] font-black tracking-tight text-[#E7EDF7] leading-none">
-                            {fmtK(item.coins)}
+                          <span className="text-[1.625rem] font-black tracking-tight text-[#E7EDF7] leading-none">
+                            {formatCoinsK(item.coins)}
                           </span>
-                          <span className="pb-1 text-sm font-medium text-[#C9D3E5]">
+                          <span className="pb-1 text-xs font-medium text-[#C9D3E5]">
                             Coins
                           </span>
                         </div>
                         {item.giftCoins > 0 && (
-                          <div className="mt-1 text-sm font-bold text-[#00FF9A]">
-                            +{fmtK(item.giftCoins)} {t("cart.gift")}
+                          <div className="mt-1 text-xs font-bold text-[#00FF9A]">
+                            +{formatCoinsK(item.giftCoins)} {t("cart.gift")}
                           </div>
                         )}
                       </div>
                       <div className="shrink-0 text-right">
-                        <div className="text-[11px] uppercase tracking-[0.2em] text-[#9AA7BD]">
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-[#9AA7BD]">
                           {item.currency || "USD"}
                         </div>
-                        <div className="mt-1 text-2xl font-black tracking-tight text-[#E7EDF7]">
-                          {fmtPrice(subtotal, item.currency)}
+                        <div className="mt-1 text-xl font-black tracking-tight text-[#E7EDF7] whitespace-nowrap">
+                          {formatPrice(subtotal, item.currency)}
                         </div>
-                        <div className="mt-1 text-xs text-[#9AA7BD]">
-                          {fmtPrice(item.price, item.currency)} × {item.quantity}
+                        <div className="mt-1 text-[11px] text-[#9AA7BD] whitespace-nowrap">
+                          {formatPrice(item.price, item.currency)} × {item.quantity}
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-[104px_84px_minmax(0,1fr)] items-center gap-2">
+                    <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-2">
                       <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.04] px-2.5 py-2 text-[#9AA7BD]">
                         <button
                           onClick={() =>
@@ -239,11 +220,7 @@ export default function Cart() {
                     </div>
                   </div>
 
-                  <div className="hidden sm:grid grid-cols-[44px_minmax(0,1fr)_186px] gap-4">
-                    <div className="pt-1">
-                      <div className="h-5 w-5 rounded-[6px] border border-white/10 bg-white/[0.03]" />
-                    </div>
-
+                  <div className="hidden sm:grid grid-cols-[minmax(0,1fr)_186px] gap-4">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full border border-[#00FF9A]/18 bg-[#00FF9A]/8 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#69FFBB]">
@@ -258,7 +235,7 @@ export default function Cart() {
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                             <span className="text-[3rem] font-black leading-none tracking-[-0.06em] text-[#E7EDF7]">
-                              {fmtK(item.coins)}
+                              {formatCoinsK(item.coins)}
                             </span>
                             <span className="pb-1 text-base font-semibold uppercase tracking-[0.16em] text-[#C9D3E5]">
                               {t("cart.coins")}
@@ -268,7 +245,7 @@ export default function Cart() {
                           {item.giftCoins > 0 && (
                             <div className="mt-3">
                               <span className="rounded-full border border-[#00FF9A]/16 bg-[#00FF9A]/8 px-3 py-1.5 text-sm font-bold text-[#00FF9A]">
-                                +{fmtK(item.giftCoins)} {t("cart.gift")}
+                                +{formatCoinsK(item.giftCoins)} {t("cart.gift")}
                               </span>
                             </div>
                           )}
@@ -279,10 +256,10 @@ export default function Cart() {
                             {item.currency || "USD"}
                           </div>
                           <div className="mt-2 text-3xl font-black tracking-tight text-[#E7EDF7]">
-                            {fmtPrice(subtotal, item.currency)}
+                            {formatPrice(subtotal, item.currency)}
                           </div>
                           <div className="mt-2 text-sm text-[#9AA7BD]">
-                            {fmtPrice(item.price, item.currency)}
+                            {formatPrice(item.price, item.currency)}
                           </div>
                         </div>
                       </div>
@@ -350,7 +327,7 @@ export default function Cart() {
                     {currency}
                   </div>
                   <div className="mt-2 text-3xl font-black tracking-tight text-[#00FF9A]">
-                    {fmtPrice(amount, currency)}
+                    {formatPrice(amount, currency)}
                   </div>
                 </div>
               ))}

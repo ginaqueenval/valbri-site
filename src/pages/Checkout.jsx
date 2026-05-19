@@ -1,22 +1,9 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { checkoutCartItem, getCartItem } from "../api/cart";
 import { createStripeSession, createPayPalOrder } from "../api/payment";
-import { getPlayerToken } from "../utils/request";
-
-const fmtK = (n) => {
-  if (!n) return "0";
-  if (n < 1000) return String(n);
-  const k = Math.round(n / 1000);
-  return k.toLocaleString("en-US") + "K";
-};
-
-const fmtPrice = (n, currency) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency || "USD",
-  }).format(n);
+import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
 
 const isPaymentNotConfiguredMessage = (message) => {
   const normalized = String(message || "").toLowerCase();
@@ -28,53 +15,77 @@ const isPaymentNotConfiguredMessage = (message) => {
   );
 };
 
+const paymentButtonBaseClass =
+  "inline-flex min-h-[52px] min-w-[190px] items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap";
+
 export default function Checkout() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cartItemId = searchParams.get("cartItemId");
 
-  const [loading, setLoading] = useState(false);
+  const [activePaymentMethod, setActivePaymentMethod] = useState(null);
   const [cartItem, setCartItem] = useState(null);
   const [itemLoading, setItemLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [orderResult, setOrderResult] = useState(null);
   const [error, setError] = useState("");
+  const activePaymentMethodRef = useRef(null);
 
   useEffect(() => {
-    if (!getPlayerToken()) {
-      navigate("/login", {
-        state: { redirectTo: cartItemId ? `/checkout?cartItemId=${cartItemId}` : "/cart" },
-      });
-      return;
-    }
     if (!cartItemId) {
       setCartItem(null);
+      setAccessDenied(false);
       setItemLoading(false);
       return;
     }
     setItemLoading(true);
+    setAccessDenied(false);
     getCartItem(cartItemId)
       .then((res) => setCartItem(res.data || null))
       .catch((err) => {
-        setError(err.message || t("checkout.loadFailed"));
+        const status = err?.response?.status;
+        if (status === 403 || status === 404) {
+          setAccessDenied(true);
+        } else {
+          setError(err.message || t("checkout.loadFailed"));
+        }
         setCartItem(null);
       })
       .finally(() => setItemLoading(false));
-  }, [cartItemId, navigate, t]);
+  }, [cartItemId, t]);
+
+  const beginPayment = (method) => {
+    if (activePaymentMethodRef.current) {
+      return false;
+    }
+    activePaymentMethodRef.current = method;
+    setActivePaymentMethod(method);
+    return true;
+  };
+
+  const endPayment = () => {
+    activePaymentMethodRef.current = null;
+    setActivePaymentMethod(null);
+  };
+
+  const redirectToPayment = (paymentUrl) => {
+    window.location.href = paymentUrl;
+  };
 
   const handleStripePay = async () => {
-    if (!cartItem) {
+    if (!cartItem || !beginPayment("stripe")) {
       return;
     }
-    setLoading(true);
     setError("");
     try {
       const res = await createStripeSession({
+        cartItemId: cartItem.id,
         packageId: cartItem.packageId,
         platform: cartItem.platform,
         quantity: cartItem.quantity || 1,
       });
-      window.location.href = res.data.sessionUrl;
+      window.dispatchEvent(new Event("cart-changed"));
+      redirectToPayment(res.data.sessionUrl);
     } catch (err) {
       const msg = err.msg || err.message || "";
       if (isPaymentNotConfiguredMessage(msg)) {
@@ -82,23 +93,24 @@ export default function Checkout() {
       } else {
         setError(msg || t("payment.failed"));
       }
-      setLoading(false);
+      endPayment();
     }
   };
 
   const handlePayPalPay = async () => {
-    if (!cartItem) {
+    if (!cartItem || !beginPayment("paypal")) {
       return;
     }
-    setLoading(true);
     setError("");
     try {
       const res = await createPayPalOrder({
+        cartItemId: cartItem.id,
         packageId: cartItem.packageId,
         platform: cartItem.platform,
         quantity: cartItem.quantity || 1,
       });
-      window.location.href = res.data.approveUrl;
+      window.dispatchEvent(new Event("cart-changed"));
+      redirectToPayment(res.data.approveUrl);
     } catch (err) {
       const msg = err.msg || err.message || "";
       if (isPaymentNotConfiguredMessage(msg)) {
@@ -106,15 +118,14 @@ export default function Checkout() {
       } else {
         setError(msg || t("payment.failed"));
       }
-      setLoading(false);
+      endPayment();
     }
   };
 
   const handleWidgetPay = async () => {
-    if (!cartItem) {
+    if (!cartItem || !beginPayment("widget")) {
       return;
     }
-    setLoading(true);
     setError("");
     try {
       const res = await checkoutCartItem(cartItem.id);
@@ -126,7 +137,7 @@ export default function Checkout() {
     } catch (err) {
       setError(err.message || t("checkout.createOrderFailed"));
     } finally {
-      setLoading(false);
+      endPayment();
     }
   };
 
@@ -140,6 +151,22 @@ export default function Checkout() {
       {itemLoading ? (
         <div className="mt-6 rounded-3xl border border-white/5 bg-[#0B1220]/60 py-12 text-center text-sm text-[#9AA7BD]">
           {t("checkout.loading")}
+        </div>
+      ) : accessDenied ? (
+        <div className="mt-6 rounded-3xl border border-red-500/20 bg-[#0B1220]/60 p-6 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 text-red-400">
+              <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="text-sm font-semibold text-red-400">{t("checkout.accessDenied")}</div>
+          <p className="mt-2 text-sm text-[#9AA7BD]">{t("checkout.accessDeniedDesc")}</p>
+          <Link
+            to="/cart"
+            className="mt-5 inline-flex rounded-xl bg-[#00FF9A] px-5 py-2.5 text-sm font-semibold text-[#070A0F] hover:bg-[#00D47E]"
+          >
+            {t("checkout.noOrderLink")}
+          </Link>
         </div>
       ) : cartItem ? (
         <div className="mt-6 rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
@@ -166,7 +193,7 @@ export default function Checkout() {
             <div className="flex justify-between text-sm">
               <span className="text-[#9AA7BD]">{t("checkout.coins")}:</span>
               <span className="font-semibold">
-                {fmtK(cartItem.coins)}
+                {formatCoinsK(cartItem.coins)}
                 {(cartItem.quantity || 1) > 1 && (
                   <span className="text-[#9AA7BD] font-normal">
                     {" "}× {cartItem.quantity}
@@ -177,7 +204,7 @@ export default function Checkout() {
             <div className="flex justify-between text-sm">
               <span className="text-[#9AA7BD]">{t("checkout.gift")}:</span>
               <span className="font-semibold text-[#00FF9A]">
-                +{fmtK(cartItem.giftCoins)}
+                +{formatCoinsK(cartItem.giftCoins)}
                 {(cartItem.quantity || 1) > 1 && (
                   <span className="text-[#9AA7BD] font-normal">
                     {" "}× {cartItem.quantity}
@@ -192,7 +219,7 @@ export default function Checkout() {
             <div className="flex justify-between text-sm border-t border-white/5 pt-3 mt-3">
               <span className="text-[#9AA7BD]">{t("checkout.total")}:</span>
               <span className="font-semibold text-[#00FF9A]">
-                {fmtPrice(
+                {formatPrice(
                   Number(cartItem.price || 0) * Number(cartItem.quantity || 1),
                   cartItem.currency,
                 )}
@@ -236,36 +263,27 @@ export default function Checkout() {
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-3">
               <button
                 onClick={handleStripePay}
-                disabled={loading}
-                className="rounded-xl bg-[#00FF9A] px-6 py-3 text-sm font-semibold text-[#070A0F] hover:bg-[#00D47E] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                disabled={activePaymentMethod !== null}
+                className={`${paymentButtonBaseClass} bg-[#00FF9A] text-[#070A0F] hover:bg-[#00D47E]`}
               >
-                {loading ? t("payment.creating") : t("payment.stripePay")}
+                {activePaymentMethod === "stripe" ? t("payment.creating") : t("payment.stripePay")}
               </button>
               <button
                 onClick={handlePayPalPay}
-                disabled={loading}
-                className="rounded-xl bg-[#0070BA] px-6 py-3 text-sm font-semibold text-white hover:bg-[#005EA6] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                disabled={activePaymentMethod !== null}
+                className={`${paymentButtonBaseClass} bg-[#0070BA] text-white hover:bg-[#005EA6]`}
               >
-                {loading ? t("payment.creating") : t("payment.paypalPay")}
+                {activePaymentMethod === "paypal" ? t("payment.creating") : t("payment.paypalPay")}
               </button>
               {cartItem.widgetUrl && (
                 <button
                   onClick={handleWidgetPay}
-                  disabled={loading}
-                  className="rounded-xl border border-[#00FF9A]/30 px-6 py-3 text-sm text-[#00FF9A] hover:bg-[#00FF9A]/10 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  disabled={activePaymentMethod !== null}
+                  className={`${paymentButtonBaseClass} border border-[#00FF9A]/30 text-[#00FF9A] hover:bg-[#00FF9A]/10`}
                 >
-                  {t("payment.widgetPay")}
+                  {activePaymentMethod === "widget" ? t("payment.creating") : t("payment.widgetPay")}
                 </button>
               )}
-            </div>
-          )}
-
-          {!orderResult && !cartItem.widgetUrl && (
-            <div className="mt-4 rounded-2xl border border-[#00FF9A]/15 bg-[#00FF9A]/5 p-4 text-xs text-[#9AA7BD]">
-              {t("checkout.status")}:{" "}
-              <span className="text-[#E7EDF7] font-semibold">
-                {t("checkout.comingSoon")}
-              </span>
             </div>
           )}
         </div>

@@ -1,869 +1,148 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { memo, useState } from "react";
+import { buildCustomerMediaUrl } from "../utils/customerServiceState";
 import {
-  bindCustomerPlayer,
-  createCustomerStreamToken,
-  getCustomerMedia,
-  getCustomerMessages,
-  initCustomerSession,
-  markCustomerRead,
-  sendCustomerImageMessage,
-  sendCustomerMessage,
-} from "../api/cs";
-import { getPlayerToken } from "../utils/request";
-import {
-  buildCustomerStreamUrl,
-  buildCustomerMediaUrl,
-  isCustomerSessionAccessDenied,
-  isCustomerSessionClosed,
-  normalizeCustomerServiceNotice,
-  normalizeVisitorToken,
-  resolveCustomerVisitorToken,
-  upsertCustomerMessage,
-} from "../utils/customerServiceState";
-import {
-  CUSTOMER_SERVICE_FLOATING_GAP,
-  CUSTOMER_SERVICE_FLOATING_STORAGE_KEY,
-  CUSTOMER_SERVICE_MOBILE_BREAKPOINT,
-  getDefaultFloatingPosition,
-  getDesktopPanelPosition,
-  normalizeFloatingPosition,
-  parseStoredFloatingPosition,
-} from "../utils/customerServiceFloating.js";
+  SupportIcon,
+  MinimizeIcon,
+  HistoryChevronIcon,
+  ImageIcon,
+  SendIcon,
+} from "./CustomerServiceIcons";
+import useCustomerService from "./useCustomerService";
 
-const VISITOR_TOKEN_KEY = "cs_visitor_token";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
-const DESKTOP_BUTTON_SIZE = 60;
-const MOBILE_BUTTON_SIZE = 58;
-const DESKTOP_PADDING = 18;
-const MOBILE_PADDING = 14;
-const DESKTOP_PANEL_WIDTH = 400;
-const MAX_MESSAGE_LENGTH = 500;
-const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
-const CUSTOMER_MESSAGE_WINDOW_DAYS = 1;
-const CUSTOMER_HISTORY_SCROLL_THRESHOLD = 24;
-const CUSTOMER_TIME_SEPARATOR_MINUTES = 5;
+const DISPLAY_ITEM_RENDER_CAP = 150;
+const DISPLAY_ITEM_EXPAND_STEP = 100;
 
-function getViewportSnapshot() {
-  if (typeof window === "undefined") {
-    return { width: 1440, height: 900 };
-  }
-  return { width: window.innerWidth, height: window.innerHeight };
-}
-
-function getLauncherConfig(viewportWidth) {
-  const mobile = viewportWidth < CUSTOMER_SERVICE_MOBILE_BREAKPOINT;
-  return {
-    mobile,
-    buttonSize: mobile ? MOBILE_BUTTON_SIZE : DESKTOP_BUTTON_SIZE,
-    padding: mobile ? MOBILE_PADDING : DESKTOP_PADDING,
-  };
-}
-
-function getInitialLauncherPosition() {
-  const viewport = getViewportSnapshot();
-  const config = getLauncherConfig(viewport.width);
-  if (typeof window === "undefined") {
-    return getDefaultFloatingPosition(viewport, config);
-  }
-  const stored = parseStoredFloatingPosition(
-    window.localStorage.getItem(CUSTOMER_SERVICE_FLOATING_STORAGE_KEY),
-  );
-  return normalizeFloatingPosition(stored, viewport, config);
-}
-
-function getMessageTime(message) {
-  const time = new Date(message?.createTime || 0).getTime();
-  return Number.isFinite(time) ? time : 0;
-}
-
-function normalizeMessageWindowPayload(payload) {
-  const nextBefore =
-    payload?.nextBefore == null
-      ? null
-      : Number.isFinite(Number(payload.nextBefore))
-        ? String(payload.nextBefore)
-        : String(new Date(payload.nextBefore).getTime());
-  if (Array.isArray(payload)) {
-    return { rows: payload, hasMore: false, nextBefore: null };
-  }
-  return {
-    rows: Array.isArray(payload?.rows) ? payload.rows : [],
-    hasMore: payload?.hasMore === true,
-    nextBefore: nextBefore && nextBefore !== "NaN" ? nextBefore : null,
-  };
-}
-
-function mergeCustomerMessages(current, incoming) {
-  return (incoming || []).reduce(upsertCustomerMessage, current || []);
-}
-
-function formatCustomerTimeSeparator(value, language) {
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) {
-    return "";
-  }
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const startOfMessageDay = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-  const timeText = date.toLocaleTimeString(language, { hour: "2-digit", minute: "2-digit" });
-  if (startOfMessageDay === startOfToday) {
-    return timeText;
-  }
-  if (startOfMessageDay === startOfToday - 24 * 60 * 60 * 1000) {
-    return `${String(language || "").startsWith("zh") ? "昨天" : "Yesterday"} ${timeText}`;
-  }
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${timeText}`;
-}
-
-function buildCustomerDisplayItems(list, language) {
-  const items = [];
-  let previousTime = null;
-  (list || []).forEach((message) => {
-    const currentTime = getMessageTime(message);
-    if (
-      currentTime > 0 &&
-      (previousTime == null ||
-        currentTime - previousTime >= CUSTOMER_TIME_SEPARATOR_MINUTES * 60 * 1000)
-    ) {
-      items.push({
-        type: "time",
-        key: `time-${message.id || currentTime}`,
-        label: formatCustomerTimeSeparator(currentTime, language),
-      });
-    }
-    items.push({ type: "message", key: message.id || `${message.senderType}-${message.createTime}`, message });
-    if (currentTime > 0) {
-      previousTime = currentTime;
-    }
-  });
-  return items;
-}
-
-function SupportIcon({ className = "h-5 w-5" }) {
+const ChatTimestamp = memo(function ChatTimestamp({ label }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M6.75 9.75a5.25 5.25 0 1 1 10.5 0v3.3a1.95 1.95 0 0 1-1.95 1.95H14.4a1.2 1.2 0 0 0-1.2 1.2v.1a1.95 1.95 0 1 1-3.9 0v-1.16" />
-      <path d="M6.75 14.25h-.45a1.8 1.8 0 0 1-1.8-1.8v-1.8a1.8 1.8 0 0 1 1.8-1.8h.45" />
-      <path d="M17.25 9h.45a1.8 1.8 0 0 1 1.8 1.8v1.8a1.8 1.8 0 0 1-1.8 1.8h-.45" />
-    </svg>
+    <div className="flex justify-center">
+      <span className="rounded-full bg-white/[0.06] px-3 py-1 text-[11px] text-[#8EA0B9]">
+        {label}
+      </span>
+    </div>
   );
-}
+});
 
-function MinimizeIcon() {
+const ChatMessage = memo(function ChatMessage({
+  message, isMine, mediaUrl, apiBase, visitorToken, onImageLoad, youLabel, supportLabel, imageAlt,
+}) {
+  const isImage = message.contentType === "image";
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="h-4 w-4"
-    >
-      <path d="M4.25 10a.75.75 0 0 1 .75-.75h10a.75.75 0 1 1 0 1.5H5A.75.75 0 0 1 4.25 10Z" />
-    </svg>
+    <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
+      <div className={`flex max-w-[76%] flex-col ${isMine ? "items-end" : "items-start"}`}>
+        <div className="mb-1 px-1 text-[10px] font-semibold text-[#8EA0B9]">
+          {isMine ? youLabel : supportLabel}
+        </div>
+        <div
+          className={`rounded-[10px] px-3.5 py-2 text-sm leading-5 shadow-[0_10px_20px_rgba(0,0,0,0.14)] ${
+            isMine
+              ? "border border-[#00FF9A]/24 bg-[#00FF9A]/10 text-[#E9FFF4]"
+              : "border border-white/8 bg-white/[0.045] text-[#E7EDF7]"
+          }`}
+        >
+          {isImage ? (
+            <img
+              src={mediaUrl || buildCustomerMediaUrl(apiBase, message.id, visitorToken)}
+              alt={imageAlt}
+              className="max-h-64 max-w-full rounded-xl border border-white/10 object-contain"
+              loading="lazy"
+              onLoad={onImageLoad}
+            />
+          ) : (
+            <div className="whitespace-pre-wrap break-words">{message.content}</div>
+          )}
+        </div>
+      </div>
+    </div>
   );
-}
+});
 
-function HistoryChevronIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4 text-[#9EFED1]"
-    >
-      <path d="M4.5 7.25 10 12.75l5.5-5.5" />
-    </svg>
-  );
-}
+function ChatMessageList({
+  displayItems, mediaUrls, apiBase, visitorToken, onImageLoad,
+  youLabel, supportLabel, imageAlt, showEarlierLabel,
+}) {
+  const [renderCap, setRenderCap] = useState(DISPLAY_ITEM_RENDER_CAP);
+  const total = displayItems.length;
+  const capped = total > renderCap;
+  const visibleItems = capped ? displayItems.slice(total - renderCap) : displayItems;
 
-function ImageIcon() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4"
-    >
-      <rect x="3" y="4" width="14" height="12" rx="2" />
-      <path d="m6 13 3.2-3.2 2.2 2.2 1.3-1.3L16 14" />
-      <circle cx="7.5" cy="7.5" r="1" />
-    </svg>
-  );
-}
-
-function SendIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-    >
-      <path d="M17 3 8.2 11.8" />
-      <path d="m17 3-5.6 14-3.2-5.2L3 8.6 17 3Z" />
-    </svg>
+    <>
+      {capped && (
+        <button
+          type="button"
+          onClick={() => setRenderCap((cap) => cap + DISPLAY_ITEM_EXPAND_STEP)}
+          className="w-full rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-2 text-center text-xs text-[#8EA0B9] hover:bg-white/[0.06]"
+        >
+          {showEarlierLabel} ({total - renderCap})
+        </button>
+      )}
+      {visibleItems.map((item) =>
+        item.type === "time" ? (
+          <ChatTimestamp key={item.key} label={item.label} />
+        ) : (
+          <ChatMessage
+            key={item.key}
+            message={item.message}
+            isMine={item.message.senderType !== "admin"}
+            mediaUrl={mediaUrls[item.message.id]}
+            apiBase={apiBase}
+            visitorToken={visitorToken}
+            onImageLoad={onImageLoad}
+            youLabel={youLabel}
+            supportLabel={supportLabel}
+            imageAlt={imageAlt}
+          />
+        ),
+      )}
+    </>
   );
 }
 
 export default function CustomerService() {
-  const { t, i18n } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [mediaUrls, setMediaUrls] = useState({});
-  const [input, setInput] = useState("");
-  const [session, setSession] = useState(null);
-  const [visitorToken, setVisitorToken] = useState(() =>
-    normalizeVisitorToken(localStorage.getItem(VISITOR_TOKEN_KEY)),
-  );
-  const [unread, setUnread] = useState(0);
-  const [notice, setNotice] = useState("");
-  const [polling, setPolling] = useState(false);
-  const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
-  const [viewport, setViewport] = useState(() => getViewportSnapshot());
-  const [launcherPosition, setLauncherPosition] = useState(() =>
-    getInitialLauncherPosition(),
-  );
-  const [dragging, setDragging] = useState(false);
-  const [historyBefore, setHistoryBefore] = useState(null);
-  const [hasMoreHistory, setHasMoreHistory] = useState(false);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-
-  const streamRef = useRef(null);
-  const pollingRef = useRef(null);
-  const messageBoxRef = useRef(null);
-  const previousMessageScrollHeightRef = useRef(null);
-  const mediaUrlsRef = useRef({});
-  const launcherRef = useRef(null);
-  const panelRef = useRef(null);
-  const imageInputRef = useRef(null);
-  const dragStateRef = useRef(null);
-  const launcherPositionRef = useRef(launcherPosition);
-  const viewportRef = useRef(viewport);
-  const suppressToggleRef = useRef(false);
-  const ignoreNextLauncherClickRef = useRef(false);
-  const launcherClickIgnoreTimerRef = useRef(null);
-  const togglePanelRef = useRef(null);
-  const openRef = useRef(open);
-  const ignoreNextStreamErrorRef = useRef(false);
-  const ensuringSessionRef = useRef(false);
-  const loadingHistoryRef = useRef(false);
-  const preserveHistoryScrollRef = useRef(false);
-
-  const playerToken = getPlayerToken();
-  const effectiveVisitorToken = resolveCustomerVisitorToken(visitorToken, session);
-  const displayItems = buildCustomerDisplayItems(messages, i18n.language);
-  const launcherConfig = getLauncherConfig(viewport.width);
-  const launcherSize = launcherConfig.buttonSize;
-  const isMobile = launcherConfig.mobile;
-  const desktopPanelHeight = Math.min(Math.round(viewport.height * 0.78), 640);
-  const desktopPanelPosition = !isMobile
-    ? getDesktopPanelPosition(launcherPosition, viewport, {
-        buttonSize: launcherSize,
-        panelWidth: DESKTOP_PANEL_WIDTH,
-        panelHeight: desktopPanelHeight,
-        padding: launcherConfig.padding,
-        gap: CUSTOMER_SERVICE_FLOATING_GAP,
-      })
-    : null;
-
-  const handlePointerMove = useCallback((event) => {
-    const dragState = dragStateRef.current;
-    if (!dragState || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-    if (event.pointerType === "touch") {
-      event.preventDefault();
-    }
-    const deltaX = event.clientX - dragState.startX;
-    const deltaY = event.clientY - dragState.startY;
-    if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
-      dragState.moved = true;
-    }
-    const nextViewport = viewportRef.current;
-    const nextPosition = normalizeFloatingPosition(
-      {
-        x: dragState.origin.x + deltaX,
-        y: dragState.origin.y + deltaY,
-      },
-      nextViewport,
-      getLauncherConfig(nextViewport.width),
-    );
-    setLauncherPosition(nextPosition);
-  }, []);
-
-  const handlePointerUp = useCallback((event) => {
-    const dragState = dragStateRef.current;
-    if (!dragState || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-    if (dragState.moved) {
-      suppressToggleRef.current = true;
-      ignoreNextLauncherClickRef.current = true;
-      window.setTimeout(() => {
-        suppressToggleRef.current = false;
-      }, 0);
-      if (launcherClickIgnoreTimerRef.current) {
-        window.clearTimeout(launcherClickIgnoreTimerRef.current);
-      }
-      launcherClickIgnoreTimerRef.current = window.setTimeout(() => {
-        ignoreNextLauncherClickRef.current = false;
-        launcherClickIgnoreTimerRef.current = null;
-      }, 350);
-    }
-    if (!dragState.moved) {
-      ignoreNextLauncherClickRef.current = true;
-      if (launcherClickIgnoreTimerRef.current) {
-        window.clearTimeout(launcherClickIgnoreTimerRef.current);
-      }
-      launcherClickIgnoreTimerRef.current = window.setTimeout(() => {
-        ignoreNextLauncherClickRef.current = false;
-        launcherClickIgnoreTimerRef.current = null;
-      }, 350);
-      togglePanelRef.current?.();
-    }
-    dragStateRef.current = null;
-    setDragging(false);
-    window.removeEventListener("pointermove", handlePointerMove);
-    window.removeEventListener("pointerup", handlePointerUp);
-    window.removeEventListener("pointercancel", handlePointerUp);
-  }, [handlePointerMove]);
-
-  const removePointerListeners = useCallback(() => {
-    window.removeEventListener("pointermove", handlePointerMove);
-    window.removeEventListener("pointerup", handlePointerUp);
-    window.removeEventListener("pointercancel", handlePointerUp);
-  }, [handlePointerMove, handlePointerUp]);
-
-  const handleLauncherPointerDown = useCallback((event) => {
-    if (event.button !== 0 && event.pointerType !== "touch") {
-      return;
-    }
-    if (event.pointerType === "touch") {
-      event.preventDefault();
-    }
-    dragStateRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      origin: launcherPositionRef.current,
-      moved: false,
-    };
-    setDragging(true);
-    removePointerListeners();
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", handlePointerUp);
-    window.addEventListener("pointercancel", handlePointerUp);
-  }, [handlePointerMove, handlePointerUp, removePointerListeners]);
-
-  useEffect(() => {
-    launcherPositionRef.current = launcherPosition;
-  }, [launcherPosition]);
-
-  useEffect(() => {
-    viewportRef.current = viewport;
-  }, [viewport]);
-
-  useEffect(() => {
-    openRef.current = open;
-  }, [open]);
-
-  useEffect(() => {
-    mediaUrlsRef.current = mediaUrls;
-  }, [mediaUrls]);
-
-  useEffect(() => {
-    if (visitorToken) {
-      localStorage.setItem(VISITOR_TOKEN_KEY, visitorToken);
-      return;
-    }
-    localStorage.removeItem(VISITOR_TOKEN_KEY);
-  }, [visitorToken]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      CUSTOMER_SERVICE_FLOATING_STORAGE_KEY,
-      JSON.stringify(launcherPosition),
-    );
-  }, [launcherPosition]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const nextViewport = getViewportSnapshot();
-      setViewport(nextViewport);
-      setLauncherPosition((current) =>
-        normalizeFloatingPosition(current, nextViewport, getLauncherConfig(nextViewport.width)),
-      );
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  function scrollMessageBoxToBottom(behavior = "auto") {
-    const stage = messageBoxRef.current;
-    if (!stage) {
-      return;
-    }
-    stage.scrollTo({
-      top: stage.scrollHeight,
-      behavior,
-    });
-  }
-
-  useEffect(() => {
-    if (!open) {
-      return undefined;
-    }
-    if (previousMessageScrollHeightRef.current != null) {
-      const previousHeight = previousMessageScrollHeightRef.current;
-      previousMessageScrollHeightRef.current = null;
-      const stage = messageBoxRef.current;
-      if (stage) {
-        preserveHistoryScrollRef.current = true;
-        window.setTimeout(() => {
-          stage.scrollTop = stage.scrollHeight - previousHeight + stage.scrollTop;
-          window.setTimeout(() => {
-            preserveHistoryScrollRef.current = false;
-          }, 0);
-        }, 0);
-      }
-      return undefined;
-    }
-    const timer = window.setTimeout(() => {
-      scrollMessageBoxToBottom("auto");
-      window.requestAnimationFrame(() => scrollMessageBoxToBottom("auto"));
-    }, 40);
-    return () => window.clearTimeout(timer);
-  }, [messages, open]);
-
-  useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.close();
-        streamRef.current = null;
-      }
-      if (pollingRef.current) {
-        window.clearInterval(pollingRef.current);
-        pollingRef.current = null;
-      }
-      if (launcherClickIgnoreTimerRef.current) {
-        window.clearTimeout(launcherClickIgnoreTimerRef.current);
-        launcherClickIgnoreTimerRef.current = null;
-      }
-      Object.values(mediaUrlsRef.current).forEach((url) => {
-        if (url) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUp);
-      window.removeEventListener("pointercancel", handlePointerUp);
-    };
-  }, [handlePointerMove, handlePointerUp]);
-
-  useEffect(() => {
-    if (!open || isMobile) {
-      return undefined;
-    }
-    const handlePointerDown = (event) => {
-      if (
-        launcherRef.current?.contains(event.target) ||
-        panelRef.current?.contains(event.target)
-      ) {
-        return;
-      }
-      setOpen(false);
-    };
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [isMobile, open]);
-
-  useEffect(() => {
-    const imageIds = new Set(
-      messages
-        .filter((message) => message.contentType === "image" && message.id)
-        .map((message) => String(message.id)),
-    );
-    const staleEntries = Object.entries(mediaUrlsRef.current).filter(
-      ([messageId]) => !imageIds.has(messageId),
-    );
-    if (staleEntries.length) {
-      staleEntries.forEach(([, url]) => {
-        if (url) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      setMediaUrls((current) => {
-        const next = { ...current };
-        staleEntries.forEach(([messageId]) => delete next[messageId]);
-        return next;
-      });
-    }
-    messages
-      .filter((message) => message.contentType === "image" && message.id && !mediaUrlsRef.current[message.id])
-      .forEach(async (message) => {
-        try {
-          const blob = await getCustomerMedia(message.id, effectiveVisitorToken);
-          const objectUrl = URL.createObjectURL(blob);
-          setMediaUrls((current) => ({ ...current, [message.id]: objectUrl }));
-        } catch {
-          setMediaUrls((current) => ({ ...current, [message.id]: "" }));
-        }
-      });
-  }, [effectiveVisitorToken, messages]);
-
-  useEffect(() => {
-    if (!open || !session) {
-      return;
-    }
-    setUnread(0);
-    markCustomerRead(
-      session.id || session.conversationId,
-      effectiveVisitorToken,
-    ).catch((error) => {
-      setNotice(
-        normalizeCustomerServiceNotice(
-          error?.message || t("cs.loadFailed"),
-          t,
-        ),
-      );
-    });
-  }, [effectiveVisitorToken, open, session, t]);
-
-  function resetSessionIdentity() {
-    setSession(null);
-    setMessages([]);
-    setHistoryBefore(null);
-    setHasMoreHistory(false);
-    setLoadingHistory(false);
-    setVisitorToken(null);
-    setInput("");
-  }
-
-  function handleCustomerServiceError(errorMessage, fallbackMessageKey) {
-    if (isCustomerSessionAccessDenied(errorMessage)) {
-      resetSessionIdentity();
-    }
-    setNotice(
-      normalizeCustomerServiceNotice(
-        errorMessage || t(fallbackMessageKey),
-        t,
-      ),
-    );
-  }
-
-  function applyMessageWindow(payload, mode = "replace") {
-    const windowPayload = normalizeMessageWindowPayload(payload);
-    setHistoryBefore(windowPayload.nextBefore);
-    setHasMoreHistory(windowPayload.hasMore);
-    setMessages((current) =>
-      mode === "prepend"
-        ? mergeCustomerMessages(windowPayload.rows, current)
-        : mergeCustomerMessages([], windowPayload.rows),
-    );
-    return windowPayload;
-  }
-
-  async function loadInitialMessages(conversationId, currentVisitorToken) {
-    const messageRes = await getCustomerMessages(conversationId, currentVisitorToken, {
-      days: CUSTOMER_MESSAGE_WINDOW_DAYS,
-    });
-    return applyMessageWindow(messageRes.data, "replace");
-  }
-
-  async function loadOlderMessages() {
-    if (!session || !hasMoreHistory || !historyBefore || loadingHistoryRef.current) {
-      return;
-    }
-    const stage = messageBoxRef.current;
-    previousMessageScrollHeightRef.current = stage ? stage.scrollHeight : null;
-    loadingHistoryRef.current = true;
-    setLoadingHistory(true);
-    try {
-      const conversationId = session.id || session.conversationId;
-      const messageRes = await getCustomerMessages(conversationId, effectiveVisitorToken, {
-        before: historyBefore,
-        days: CUSTOMER_MESSAGE_WINDOW_DAYS,
-      });
-      applyMessageWindow(messageRes.data, "prepend");
-      setNotice("");
-    } catch (error) {
-      previousMessageScrollHeightRef.current = null;
-      handleCustomerServiceError(error.message, "cs.loadFailed");
-    } finally {
-      loadingHistoryRef.current = false;
-      setLoadingHistory(false);
-    }
-  }
-
-  function handleMessageBoxScroll() {
-    if (messageBoxRef.current && messageBoxRef.current.scrollTop <= CUSTOMER_HISTORY_SCROLL_THRESHOLD) {
-      loadOlderMessages();
-    }
-  }
-
-  function handleMessageImageLoad() {
-    if (!openRef.current || preserveHistoryScrollRef.current) {
-      return;
-    }
-    window.requestAnimationFrame(() => scrollMessageBoxToBottom("auto"));
-  }
-
-  async function ensureSession() {
-    if (ensuringSessionRef.current) {
-      return;
-    }
-    ensuringSessionRef.current = true;
-    setLoading(true);
-    try {
-      const initRes = await initCustomerSession({
-        visitorToken,
-        sourcePage: window.location.hash || window.location.pathname,
-        language: i18n.language,
-      });
-      let nextSession = initRes.data;
-      const nextVisitorToken =
-        normalizeVisitorToken(nextSession?.visitorToken) || visitorToken;
-      if (nextVisitorToken) {
-        setVisitorToken(nextVisitorToken);
-      }
-
-      if (playerToken && nextVisitorToken) {
-        try {
-          const bindRes = await bindCustomerPlayer({ visitorToken: nextVisitorToken });
-          nextSession = bindRes.data || nextSession;
-        } catch {
-          // keep init session as fallback if bind is rejected or not needed
-        }
-      }
-
-      setSession(nextSession);
-      const conversationId = nextSession.id || nextSession.conversationId;
-      await loadInitialMessages(conversationId, nextVisitorToken);
-      setUnread(0);
-      setNotice("");
-      await markCustomerRead(conversationId, nextVisitorToken);
-      connectStream(conversationId, nextVisitorToken);
-    } catch (error) {
-      handleCustomerServiceError(error.message, "cs.loadFailed");
-    } finally {
-      ensuringSessionRef.current = false;
-      setLoading(false);
-    }
-  }
-
-  function closeStream() {
-    if (streamRef.current) {
-      streamRef.current.close();
-      streamRef.current = null;
-    }
-  }
-
-  function stopPolling() {
-    if (pollingRef.current) {
-      window.clearInterval(pollingRef.current);
-      pollingRef.current = null;
-    }
-    setPolling(false);
-  }
-
-  function startPolling(conversationId, currentVisitorToken) {
-    if (pollingRef.current) {
-      return;
-    }
-    setPolling(true);
-    pollingRef.current = window.setInterval(async () => {
-      try {
-        const res = await getCustomerMessages(conversationId, currentVisitorToken, {
-          days: CUSTOMER_MESSAGE_WINDOW_DAYS,
-        });
-        const list = normalizeMessageWindowPayload(res.data).rows;
-        setMessages((prev) => list.reduce(upsertCustomerMessage, prev));
-      } catch (error) {
-        if (isCustomerSessionAccessDenied(error?.message)) {
-          stopPolling();
-          handleCustomerServiceError(error.message, "cs.loadFailed");
-          return;
-        }
-        if (isCustomerSessionClosed(error?.message)) {
-          stopPolling();
-          setNotice(normalizeCustomerServiceNotice(error.message, t));
-        }
-      }
-    }, 5000);
-  }
-
-  async function connectStream(conversationId, currentVisitorToken) {
-    closeStream();
-    stopPolling();
-    try {
-      const tokenRes = await createCustomerStreamToken({
-        conversationId,
-        visitorToken: currentVisitorToken,
-      });
-      const streamUrl = buildCustomerStreamUrl(
-        API_BASE_URL,
-        conversationId,
-        tokenRes.data.streamToken,
-        currentVisitorToken,
-      );
-      const stream = new EventSource(streamUrl);
-      streamRef.current = stream;
-
-      stream.addEventListener("new_message", (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-        setMessages((prev) => upsertCustomerMessage(prev, payload));
-        if (!openRef.current && payload.senderType === "admin") {
-          setUnread((count) => count + 1);
-        }
-        if (openRef.current && payload.senderType === "admin") {
-          markCustomerRead(conversationId, currentVisitorToken).catch(() => {});
-        }
-        } catch (error) {
-          console.error("Invalid customer service SSE payload", error);
-        }
-      });
-
-      stream.addEventListener("session_invalidated", (event) => {
-        ignoreNextStreamErrorRef.current = true;
-        closeStream();
-        stopPolling();
-        handleCustomerServiceError(event.data || "会话无权访问", "cs.loadFailed");
-      });
-
-      stream.addEventListener("session_closed", (event) => {
-        ignoreNextStreamErrorRef.current = true;
-        closeStream();
-        stopPolling();
-        setNotice(
-          normalizeCustomerServiceNotice(
-            event.data || "会话已关闭",
-            t,
-          ),
-        );
-      });
-
-      stream.onerror = () => {
-        const shouldIgnore = ignoreNextStreamErrorRef.current;
-        ignoreNextStreamErrorRef.current = false;
-        closeStream();
-        if (shouldIgnore) {
-          return;
-        }
-        startPolling(conversationId, currentVisitorToken);
-      };
-    } catch {
-      startPolling(conversationId, currentVisitorToken);
-    }
-  }
-
-  async function handleTogglePanel() {
-    if (suppressToggleRef.current) {
-      return;
-    }
-    if (open) {
-      setOpen(false);
-      setUnread(0);
-      return;
-    }
-    setOpen(true);
-    setUnread(0);
-    await ensureSession();
-  }
-
-  togglePanelRef.current = handleTogglePanel;
-
-  function handleLauncherClick() {
-    if (ignoreNextLauncherClickRef.current) {
-      ignoreNextLauncherClickRef.current = false;
-      if (launcherClickIgnoreTimerRef.current) {
-        window.clearTimeout(launcherClickIgnoreTimerRef.current);
-        launcherClickIgnoreTimerRef.current = null;
-      }
-      return;
-    }
-    handleTogglePanel();
-  }
-
-  async function handleSend() {
-    const nextContent = input.trim();
-    if (!session || !nextContent) {
-      return;
-    }
-    setSending(true);
-    try {
-      const res = await sendCustomerMessage({
-        conversationId: session.id || session.conversationId,
-        visitorToken: effectiveVisitorToken,
-        content: nextContent,
-      });
-      setMessages((prev) => upsertCustomerMessage(prev, res.data));
-      setInput("");
-      setNotice("");
-    } catch (error) {
-      handleCustomerServiceError(error.message, "cs.sendFailed");
-    } finally {
-      setSending(false);
-    }
-  }
-
-  async function handleImageChange(event) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!session || !file) {
-      return;
-    }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setNotice(t("cs.imageTypeInvalid") || "仅支持 JPG、PNG、WEBP 图片");
-      return;
-    }
-    if (file.size > MAX_IMAGE_SIZE_BYTES) {
-      setNotice(t("cs.imageTooLarge") || "图片大小不能超过 5MB");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("conversationId", session.id || session.conversationId);
-    const nextVisitorToken = effectiveVisitorToken;
-    if (nextVisitorToken) {
-      formData.append("visitorToken", nextVisitorToken);
-    }
-    formData.append("file", file);
-    setUploadingImage(true);
-    try {
-      const res = await sendCustomerImageMessage(formData);
-      setMessages((prev) => upsertCustomerMessage(prev, res.data));
-      setNotice("");
-    } catch (error) {
-      handleCustomerServiceError(error.message, "cs.sendFailed");
-    } finally {
-      setUploadingImage(false);
-    }
-  }
+  const cs = useCustomerService();
+  const {
+    t,
+    open,
+    setOpen,
+    loading,
+    sending,
+    uploadingImage,
+    mediaUrls,
+    input,
+    setInput,
+    session,
+    unread,
+    setUnread,
+    notice,
+    polling,
+    showAttachmentMenu,
+    setShowAttachmentMenu,
+    launcherPosition,
+    dragging,
+    hasMoreHistory,
+    loadingHistory,
+    displayItems,
+    launcherSize,
+    isMobile,
+    desktopPanelHeight,
+    desktopPanelPosition,
+    effectiveVisitorToken,
+    messageBoxRef,
+    launcherRef,
+    panelRef,
+    imageInputRef,
+    handleLauncherPointerDown,
+    handleLauncherClick,
+    handleMessageBoxScroll,
+    handleMessageImageLoad,
+    handleSend,
+    handleImageChange,
+    loadOlderMessages,
+    messages,
+    API_BASE_URL,
+    MAX_MESSAGE_LENGTH,
+    DESKTOP_PANEL_WIDTH,
+  } = cs;
 
   const launcherStyle = {
     left: `${launcherPosition.x}px`,
@@ -873,8 +152,7 @@ export default function CustomerService() {
   };
 
   const desktopPanelStyle =
-    desktopPanelPosition &&
-    !isMobile
+    desktopPanelPosition && !isMobile
       ? {
           left: `${desktopPanelPosition.x}px`,
           top: `${desktopPanelPosition.y}px`,
@@ -924,18 +202,18 @@ export default function CustomerService() {
                 disabled={loadingHistory}
                 className="inline-flex w-full items-center justify-between rounded-2xl border border-[#00FF9A]/18 bg-[#00FF9A]/[0.06] px-4 py-3 text-left text-xs font-medium text-[#7BFFCA]/84 transition-colors hover:border-[#00FF9A]/28 hover:bg-[#00FF9A]/[0.1] hover:text-[#C6FFE6]"
               >
-                <span>{loadingHistory ? t("cs.loadingHistory") || "加载历史消息..." : t("cs.viewHistory")}</span>
+                <span>{loadingHistory ? t("cs.loadingHistory") : t("cs.viewHistory")}</span>
                 <HistoryChevronIcon />
               </button>
             )}
             {loadingHistory && (
               <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-2 text-center text-xs text-[#8EA0B9]">
-                {t("cs.loadingHistory") || "加载历史消息..."}
+                {t("cs.loadingHistory")}
               </div>
             )}
             {!hasMoreHistory && messages.length > 0 && (
               <div className="px-3 py-1 text-center text-[11px] text-[#6F8099]">
-                {t("cs.noMoreHistory") || "没有更多历史消息"}
+                {t("cs.noMoreHistory")}
               </div>
             )}
             {messages.length === 0 ? (
@@ -943,53 +221,17 @@ export default function CustomerService() {
                 {t("cs.empty")}
               </div>
             ) : (
-              displayItems.map((item) => {
-                if (item.type === "time") {
-                  return (
-                    <div key={item.key} className="flex justify-center">
-                      <span className="rounded-full bg-white/[0.06] px-3 py-1 text-[11px] text-[#8EA0B9]">
-                        {item.label}
-                      </span>
-                    </div>
-                  );
-                }
-                const message = item.message;
-                const isMine = message.senderType !== "admin";
-                const isImage = message.contentType === "image";
-                return (
-                  <div
-                    key={item.key}
-                    className={`flex ${isMine ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`flex max-w-[76%] flex-col ${isMine ? "items-end" : "items-start"}`}
-                    >
-                      <div className="mb-1 px-1 text-[10px] font-semibold text-[#8EA0B9]">
-                        {isMine ? t("cs.you") : t("cs.support")}
-                      </div>
-                      <div
-                        className={`rounded-[10px] px-3.5 py-2 text-sm leading-5 shadow-[0_10px_20px_rgba(0,0,0,0.14)] ${
-                          isMine
-                            ? "border border-[#00FF9A]/24 bg-[#00FF9A]/10 text-[#E9FFF4]"
-                            : "border border-white/8 bg-white/[0.045] text-[#E7EDF7]"
-                      }`}
-                      >
-                        {isImage ? (
-                          <img
-                            src={mediaUrls[message.id] || buildCustomerMediaUrl(API_BASE_URL, message.id, effectiveVisitorToken)}
-                            alt={t("cs.imageAlt") || "客服图片"}
-                            className="max-h-64 max-w-full rounded-xl border border-white/10 object-contain"
-                            loading="lazy"
-                            onLoad={handleMessageImageLoad}
-                          />
-                        ) : (
-                          <div className="whitespace-pre-wrap break-words">{message.content}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
+              <ChatMessageList
+                displayItems={displayItems}
+                mediaUrls={mediaUrls}
+                apiBase={API_BASE_URL}
+                visitorToken={effectiveVisitorToken}
+                onImageLoad={handleMessageImageLoad}
+                youLabel={t("cs.you")}
+                supportLabel={t("cs.support")}
+                imageAlt={t("cs.imageAlt")}
+                showEarlierLabel={t("cs.viewHistory")}
+              />
             )}
           </>
         )}

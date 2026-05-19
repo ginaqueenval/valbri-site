@@ -55,6 +55,9 @@
     "gift": "礼物",
     "eta": "预计交付时间: {{eta}}",
     "usd": "美元",
+    "addToCart": "加入购物车",
+    "addedToCart": "已加入购物车！",
+    "addToCartFailed": "加入失败",
     "paymentNotice": "支付功能目前正在禁用中，支付网关正在最终确定。您仍可以从 FC26 页面提交订单详情。",
     "gamesTitle": "游戏",
     "gamesDesc": "我们目前专注于 FC26，同时也支持以下游戏。",
@@ -133,7 +136,9 @@
     "orderCreated": "订单创建成功！",
     "orderNo": "订单号",
     "quantity": "数量",
-    "createOrderFailed": "创建订单失败"
+    "createOrderFailed": "创建订单失败",
+    "accessDenied": "无权访问",
+    "accessDeniedDesc": "该订单不存在或您无权访问。"
   },
   "cart": {
     "title": "购物车",
@@ -302,7 +307,12 @@
       "pending": "待支付",
       "paid": "已支付",
       "cancelled": "已取消",
-      "refunded": "已退款"
+      "refunded": "已退款",
+      "pendingPayment": "待支付",
+      "accountRequired": "待填写资料",
+      "processing": "处理中",
+      "completed": "已完成",
+      "closed": "取消/退款"
     },
     "status": {
       "pending": "待支付",
@@ -315,9 +325,46 @@
       "delivering": "发货中",
       "completed": "已完成"
     },
+    "progress": {
+      "percent": "{{percent}}%",
+      "steps": {
+        "submitted": "提交订单",
+        "paid": "完成支付",
+        "accountInfo": "提交资料",
+        "processing": "处理中",
+        "completed": "已完成"
+      },
+      "status": {
+        "pendingPayment": "等待支付",
+        "accountRequired": "请填写交易账户信息",
+        "waitingProcessing": "正在为您处理",
+        "processing": "正在为您处理",
+        "completed": "交易已完成",
+        "cancelled": "订单已取消",
+        "refunded": "订单已退款"
+      },
+      "desc": {
+        "pendingPaymentDesc": "请完成支付，支付成功后我们会继续处理您的订单。",
+        "accountRequiredDesc": "支付已完成，请提交交易账户信息，否则交易无法成功。",
+        "waitingProcessingDesc": "资料已提交，我们正在为您处理订单，请留意进度。",
+        "processingDesc": "订单正在为您处理中，请保持账户信息可用并留意进度。",
+        "completedDesc": "交易已完成，如有问题可联系在线客服。",
+        "cancelledDesc": "订单已取消，可重新选择套餐后再次下单。",
+        "refundedDesc": "订单已退款，款项到账时间以支付渠道为准。"
+      }
+    },
     "accountInfo": {
       "missing": "待填写账号信息",
-      "submitted": "账号信息已提交"
+      "submitted": "账号信息已提交",
+      "fillAction": "填写",
+      "viewAction": "查看/修改",
+      "loadingAction": "读取中",
+      "fillHint": "点击填写交易账户信息",
+      "viewHint": "点击查看或修改交易账户信息",
+      "warning": "当前订单暂未填写交易账户信息，请点击待填写账号信息按钮填写交易账户信息，否则交易无法成功",
+      "bannerCount_one": "您有 {{count}} 个已付款订单需要填写账号信息",
+      "bannerCount_other": "您有 {{count}} 个已付款订单需要填写账号信息",
+      "bannerGuide": "请点击订单中的「待填写账号信息」按钮进行填写。"
     }
   },
   "payment": {
@@ -351,15 +398,25 @@
   "orderAccount": {
     "badge": "发货资料",
     "title": "填写游戏账号信息",
+    "viewTitle": "交易账户信息",
     "desc": "该订单已支付。请填写游戏账号、密码和备份代码，资料提交后我们才能继续为您发货。",
+    "viewDesc": "您已提交该订单的交易账户信息，可查看或修改后重新提交。",
     "encryptedNotice": "所填写的账号、密码和备份代码均已加密，请放心填写。",
     "gameAccount": "游戏账号",
     "gamePassword": "游戏密码",
     "backupCodes": "备份代码",
+    "submittedTime": "提交/更新时间",
     "required": "游戏账号、密码和备份代码都必须填写。",
+    "loadFailed": "读取游戏账号信息失败，请稍后再试。",
     "saveFailed": "保存游戏账号信息失败，请稍后再试。",
+    "loading": "正在读取账号信息...",
     "saving": "正在保存...",
     "submit": "提交账号信息",
+    "resubmit": "重新提交",
+    "edit": "修改账号信息",
+    "cancelEdit": "取消修改",
+    "showPassword": "显示完整密码",
+    "hidePassword": "隐藏完整密码",
     "close": "关闭账号信息弹窗"
   },
   "mockPayment": {
