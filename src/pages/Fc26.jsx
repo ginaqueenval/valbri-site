@@ -4,38 +4,17 @@ import { useTranslation } from "react-i18next";
 import { getPackageList } from "../api/package";
 import { getOrderList } from "../api/order";
 import { addCartItem } from "../api/cart";
-import { getPlayerToken } from "../utils/request";
+import { getStoredPlayerToken as getPlayerToken } from "../utils/playerAuth.js";
 import {
   getPackageQuantity,
   getDesktopOverlayStateClasses,
   resetPackageQuantity,
   updatePackageQuantity,
 } from "./fc26State";
+import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import { noteLabel, sortPackages } from "../utils/packageDisplay";
 
 const PLATFORMS = ["PlayStation", "Xbox", "PC"];
-
-const fmtK = (n) => {
-  if (!n) return "0";
-  if (n < 1000) return String(n);
-  const k = Math.round(n / 1000);
-  return k.toLocaleString("en-US") + "K";
-};
-
-const fmtPrice = (n, currency) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency || "USD",
-  }).format(n);
-
-const noteLabel = (tag, t) => {
-  if (!tag) return null;
-  const key = `notes.${tag}`;
-  const translated = t(key);
-  return translated === key ? tag : translated;
-};
-
-const sortPackages = (list) =>
-  [...list].sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
 
 export default function Fc26() {
   const navigate = useNavigate();
@@ -215,10 +194,10 @@ export default function Fc26() {
                     )}
                     <div className="flex flex-col gap-3 sm:hidden">
                       <div className="text-sm font-semibold">
-                        {fmtK(x.coins)} {t("fc26.coins")}{" "}
+                        {formatCoinsK(x.coins)} {t("fc26.coins")}{" "}
                         {x.giftCoins > 0 && (
                           <span className="text-[#00FF9A]">
-                            + {fmtK(x.giftCoins)} {t("fc26.gift")}
+                            + {formatCoinsK(x.giftCoins)} {t("fc26.gift")}
                           </span>
                         )}
                         {noteLabel(x.noteTag, t) && (
@@ -230,7 +209,7 @@ export default function Fc26() {
                       <div className="mt-1 text-xs text-[#9AA7BD]">
                         {t("fc26.eta", { eta: x.eta })}
                       </div>
-                      <div className="grid grid-cols-[78px_minmax(72px,1fr)_118px] items-center gap-2">
+                      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
                         <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-1">
                           <button
                             onClick={() => setQty(x.id, qty - 1)}
@@ -249,14 +228,14 @@ export default function Fc26() {
                           </button>
                         </div>
 
-                        <div className="min-w-[72px] justify-self-end text-right text-base font-black tracking-tight text-[#E7EDF7] whitespace-nowrap">
-                          {fmtPrice(x.price * qty, x.currency)}
+                        <div className="justify-self-end text-right text-base font-black tracking-tight text-[#E7EDF7] whitespace-nowrap">
+                          {formatPrice(x.price * qty, x.currency)}
                         </div>
 
                         <button
                           onClick={() => handleCartAction(x, false)}
                           disabled={actionLoadingKey === `${x.id}:cart`}
-                          className="justify-self-end w-[118px] rounded-xl border border-[#00FF9A]/30 px-0 py-2 text-center text-[10px] font-semibold tracking-[0.01em] text-[#00FF9A] hover:bg-[#00FF9A]/10 disabled:opacity-50 whitespace-nowrap"
+                          className="justify-self-end rounded-xl border border-[#00FF9A]/30 px-3 py-2 text-center text-[10px] font-semibold tracking-[0.01em] text-[#00FF9A] hover:bg-[#00FF9A]/10 disabled:opacity-50 whitespace-nowrap"
                         >
                           {actionLoadingKey === `${x.id}:cart`
                             ? "..."
@@ -324,7 +303,7 @@ export default function Fc26() {
 
                           <div className="mt-4">
                             <div className="text-[3.05rem] font-black leading-[0.88] tracking-[-0.07em] text-[#E7EDF7]">
-                              {fmtK(x.coins)}
+                              {formatCoinsK(x.coins)}
                             </div>
                             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
                               <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#AAB7CB]">
@@ -332,7 +311,7 @@ export default function Fc26() {
                               </span>
                               {x.giftCoins > 0 && (
                                 <span className="rounded-full border border-[#00FF9A]/12 bg-[#00FF9A]/8 px-3 py-1 text-sm font-bold text-[#00FF9A]">
-                                  + {fmtK(x.giftCoins)} {t("fc26.gift")}
+                                  + {formatCoinsK(x.giftCoins)} {t("fc26.gift")}
                                 </span>
                               )}
                             </div>
@@ -342,7 +321,7 @@ export default function Fc26() {
                         <div className="flex items-end justify-between gap-4">
                           <div>
                             <div className="text-[2.1rem] font-black leading-none tracking-[-0.05em] text-[#E7EDF7]">
-                              {fmtPrice(x.price * qty, x.currency)}
+                              {formatPrice(x.price * qty, x.currency)}
                             </div>
                             <div className="mt-2 text-[11px] text-[#9AA7BD]">
                               {x.currency || "USD"}
@@ -381,7 +360,7 @@ export default function Fc26() {
                               {t("fc26.total")}
                             </div>
                             <div className="mt-1 text-lg font-black text-[#E7EDF7]">
-                              {fmtPrice(x.price * qty, x.currency)}
+                              {formatPrice(x.price * qty, x.currency)}
                             </div>
                           </div>
                         </div>
@@ -434,11 +413,11 @@ export default function Fc26() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold truncate">
-                            {fmtK(o.coins)} {t("fc26.coins")}
+                            {formatCoinsK(o.coins)} {t("fc26.coins")}
                             {o.giftCoins > 0 && (
                               <span className="text-[#00FF9A]">
                                 {" "}
-                                +{fmtK(o.giftCoins)} {t("fc26.gift")}
+                                +{formatCoinsK(o.giftCoins)} {t("fc26.gift")}
                               </span>
                             )}
                           </span>
@@ -464,7 +443,7 @@ export default function Fc26() {
                           </span>
                         </div>
                         <div className="mt-0.5 text-[10px] text-[#9AA7BD]">
-                          {fmtPrice(o.price, o.currency)}
+                          {formatPrice(o.price, o.currency)}
                           {o.quantity > 1 && (
                             <span className="ml-1">×{o.quantity}</span>
                           )}

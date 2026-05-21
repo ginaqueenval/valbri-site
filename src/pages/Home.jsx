@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPackageList } from "../api/package";
 import { getGameList } from "../api/game";
+import { addCartItem } from "../api/cart";
+import { getStoredPlayerToken } from "../utils/playerAuth.js";
 import Announcement from "../components/Announcement";
 import { resolveLocalizedGameName } from "../utils/contentLocale.js";
 
@@ -73,34 +75,48 @@ const FALLBACK_GAMES = [
 ];
 const FEATURED_SKELETON_COUNT = FALLBACK_PACKAGES.length;
 
-const fmtK = (n) => {
-  if (!n) return "0";
-  if (n < 1000) return String(n);
-  const k = Math.round(n / 1000);
-  return k.toLocaleString("en-US") + "K";
-};
-
-const fmtPrice = (n, currency) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency || "USD",
-  }).format(n);
-
-const sortPackages = (list) =>
-  [...list].sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
-
-const noteLabel = (tag, t) => {
-  if (!tag) return null;
-  const key = `notes.${tag}`;
-  const translated = t(key);
-  return translated === key ? tag : translated;
-};
+import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import { noteLabel, sortPackages } from "../utils/packageDisplay";
 
 export default function Home() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [packages, setPackages] = useState([]);
   const [packagesLoading, setPackagesLoading] = useState(true);
   const [games, setGames] = useState(FALLBACK_GAMES);
+  const [cartLoadingId, setCartLoadingId] = useState(null);
+  const [cartFeedback, setCartFeedback] = useState(null);
+
+  useEffect(() => {
+    if (!cartFeedback) return undefined;
+    const id = window.setTimeout(() => setCartFeedback(null), 2000);
+    return () => window.clearTimeout(id);
+  }, [cartFeedback]);
+
+  const handleQuickAddToCart = async (pkg) => {
+    if (!getStoredPlayerToken()) {
+      navigate("/login", { state: { redirectTo: location.pathname } });
+      return;
+    }
+    const supportedPlatforms = (pkg.platform || "")
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    const platform = supportedPlatforms[0] || "PlayStation";
+    setCartLoadingId(pkg.id);
+    setCartFeedback(null);
+    try {
+      await addCartItem({ packageId: pkg.id, platform, quantity: 1 });
+      window.dispatchEvent(new Event("cart-changed"));
+      window.dispatchEvent(new Event("cart-feedback"));
+      setCartFeedback({ id: pkg.id, type: "success" });
+    } catch {
+      setCartFeedback({ id: pkg.id, type: "error" });
+    } finally {
+      setCartLoadingId(null);
+    }
+  };
 
   useEffect(() => {
     getPackageList({ gameId: 1 })
@@ -138,7 +154,7 @@ export default function Home() {
               {t("home.badge")}
             </div>
 
-            <h1 className="mt-4 text-3xl font-extrabold leading-tight md:text-5xl">
+            <h1 className="mt-4 text-2xl font-extrabold leading-tight break-words sm:text-3xl md:text-5xl">
               {t("home.title")}
               <span className="text-[#00FF9A]">{t("home.titleHighlight")}</span>
               {t("home.titleEnd")}
@@ -224,14 +240,14 @@ export default function Home() {
                 : packages.map((p) => (
                     <div
                       key={p.id || p.coins}
-                      className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-[#00FF9A]/25"
+                      className="flex items-center gap-3 rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-[#00FF9A]/25"
                     >
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <div className="text-sm font-semibold">
-                          {fmtK(p.coins)} {t("home.coins")}{" "}
+                          {formatCoinsK(p.coins)} {t("home.coins")}{" "}
                           {p.giftCoins > 0 && (
                             <span className="text-[#00FF9A]">
-                              + {fmtK(p.giftCoins)} {t("home.gift")}
+                              + {formatCoinsK(p.giftCoins)} {t("home.gift")}
                             </span>
                           )}
                           {noteLabel(p.noteTag, t) && (
@@ -244,14 +260,42 @@ export default function Home() {
                           {t("home.eta", { eta: p.eta })}
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="shrink-0 text-right">
                         <div className="text-sm font-semibold">
-                          {fmtPrice(p.price, p.currency)}
+                          {formatPrice(p.price, p.currency)}
                         </div>
                         <div className="mt-1 text-xs text-[#9AA7BD]">
                           {p.currency || "USD"}
                         </div>
                       </div>
+                      {p.id && (
+                        <button
+                          type="button"
+                          onClick={() => handleQuickAddToCart(p)}
+                          disabled={cartLoadingId === p.id}
+                          title={t("home.addToCart")}
+                          className={
+                            "shrink-0 grid h-8 w-8 place-items-center rounded-lg border text-xs transition-colors disabled:opacity-50 " +
+                            (cartFeedback?.id === p.id && cartFeedback.type === "success"
+                              ? "border-[#00FF9A]/40 bg-[#00FF9A]/15 text-[#00FF9A]"
+                              : cartFeedback?.id === p.id && cartFeedback.type === "error"
+                                ? "border-red-400/40 bg-red-500/15 text-red-300"
+                                : "border-white/10 bg-white/5 text-[#9AA7BD] hover:border-[#00FF9A]/30 hover:text-[#00FF9A]")
+                          }
+                        >
+                          {cartLoadingId === p.id ? (
+                            <span className="animate-spin">⟳</span>
+                          ) : cartFeedback?.id === p.id && cartFeedback.type === "success" ? (
+                            "✓"
+                          ) : cartFeedback?.id === p.id && cartFeedback.type === "error" ? (
+                            "✗"
+                          ) : (
+                            <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                              <path d="M1 1.75A.75.75 0 011.75 1h1.628a1.75 1.75 0 011.734 1.51L5.18 3H17.25a.75.75 0 01.727.935l-1.847 7.138a1.75 1.75 0 01-1.693 1.302H7.438a1.75 1.75 0 01-1.693-1.302L3.842 3.589 3.752 3H1.75A.75.75 0 011 2.25zM7.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM14.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                            </svg>
+                          )}
+                        </button>
+                      )}
                     </div>
                   ))}
             </div>

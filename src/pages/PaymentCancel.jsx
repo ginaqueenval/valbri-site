@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPaymentStatus } from "../api/payment";
-import { getPlayerToken } from "../utils/request";
 import {
   DELIVERY_STATUS_LABEL,
   PAYMENT_STATUS_LABEL,
   formatCoinsK,
   formatPrice,
+  shouldShowDeliveryStatus,
 } from "../utils/orderDisplay";
 
 export default function PaymentCancel() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const orderNo = searchParams.get("orderNo");
   const [order, setOrder] = useState(null);
@@ -24,28 +23,26 @@ export default function PaymentCancel() {
     if (!hasOrderNo) {
       return;
     }
-    if (!getPlayerToken()) {
-      navigate("/login", {
-        state: { redirectTo: `/payment/cancel?${requestKey}` },
-      });
-      return;
-    }
     let cancelled = false;
+    let timer = null;
+    let attempts = 0;
+    const maxAttempts = 3;
 
     const loadStatus = async () => {
       try {
         const res = await getPaymentStatus({ orderNo });
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
         setOrder(res.data || null);
         setError("");
       } catch (err) {
-        if (cancelled) {
+        if (cancelled) return;
+        attempts += 1;
+        if (attempts >= maxAttempts) {
+          setOrder(null);
+          setError(err.message || t("payment.confirmFailed"));
           return;
         }
-        setOrder(null);
-        setError(err.message || t("payment.confirmFailed"));
+        timer = window.setTimeout(loadStatus, 1500 * attempts);
       }
     };
 
@@ -53,8 +50,11 @@ export default function PaymentCancel() {
 
     return () => {
       cancelled = true;
+      if (timer) {
+        window.clearTimeout(timer);
+      }
     };
-  }, [hasOrderNo, navigate, orderNo, requestKey, t]);
+  }, [hasOrderNo, orderNo, requestKey, t]);
 
   const effectiveError = hasOrderNo ? error : t("payment.confirmMissing");
 
@@ -81,8 +81,8 @@ export default function PaymentCancel() {
         <div className="mt-5 space-y-2 rounded-2xl border border-white/5 bg-white/5 p-4 text-left text-sm">
           {orderNo && (
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[#9AA7BD]">{t("payment.orderNo")}</span>
-              <span className="font-mono text-xs text-[#E7EDF7]">{orderNo}</span>
+              <span className="shrink-0 text-[#9AA7BD]">{t("payment.orderNo")}</span>
+              <span className="min-w-0 break-all text-right font-mono text-xs text-[#E7EDF7]">{orderNo}</span>
             </div>
           )}
           {order?.payStatus ? (
@@ -93,7 +93,7 @@ export default function PaymentCancel() {
               </span>
             </div>
           ) : null}
-          {order?.deliveryStatus ? (
+          {shouldShowDeliveryStatus(order) ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("payment.deliveryStatus")}</span>
               <span className="font-semibold text-[#E7EDF7]">
@@ -105,8 +105,8 @@ export default function PaymentCancel() {
           ) : null}
           {order?.packageName ? (
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[#9AA7BD]">{t("checkout.package")}</span>
-              <span className="text-right font-semibold text-[#E7EDF7]">{order.packageName}</span>
+              <span className="shrink-0 text-[#9AA7BD]">{t("checkout.package")}</span>
+              <span className="min-w-0 break-words text-right font-semibold text-[#E7EDF7]">{order.packageName}</span>
             </div>
           ) : null}
           {order?.platform ? (

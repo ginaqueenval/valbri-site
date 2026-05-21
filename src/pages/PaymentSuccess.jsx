@@ -1,35 +1,35 @@
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPaymentStatus } from "../api/payment";
-import { getPlayerToken } from "../utils/request";
+import OrderAccountInfoModal from "../components/OrderAccountInfoModal";
+import useOrderSse from "../hooks/useOrderSse";
 import {
   DELIVERY_STATUS_LABEL,
   PAYMENT_STATUS_LABEL,
   formatCoinsK,
   formatPrice,
+  shouldShowDeliveryStatus,
 } from "../utils/orderDisplay";
+import { isAccountInfoMissing } from "../utils/orderProgress";
 
 export default function PaymentSuccess() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const orderNo = searchParams.get("orderNo");
   const [order, setOrder] = useState(null);
   const [viewState, setViewState] = useState("checking");
   const [error, setError] = useState("");
+  const [accountInfoCompletedKey, setAccountInfoCompletedKey] = useState("");
+  const [accountInfoDismissedKey, setAccountInfoDismissedKey] = useState("");
   const requestKey = useMemo(() => searchParams.toString(), [searchParams]);
   const hasPaymentReference = Boolean(sessionId || orderNo);
+  const settledRef = useRef(false);
+  const fetchOnceRef = useRef(null);
 
   useEffect(() => {
     if (!hasPaymentReference) {
-      return;
-    }
-    if (!getPlayerToken()) {
-      navigate("/login", {
-        state: { redirectTo: `/payment/success?${requestKey}` },
-      });
       return;
     }
 
@@ -38,61 +38,86 @@ export default function PaymentSuccess() {
     let attempts = 0;
     const maxAttempts = 10;
     const intervalMs = 1500;
+    settledRef.current = false;
 
-    const pollStatus = async () => {
+    const fetchStatus = async () => {
       try {
         const res = await getPaymentStatus({
           sessionId: sessionId || undefined,
           orderNo: orderNo || undefined,
         });
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return { settled: true };
         const nextOrder = res.data || null;
         setOrder(nextOrder);
         if (nextOrder?.payStatus === "1") {
           setViewState("paid");
-          return;
+          settledRef.current = true;
+          return { settled: true };
         }
-        attempts += 1;
-        if (attempts >= maxAttempts) {
-          setViewState("pending");
-          return;
-        }
-        timer = window.setTimeout(pollStatus, intervalMs);
+        return { settled: false };
       } catch (err) {
-        if (cancelled) {
-          return;
-        }
-        attempts += 1;
-        if (attempts >= maxAttempts) {
-          setViewState("error");
-          setError(err.message || t("payment.confirmFailed"));
-          return;
-        }
-        timer = window.setTimeout(pollStatus, intervalMs);
+        if (cancelled) return { settled: true };
+        return { settled: false, error: err };
       }
     };
 
-    const startPolling = async () => {
-      setOrder(null);
-      setViewState("checking");
-      setError("");
-      await pollStatus();
+    fetchOnceRef.current = fetchStatus;
+
+    const pollStatus = async () => {
+      const result = await fetchStatus();
+      if (cancelled || result.settled) return;
+      attempts += 1;
+      if (attempts >= maxAttempts) {
+        if (result.error) {
+          setViewState("error");
+          setError(result.error.message || t("payment.confirmFailed"));
+        } else {
+          setViewState("pending");
+        }
+        settledRef.current = true;
+        return;
+      }
+      timer = window.setTimeout(pollStatus, intervalMs);
     };
 
-    startPolling();
+    setOrder(null);
+    setViewState("checking");
+    setError("");
+    pollStatus();
 
     return () => {
       cancelled = true;
+      fetchOnceRef.current = null;
       if (timer) {
         window.clearTimeout(timer);
       }
     };
-  }, [hasPaymentReference, navigate, orderNo, requestKey, sessionId, t]);
+  }, [hasPaymentReference, orderNo, requestKey, sessionId, t]);
+
+  const handleSseEvent = useCallback(
+    (event) => {
+      if (settledRef.current || !fetchOnceRef.current) return;
+      if (event.fallback) return;
+      if (event.bulk) {
+        const targetSet = Array.isArray(event.orderNos) ? new Set(event.orderNos) : null;
+        if (orderNo && targetSet && !targetSet.has(orderNo)) return;
+      } else if (orderNo && event.orderNo && event.orderNo !== orderNo) {
+        return;
+      }
+      fetchOnceRef.current();
+    },
+    [orderNo],
+  );
+
+  useOrderSse(handleSseEvent);
 
   const effectiveViewState = hasPaymentReference ? viewState : "error";
   const effectiveError = hasPaymentReference ? error : t("payment.confirmMissing");
+  const accountInfoOpen =
+    effectiveViewState === "paid" &&
+    isAccountInfoMissing(order) &&
+    accountInfoCompletedKey !== requestKey &&
+    accountInfoDismissedKey !== requestKey;
 
   const titleKey =
     effectiveViewState === "paid"
@@ -129,6 +154,18 @@ export default function PaymentSuccess() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-20 text-center">
+      <OrderAccountInfoModal
+        order={order}
+        open={accountInfoOpen}
+        onSaved={() => {
+          setAccountInfoCompletedKey(requestKey);
+          setAccountInfoDismissedKey("");
+          setOrder((prev) =>
+            prev ? { ...prev, requiresAccountInfo: false, accountInfoStatus: "submitted" } : prev,
+          );
+        }}
+        onClose={() => setAccountInfoDismissedKey(requestKey)}
+      />
       <div className={`mx-auto max-w-md rounded-3xl border bg-[#0B1220]/60 p-8 ${accentClass}`}>
         <div
           className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
@@ -201,14 +238,14 @@ export default function PaymentSuccess() {
         <div className="mt-5 space-y-2 rounded-2xl border border-white/5 bg-white/5 p-4 text-left text-sm">
           {order?.orderNo || orderNo ? (
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[#9AA7BD]">{t("payment.orderNo")}</span>
-              <span className="font-mono text-xs text-[#E7EDF7]">{order?.orderNo || orderNo}</span>
+              <span className="shrink-0 text-[#9AA7BD]">{t("payment.orderNo")}</span>
+              <span className="min-w-0 break-all text-right font-mono text-xs text-[#E7EDF7]">{order?.orderNo || orderNo}</span>
             </div>
           ) : null}
           {sessionId && (
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[#9AA7BD]">{t("payment.sessionId")}</span>
-              <span className="font-mono text-xs text-[#E7EDF7]">{sessionId.slice(0, 20)}...</span>
+              <span className="shrink-0 text-[#9AA7BD]">{t("payment.sessionId")}</span>
+              <span className="min-w-0 break-all text-right font-mono text-xs text-[#E7EDF7]">{sessionId.slice(0, 20)}...</span>
             </div>
           )}
           {order?.payStatus ? (
@@ -219,7 +256,7 @@ export default function PaymentSuccess() {
               </span>
             </div>
           ) : null}
-          {order?.deliveryStatus ? (
+          {shouldShowDeliveryStatus(order) ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("payment.deliveryStatus")}</span>
               <span className="font-semibold text-[#E7EDF7]">
@@ -231,8 +268,8 @@ export default function PaymentSuccess() {
           ) : null}
           {order?.packageName ? (
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[#9AA7BD]">{t("checkout.package")}</span>
-              <span className="text-right font-semibold text-[#E7EDF7]">{order.packageName}</span>
+              <span className="shrink-0 text-[#9AA7BD]">{t("checkout.package")}</span>
+              <span className="min-w-0 break-words text-right font-semibold text-[#E7EDF7]">{order.packageName}</span>
             </div>
           ) : null}
           {order?.platform ? (

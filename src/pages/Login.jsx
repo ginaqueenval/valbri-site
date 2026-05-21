@@ -1,50 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getPlayerCaptcha, playerLogin } from "../api/auth";
+import { playerLogin } from "../api/auth";
 import PlayerAuthLayout from "../components/PlayerAuthLayout.jsx";
 import { setStoredPlayerSession } from "../utils/playerAuth.js";
+import useCaptcha from "../hooks/useCaptcha.js";
 
 export default function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const {
+    captchaCode, setCaptchaCode, captchaUuid, captchaUrl, captchaEnabled, loadCaptcha,
+  } = useCaptcha();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [captchaCode, setCaptchaCode] = useState("");
-  const [captchaUuid, setCaptchaUuid] = useState("");
-  const [captchaUrl, setCaptchaUrl] = useState("");
-  const [captchaEnabled, setCaptchaEnabled] = useState(true);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const successMessage =
     typeof location.state?.message === "string" ? location.state.message : "";
-
-  useEffect(() => {
-    loadCaptcha();
-  }, []);
-
-  const loadCaptcha = async () => {
-    try {
-      const res = await getPlayerCaptcha();
-      const enabled = res.captchaEnabled !== false;
-      setCaptchaEnabled(enabled);
-      if (enabled) {
-        setCaptchaUrl(`data:image/jpeg;base64,${res.img}`);
-        setCaptchaUuid(res.uuid || "");
-      } else {
-        setCaptchaUrl("");
-        setCaptchaUuid("");
-      }
-      setCaptchaCode("");
-    } catch {
-      setCaptchaEnabled(false);
-      setCaptchaUrl("");
-      setCaptchaUuid("");
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -117,6 +93,7 @@ export default function Login() {
               onChange={(e) => setUsername(e.target.value)}
               required
               placeholder={t("auth.username")}
+              autoComplete="username"
             />
           </div>
 
@@ -130,6 +107,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder={t("auth.password")}
+              autoComplete="current-password"
             />
             <button
               type="button"
@@ -153,6 +131,8 @@ export default function Login() {
                   onChange={(e) => setCaptchaCode(e.target.value)}
                   required={captchaEnabled}
                   placeholder={t("auth.captchaPlaceholder")}
+                  autoComplete="off"
+                  inputMode="text"
                 />
               </div>
 
