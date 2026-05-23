@@ -50,20 +50,25 @@ export function resolveCustomerVisitorToken(localVisitorToken, session) {
   );
 }
 
+const SESSION_ACCESS_DENIED_PATTERNS = ["会话无权访问", "session access denied"];
+const SESSION_CLOSED_PATTERNS = ["会话已关闭", "session closed"];
+
 export function isCustomerSessionAccessDenied(message) {
-  return String(message || "").trim() === "会话无权访问";
+  const normalized = String(message || "").trim().toLowerCase();
+  return SESSION_ACCESS_DENIED_PATTERNS.some((p) => normalized === p);
 }
 
 export function isCustomerSessionClosed(message) {
-  return String(message || "").trim() === "会话已关闭";
+  const normalized = String(message || "").trim().toLowerCase();
+  return SESSION_CLOSED_PATTERNS.some((p) => normalized === p);
 }
 
 export function normalizeCustomerServiceNotice(message, translate) {
   if (isCustomerSessionAccessDenied(message)) {
-    return translate?.("cs.sessionAccessDenied") || "当前客服会话已失效，请关闭后重新打开客服窗口";
+    return translate?.("cs.sessionAccessDenied") || message;
   }
   if (isCustomerSessionClosed(message)) {
-    return translate?.("cs.sessionClosed") || "当前客服会话已关闭";
+    return translate?.("cs.sessionClosed") || message;
   }
   return message;
 }

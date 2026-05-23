@@ -23,3 +23,24 @@ export const formatPrice = (value, currency) =>
     style: "currency",
     currency: currency || "USD",
   }).format(value || 0);
+
+export const shouldShowDeliveryStatus = (order) => {
+  const deliveryStatus = order?.deliveryStatus;
+  return (
+    String(order?.payStatus) === "1" &&
+    deliveryStatus !== undefined &&
+    deliveryStatus !== null &&
+    deliveryStatus !== ""
+  );
+};
+
+export const isAccountInfoSubmitted = (order) =>
+  order?.accountInfoStatus === "submitted";
+
+export const formatTime = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};

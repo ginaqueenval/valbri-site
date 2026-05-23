@@ -34,7 +34,7 @@ request.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status } = error.response;
-      if (status === 401) {
+      if (status === 401 && getStoredPlayerToken()) {
         clearStoredPlayerSession({
           reason: "expired",
           notifySessionExpired: error.config?.skipSessionExpiredPrompt !== true,
@@ -44,9 +44,5 @@ request.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-export function getPlayerToken() {
-  return getStoredPlayerToken();
-}
 
 export default request;

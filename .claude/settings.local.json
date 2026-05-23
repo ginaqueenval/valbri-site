@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -n '8,13p' /Users/zhangjie/zhanglei/Lootbar-github/valbri-site/src/utils/orderProgress.js)",
+      "Bash(sed -n '41,44p' /Users/zhangjie/zhanglei/Lootbar-github/valbri-site/src/pages/Orders.jsx)",
+      "Bash(sed -n '13,14p' /Users/zhangjie/zhanglei/Lootbar-github/valbri-site/src/pages/PaymentSuccess.jsx)",
+      "Bash(sed -n '16,23p' /Users/zhangjie/zhanglei/Lootbar-github/valbri-site/src/pages/PaymentSuccess.jsx)",
+      "Bash(sed -n '12,19p' /Users/zhangjie/zhanglei/Lootbar-github/valbri-site/src/pages/PaymentCancel.jsx)",
+      "Bash(npx vite *)",
+      "Read(//Users/zhangjie/zhanglei/Lootbar-github/Walbri-Backend/**)",
+      "Bash(mvn compile *)",
+      "Bash(node --test src/utils/orderProgress.test.js)",
+      "Bash(node --test src/pages/MockPayment.test.js src/pages/OrderAccountInfo.test.js)",
+      "Bash(node --test src/pages/OrderAccountInfo.test.js)",
+      "Bash(git stash *)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "Bash(node -e ' *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(curl -s http://localhost:5180/)",
+      "Bash(pkill -f \"vite --port 5180\")"
+    ]
+  }
+}
