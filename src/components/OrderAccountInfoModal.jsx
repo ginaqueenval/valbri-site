@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getOrderAccountInfo, saveOrderAccountInfo } from "../api/order";
 import { formatTime, isAccountInfoSubmitted } from "../utils/orderDisplay";
+import { validateOrderAccountForm } from "../utils/orderAccountValidation";
 
 const emptyForm = {
   gameAccount: "",
@@ -138,23 +139,25 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
 
   const submit = async (event) => {
     event.preventDefault();
-    if (!form.gameAccount.trim() || !form.gamePassword.trim() || !form.backupCodes.trim()) {
-      setError(t("orderAccount.required"));
+    const validation = validateOrderAccountForm(form);
+    if (!validation.valid) {
+      setError(t(`orderAccount.${validation.errorKey}`));
       return;
     }
+    const data = validation.data;
     setSaving(true);
     setError("");
     try {
       await saveOrderAccountInfo(order.id, {
-        gameAccount: form.gameAccount.trim(),
-        gamePassword: form.gamePassword.trim(),
-        backupCodes: form.backupCodes.trim(),
+        gameAccount: data.gameAccount,
+        gamePassword: data.gamePassword,
+        backupCodes: data.backupCodes,
       });
       setAccountInfo({
         ...(accountInfo || {}),
-        gameAccount: form.gameAccount.trim(),
-        gamePassword: form.gamePassword.trim(),
-        backupCodes: form.backupCodes.trim(),
+        gameAccount: data.gameAccount,
+        gamePassword: data.gamePassword,
+        backupCodes: data.backupCodes,
         updatedAt: new Date().toISOString(),
         submittedAt: accountInfo?.submittedAt || new Date().toISOString(),
       });
@@ -179,8 +182,8 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
   );
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-2 sm:px-4">
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#00FF9A]/20 bg-[#0B1220] p-4 text-left shadow-2xl sm:p-6">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-3 sm:px-4">
+      <div className="valbri-scrollbar relative max-h-[82dvh] w-full max-w-[min(92vw,420px)] overflow-y-auto rounded-2xl border border-[#00FF9A]/20 bg-[#0B1220] p-3 text-left shadow-2xl sm:max-h-[90vh] sm:max-w-lg sm:p-6">
         <button
           type="button"
           onClick={onClose}
@@ -193,13 +196,13 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
           <div className="px-10 text-xs font-semibold uppercase tracking-widest text-[#00FF9A]">
             {t("orderAccount.badge")}
           </div>
-          <h2 className="mt-2 text-xl font-extrabold">
+          <h2 className="mt-2 text-lg font-extrabold sm:text-xl">
             {submitted ? t("orderAccount.viewTitle") : t("orderAccount.title")}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-[#9AA7BD]">
+          <p className="mt-2 text-xs leading-5 text-[#9AA7BD] sm:text-sm sm:leading-6">
             {submitted ? t("orderAccount.viewDesc") : t("orderAccount.desc")}
           </p>
-          <p className="mt-2 text-base font-semibold leading-6 text-[#00FF9A]">
+          <p className="mt-2 text-sm font-semibold leading-5 text-[#00FF9A] sm:text-base sm:leading-6">
             {t("orderAccount.encryptedNotice")}
           </p>
         </div>
@@ -243,7 +246,7 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
             </button>
           </div>
         ) : (
-          <form className="mt-5 grid gap-4 text-left" onSubmit={submit}>
+          <form className="mt-4 grid gap-3 text-left sm:mt-5 sm:gap-4" onSubmit={submit}>
             <label className="grid gap-2 text-sm">
               <span className="font-semibold">{t("orderAccount.gameAccount")}</span>
               <input
@@ -265,10 +268,13 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
             </label>
             <label className="grid gap-2 text-sm">
               <span className="font-semibold">{t("orderAccount.backupCodes")}</span>
-              <textarea
+              <input
                 value={form.backupCodes}
                 onChange={(event) => updateField("backupCodes", event.target.value)}
-                className="min-h-[110px] resize-y rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/50"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/50"
+                autoComplete="off"
               />
             </label>
             {error && (

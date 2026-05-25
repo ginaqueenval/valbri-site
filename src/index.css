@@ -4,10 +4,42 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  scrollbar-color: rgba(0, 255, 154, 0.42) rgba(10, 16, 28, 0.82);
+  scrollbar-width: thin;
 }
 
 body {
   width: 100%;
+}
+
+* {
+  scrollbar-color: rgba(0, 255, 154, 0.38) rgba(10, 16, 28, 0.76);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(10, 16, 28, 0.82);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 255, 154, 0.7), rgba(102, 224, 255, 0.58));
+  border: 2px solid rgba(10, 16, 28, 0.86);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0, 255, 154, 0.92), rgba(102, 224, 255, 0.78));
+}
+
+.valbri-scrollbar {
+  scrollbar-color: rgba(0, 255, 154, 0.5) rgba(15, 23, 42, 0.92);
+  scrollbar-width: thin;
 }
 
 @keyframes drawerOpen {
@@ -50,7 +82,7 @@ body {
 
 .customer-service-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(142, 160, 185, 0.46) rgba(255, 255, 255, 0.04);
+  scrollbar-color: rgba(0, 255, 154, 0.46) rgba(10, 16, 28, 0.72);
 }
 
 .customer-service-scrollbar::-webkit-scrollbar {
@@ -58,17 +90,17 @@ body {
 }
 
 .customer-service-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(10, 16, 28, 0.72);
   border-radius: 999px;
 }
 
 .customer-service-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(142, 160, 185, 0.46);
+  background: linear-gradient(180deg, rgba(0, 255, 154, 0.68), rgba(102, 224, 255, 0.54));
   border-radius: 999px;
 }
 
 .customer-service-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(158, 254, 209, 0.58);
+  background: linear-gradient(180deg, rgba(0, 255, 154, 0.9), rgba(102, 224, 255, 0.74));
 }
 
 @property --auth-ring {
