@@ -11,6 +11,21 @@ export const DELIVERY_STATUS_LABEL = {
   2: "completed",
 };
 
+export const normalizePaymentStatus = (value) => String(value ?? "0");
+
+export const normalizeDeliveryStatus = (value) => String(value ?? "");
+
+export const getPaymentStatusLabel = (value) =>
+  PAYMENT_STATUS_LABEL[normalizePaymentStatus(value)] || "pending";
+
+export const getDeliveryStatusLabel = (value) =>
+  DELIVERY_STATUS_LABEL[normalizeDeliveryStatus(value)] || "pendingDelivery";
+
+export const isPaidPaymentStatus = (value) => normalizePaymentStatus(value) === "1";
+
+export const isPendingPaymentStatus = (value) =>
+  normalizePaymentStatus(value) === "0";
+
 export const formatCoinsK = (value) => {
   if (!value) return "0";
   if (value < 1000) return String(value);
@@ -27,7 +42,7 @@ export const formatPrice = (value, currency) =>
 export const shouldShowDeliveryStatus = (order) => {
   const deliveryStatus = order?.deliveryStatus;
   return (
-    String(order?.payStatus) === "1" &&
+    isPaidPaymentStatus(order?.payStatus) &&
     deliveryStatus !== undefined &&
     deliveryStatus !== null &&
     deliveryStatus !== ""
@@ -42,5 +57,7 @@ export const formatTime = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
   const pad = (n) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const dateText = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const timeText = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return `${dateText} ${timeText}`;
 };

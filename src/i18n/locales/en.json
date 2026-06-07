@@ -3,9 +3,9 @@
     "brand": "valbri",
     "brandSubtitle": "Gaming Marketplace",
     "nav": {
-    "fc26": "FC26 Coins",
-    "about": "About",
-    "contact": "Contact"
+      "fc26": "FC26 Coins",
+      "about": "About",
+      "contact": "Contact"
     },
     "buyBtn": "Buy FC26 Coins",
     "accountLabel": "Player Account",
@@ -23,11 +23,109 @@
     "chinese": "中文"
   },
   "home": {
-    "badge": "FC26 packages live — payment integration next",
+    "eyebrow": "FC26 · Ultimate Team",
+    "heroLine1": "Focused on FC26",
+    "heroLine2": "Coin Trading.",
+    "tagline": "Encrypted end to end. Delivered fast. Engineered to keep your account safe — from checkout to coins in hand, every step stays clear and rock-solid.",
+    "pill": {
+      "encrypted": "Encrypted",
+      "fast": "Fast Delivery",
+      "safe": "Account Safe"
+    },
+    "stickyBar": {
+      "title": "FC 26 Coins"
+    },
+    "cta": "Shop Packages",
+    "ctaShort": "Shop",
+    "scrollHint": "Scroll to explore",
+    "howToBuy": {
+      "eyebrow": "How To Buy",
+      "title": "How to buy",
+      "subtitle": "Here are the detailed steps for purchasing FC 26 Coins on Valbri.",
+      "step1": "On the Valbri home page, choose your preferred language.",
+      "step2": "Sign in to your Valbri account, or create a new one if you don't have it yet.",
+      "step3": "Click \"Shop Packages\" on the home page to enter the FC 26 Coins page.",
+      "step4": "Pick your platform — PlayStation, Xbox, or PC.",
+      "step5": "Choose the FC coin bundle you want and adjust the quantity.",
+      "step6": "Tap \"Checkout\", select your preferred payment method (Stripe / PayPal), and complete payment.",
+      "step7": "Submit the required game account info and wait for our manual delivery."
+    },
+    "precautions": {
+      "eyebrow": "Before You Buy",
+      "title": "Before you buy",
+      "subtitle": "Please read and confirm the following before placing your order — it makes delivery smoother and keeps your account safer.",
+      "item1": {
+        "title": "Unlock the Transfer Market",
+        "desc": "Before continuing, please make sure you've unlocked the Transfer Market in FUT Web or the Companion App."
+      },
+      "item2": {
+        "title": "Minimum Coin Requirement",
+        "desc": "Please make sure you have at least 3,000 FC Coins in-game as starting capital. The more coins on the account, the faster and safer the delivery. If you don't have enough FC 26 Coins yet, try selling some unused player cards or playing a few matches to build up a balance."
+      },
+      "item3": {
+        "title": "Avoid Cross-Platform Buying",
+        "desc": "Within 24 hours before and 48 hours after a Valbri transaction, please avoid buying FC 26 Coins from other platforms to reduce the risk of being banned."
+      },
+      "item4": {
+        "title": "Don't Log In During Delivery",
+        "desc": "Please don't sign in to FC 26 (game, Web App, or Mobile App) while a delivery is in progress, so the process stays smooth."
+      },
+      "item5": {
+        "title": "Post-Trade Security",
+        "desc": "After a successful trade, please change your account password immediately and remove any unrecognized trusted devices to harden your account."
+      }
+    },
+    "guarantee": {
+      "eyebrow": "Service Guarantee",
+      "title": "Service guarantee",
+      "subtitle": "From checkout to coins in hand, we've got you covered.",
+      "items": {
+        "noFee": {
+          "title": "No 5% Fee",
+          "desc": "Skip the 5% EA transfer fee — every coin you buy lands in your wallet."
+        },
+        "fastDelivery": {
+          "title": "Safe & Fast Delivery",
+          "desc": "Coins are sourced through manual in-game runs — the supply chain stays clean and reliable."
+        },
+        "afterSale": {
+          "title": "Stress-Free After-Sales",
+          "desc": "Within warranty: if coins get clawed back, we top them up; if you get banned, we refund in full."
+        },
+        "warranty7d": {
+          "title": "7-Day Warranty",
+          "desc": "Extended coverage — if your order triggers an in-game ban within 7 days of delivery, refunds and other remedies apply."
+        }
+      }
+    },
+    "whyUs": {
+      "eyebrow": "Why Choose Us",
+      "title": "Why pick Valbri?",
+      "subtitle": "Every delivery is engineered with the care of a software craftsman.",
+      "items": {
+        "secure": {
+          "title": "100% Secure",
+          "desc": "Efficient, professional, and safe transactions with your data fully protected — 100% secure."
+        },
+        "support": {
+          "title": "24/7 Support",
+          "desc": "Our reliable support team is on call around the clock — before, during, and after your purchase."
+        },
+        "refund": {
+          "title": "Full Refund Guarantee",
+          "desc": "We offer the most competitive prices and efficient delivery. If your order doesn't arrive or can't be used, we promise a 100% refund."
+        }
+      }
+    },
+    "closing": {
+      "title": "Ready to start your FC 26 journey?",
+      "subtitle": "Pick a pack, pay, and your coins land in minutes."
+    },
+    "badge": "FC26 packages live — Stripe & PayPal available",
     "title": "FC26 Ultimate Team Coins —",
     "titleHighlight": " fast & secure",
     "titleEnd": " delivery",
-    "description": "Valbri is a gaming marketplace focused on FC26 coins and selected game services. Checkout and payment gateway will be enabled after final approval.",
+    "description": "Valbri is a gaming marketplace focused on FC26 coins and selected game services. Check out with Stripe or PayPal and get your coins in minutes.",
     "viewPackages": "View FC26 Packages",
     "browseGames": "Browse Games",
     "features": {
@@ -44,8 +142,8 @@
         "desc": "Packages + bonus gift"
       },
       "gateway": {
-        "title": "Gateway Soon",
-        "desc": "Checkout in final step"
+        "title": "Stripe & PayPal",
+        "desc": "Trusted global checkout"
       }
     },
     "featuredTitle": "Featured Packages",
@@ -58,7 +156,7 @@
     "addToCart": "Add to Cart",
     "addedToCart": "Added to cart!",
     "addToCartFailed": "Failed to add",
-    "paymentNotice": "Payment is currently disabled while the gateway is being finalized. You can still submit your order details from the FC26 page.",
+    "paymentNotice": "Check out with Stripe or PayPal and get your coins delivered within minutes.",
     "gamesTitle": "Games",
     "gamesDesc": "We currently focus on FC26, and also support the following games.",
     "comingSoon": "Page & pricing: coming soon"

@@ -11,7 +11,12 @@ import {
   resetPackageQuantity,
   updatePackageQuantity,
 } from "./fc26State";
-import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import {
+  formatCoinsK,
+  formatPrice,
+  getPaymentStatusLabel,
+  isPaidPaymentStatus,
+} from "../utils/orderDisplay";
 import { noteLabel, sortPackages } from "../utils/packageDisplay";
 
 const PLATFORMS = ["PlayStation", "Xbox", "PC"];
@@ -405,55 +410,52 @@ export default function Fc26() {
                 </div>
               ) : (
                 <div className="mt-3 grid gap-2">
-                  {recentOrders.map((o) => (
-                    <div
-                      key={o.id}
-                      className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold truncate">
-                            {formatCoinsK(o.coins)} {t("fc26.coins")}
-                            {o.giftCoins > 0 && (
-                              <span className="text-[#00FF9A]">
-                                {" "}
-                                +{formatCoinsK(o.giftCoins)} {t("fc26.gift")}
-                              </span>
+                  {recentOrders.map((o) => {
+                    const paymentStatusLabel = getPaymentStatusLabel(o.payStatus);
+                    return (
+                      <div
+                        key={o.id}
+                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold truncate">
+                              {formatCoinsK(o.coins)} {t("fc26.coins")}
+                              {o.giftCoins > 0 && (
+                                <span className="text-[#00FF9A]">
+                                  {" "}
+                                  +{formatCoinsK(o.giftCoins)} {t("fc26.gift")}
+                                </span>
+                              )}
+                            </span>
+                            <span
+                              className={
+                                "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold " +
+                                (isPaidPaymentStatus(o.payStatus)
+                                  ? "bg-[#00FF9A]/10 text-[#00FF9A]"
+                                  : paymentStatusLabel === "cancelled"
+                                    ? "bg-slate-500/10 text-slate-300"
+                                    : paymentStatusLabel === "refunded"
+                                      ? "bg-red-500/10 text-red-400"
+                                      : "bg-yellow-500/10 text-yellow-400")
+                              }
+                            >
+                              {t(`fc26.orderStatus.${paymentStatusLabel}`)}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 text-[10px] text-[#9AA7BD]">
+                            {formatPrice(o.price, o.currency)}
+                            {o.quantity > 1 && (
+                              <span className="ml-1">×{o.quantity}</span>
                             )}
-                          </span>
-                          <span
-                            className={
-                              "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold " +
-                              (o.payStatus === "1"
-                                ? "bg-[#00FF9A]/10 text-[#00FF9A]"
-                                : o.payStatus === "2"
-                                  ? "bg-slate-500/10 text-slate-300"
-                                  : o.payStatus === "3"
-                                  ? "bg-red-500/10 text-red-400"
-                                  : "bg-yellow-500/10 text-yellow-400")
-                            }
-                          >
-                            {t(
-                              `fc26.orderStatus.${
-                                { 0: "pending", 1: "paid", 2: "cancelled", 3: "refunded" }[
-                                  o.payStatus
-                                ] || "pending"
-                              }`,
-                            )}
-                          </span>
+                          </div>
                         </div>
-                        <div className="mt-0.5 text-[10px] text-[#9AA7BD]">
-                          {formatPrice(o.price, o.currency)}
-                          {o.quantity > 1 && (
-                            <span className="ml-1">×{o.quantity}</span>
-                          )}
-                        </div>
+                        <span className="shrink-0 text-[10px] text-[#9AA7BD]">
+                          {new Date(o.createTime).toLocaleDateString()}
+                        </span>
                       </div>
-                      <span className="shrink-0 text-[10px] text-[#9AA7BD]">
-                        {new Date(o.createTime).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <Link
                     to="/orders"
                     className="mt-1 block text-center text-xs text-[#00FF9A] hover:underline"

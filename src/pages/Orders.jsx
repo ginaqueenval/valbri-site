@@ -14,7 +14,9 @@ import {
   formatCoinsK,
   formatPrice,
   formatTime,
+  isPaidPaymentStatus,
   isAccountInfoSubmitted,
+  isPendingPaymentStatus,
 } from "../utils/orderDisplay";
 
 const ORDER_TABS = [
@@ -236,7 +238,7 @@ export default function Orders() {
           return prev.map((order) => {
             const match = targetSet
               ? targetSet.has(order.orderNo)
-              : order.payStatus === "0";
+              : isPendingPaymentStatus(order.payStatus);
             return match ? applySseUpdate(order, event) : order;
           });
         }
@@ -403,7 +405,7 @@ export default function Orders() {
                       <span className="font-mono text-xs text-[#9AA7BD]">
                         {o.orderNo}
                       </span>
-                      {o.payStatus === "1" && (
+                      {isPaidPaymentStatus(o.payStatus) && (
                         <button
                           type="button"
                           onClick={() => openAccountInfo(o)}

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { checkoutCartItem, getCartItem } from "../api/cart";
 import { createStripeSession, createPayPalOrder } from "../api/payment";
 import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import { getSafePaymentRedirectUrl } from "../utils/paymentRedirect";
 
 const isPaymentNotConfiguredMessage = (message) => {
   const normalized = String(message || "").toLowerCase();
@@ -69,7 +70,12 @@ export default function Checkout() {
   };
 
   const redirectToPayment = (paymentUrl) => {
-    window.location.href = paymentUrl;
+    const safePaymentUrl = getSafePaymentRedirectUrl(paymentUrl);
+    if (!safePaymentUrl) {
+      return false;
+    }
+    window.location.href = safePaymentUrl;
+    return true;
   };
 
   const handleStripePay = async () => {
@@ -85,7 +91,10 @@ export default function Checkout() {
         quantity: cartItem.quantity || 1,
       });
       window.dispatchEvent(new Event("cart-changed"));
-      redirectToPayment(res.data.sessionUrl);
+      if (!redirectToPayment(res.data?.sessionUrl)) {
+        setError(t("payment.failed"));
+        endPayment();
+      }
     } catch (err) {
       const msg = err.msg || err.message || "";
       if (isPaymentNotConfiguredMessage(msg)) {
@@ -110,7 +119,10 @@ export default function Checkout() {
         quantity: cartItem.quantity || 1,
       });
       window.dispatchEvent(new Event("cart-changed"));
-      redirectToPayment(res.data.approveUrl);
+      if (!redirectToPayment(res.data?.approveUrl)) {
+        setError(t("payment.failed"));
+        endPayment();
+      }
     } catch (err) {
       const msg = err.msg || err.message || "";
       if (isPaymentNotConfiguredMessage(msg)) {

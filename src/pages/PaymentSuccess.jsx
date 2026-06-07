@@ -5,10 +5,11 @@ import { getPaymentStatus } from "../api/payment";
 import OrderAccountInfoModal from "../components/OrderAccountInfoModal";
 import useOrderSse from "../hooks/useOrderSse";
 import {
-  DELIVERY_STATUS_LABEL,
-  PAYMENT_STATUS_LABEL,
   formatCoinsK,
   formatPrice,
+  getDeliveryStatusLabel,
+  getPaymentStatusLabel,
+  isPaidPaymentStatus,
   shouldShowDeliveryStatus,
 } from "../utils/orderDisplay";
 import { isAccountInfoMissing } from "../utils/orderProgress";
@@ -49,7 +50,7 @@ export default function PaymentSuccess() {
         if (cancelled) return { settled: true };
         const nextOrder = res.data || null;
         setOrder(nextOrder);
-        if (nextOrder?.payStatus === "1") {
+        if (isPaidPaymentStatus(nextOrder?.payStatus)) {
           setViewState("paid");
           settledRef.current = true;
           return { settled: true };
@@ -252,7 +253,7 @@ export default function PaymentSuccess() {
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("payment.realStatus")}</span>
               <span className="font-semibold text-[#E7EDF7]">
-                {t(`orders.status.${PAYMENT_STATUS_LABEL[order.payStatus] || "pending"}`)}
+                {t(`orders.status.${getPaymentStatusLabel(order.payStatus)}`)}
               </span>
             </div>
           ) : null}
@@ -261,7 +262,7 @@ export default function PaymentSuccess() {
               <span className="text-[#9AA7BD]">{t("payment.deliveryStatus")}</span>
               <span className="font-semibold text-[#E7EDF7]">
                 {t(
-                  `orders.delivery.${DELIVERY_STATUS_LABEL[order.deliveryStatus] || "pendingDelivery"}`,
+                  `orders.delivery.${getDeliveryStatusLabel(order.deliveryStatus)}`,
                 )}
               </span>
             </div>

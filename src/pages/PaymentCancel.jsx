@@ -3,10 +3,10 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPaymentStatus } from "../api/payment";
 import {
-  DELIVERY_STATUS_LABEL,
-  PAYMENT_STATUS_LABEL,
   formatCoinsK,
   formatPrice,
+  getDeliveryStatusLabel,
+  getPaymentStatusLabel,
   shouldShowDeliveryStatus,
 } from "../utils/orderDisplay";
 
@@ -89,7 +89,7 @@ export default function PaymentCancel() {
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("payment.realStatus")}</span>
               <span className="font-semibold text-[#E7EDF7]">
-                {t(`orders.status.${PAYMENT_STATUS_LABEL[order.payStatus] || "pending"}`)}
+                {t(`orders.status.${getPaymentStatusLabel(order.payStatus)}`)}
               </span>
             </div>
           ) : null}
@@ -98,7 +98,7 @@ export default function PaymentCancel() {
               <span className="text-[#9AA7BD]">{t("payment.deliveryStatus")}</span>
               <span className="font-semibold text-[#E7EDF7]">
                 {t(
-                  `orders.delivery.${DELIVERY_STATUS_LABEL[order.deliveryStatus] || "pendingDelivery"}`,
+                  `orders.delivery.${getDeliveryStatusLabel(order.deliveryStatus)}`,
                 )}
               </span>
             </div>

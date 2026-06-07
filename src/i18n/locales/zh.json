@@ -3,9 +3,9 @@
     "brand": "valbri",
     "brandSubtitle": "游戏交易平台",
     "nav": {
-    "fc26": "FC26 金币",
-    "about": "关于我们",
-    "contact": "联系我们"
+      "fc26": "FC26 金币",
+      "about": "关于我们",
+      "contact": "联系我们"
     },
     "buyBtn": "购买 FC26 金币",
     "accountLabel": "玩家账号",
@@ -23,11 +23,109 @@
     "chinese": "中文"
   },
   "home": {
-    "badge": "FC26 套餐已上线 — 支付集成即将完成",
+    "eyebrow": "FC26 · Ultimate Team",
+    "heroLine1": "专注 FC26",
+    "heroLine2": "金币交易",
+    "tagline": "全程信息加密，订单交付迅速，账号安全有保障。从下单到到账，每一步都清晰可见、稳如磐石。",
+    "pill": {
+      "encrypted": "信息加密",
+      "fast": "极速交付",
+      "safe": "账号无忧"
+    },
+    "stickyBar": {
+      "title": "FC 26 金币"
+    },
+    "cta": "选购套餐",
+    "ctaShort": "选购",
+    "scrollHint": "滚动了解更多",
+    "howToBuy": {
+      "eyebrow": "How To Buy",
+      "title": "如何购买",
+      "subtitle": "以下是如何在 Valbri 购买 FC 26 金币的详细步骤。",
+      "step1": "在 Valbri 首页，选择您偏好的语言。",
+      "step2": "登入您的 Valbri 帐户，或者如果您尚未拥有帐户，请创建一个帐户。",
+      "step3": "在首页点击「选购套餐」进入 FC 26 金币页面。",
+      "step4": "选择您的平台（PlayStation、Xbox 或 PC）。",
+      "step5": "选择您想购买的 FC 金币套装并调整数量。",
+      "step6": "点击「立即结算」，选择您偏好的付款方式（Stripe / PayPal），然后完成付款。",
+      "step7": "提交所需的游戏账户信息并等待我们手动交付。"
+    },
+    "precautions": {
+      "eyebrow": "Before You Buy",
+      "title": "购买前注意事项",
+      "subtitle": "在下单前，请阅读并确认以下事项，这能让交付更顺利、账号更安全。",
+      "item1": {
+        "title": "解锁转会市场",
+        "desc": "在继续之前，请确保您已在 FUT Web 或 Companion App 上解锁转会市场。"
+      },
+      "item2": {
+        "title": "最低硬币要求",
+        "desc": "请确保您的游戏中至少有 3000 FC 金币作为起始资金。帐户中的金币越多，订单交付的速度和安全性就越高。如果您没有足够的 FC 26 金币，请尝试先出售一些未使用的球员卡或玩几场游戏以累积更多硬币。"
+      },
+      "item3": {
+        "title": "避免跨平台购买",
+        "desc": "在 Valbri 交易前 24 小时和后 48 小时内，请避免在其他平台购买 FC 26 金币，以降低被封禁的风险。"
+      },
+      "item4": {
+        "title": "交易期间请勿登入",
+        "desc": "在交易期间，请勿登入 FC 26 游戏、Web App 或 Mobile App，以确保交付过程顺利。"
+      },
+      "item5": {
+        "title": "交易后安全性",
+        "desc": "在成功交易后，请立即更改您的帐户密码并移除受信设备中的未认可设备，以加强帐户安全性。"
+      }
+    },
+    "guarantee": {
+      "eyebrow": "Service Guarantee",
+      "title": "服务保障",
+      "subtitle": "从下单到到账，全流程为您兜底。",
+      "items": {
+        "noFee": {
+          "title": "免 5% 手续费",
+          "desc": "金币交易过程中，无需支付球员转会 5% 手续费，所购金币全额到账。"
+        },
+        "fastDelivery": {
+          "title": "安全快速发货",
+          "desc": "通过人工方式在游戏内正规打金，来源可控、安全可靠。"
+        },
+        "afterSale": {
+          "title": "售后无忧保障",
+          "desc": "质保有效期内，发生扣金我们将为您补发金币；邮件收信封号提供全额退款。"
+        },
+        "warranty7d": {
+          "title": "7 天售后保障",
+          "desc": "超长质保时效，发货后 7 天内因订单导致游戏内封号等问题，支持退款等售后处理。"
+        }
+      }
+    },
+    "whyUs": {
+      "eyebrow": "Why Choose Us",
+      "title": "为什么选择 Valbri？",
+      "subtitle": "我们用一颗工程师的心打磨每一次金币交付。",
+      "items": {
+        "secure": {
+          "title": "100% 交易安全",
+          "desc": "我们保证高效、专业和安全的交易，全面保护您的数据 —— 100% 安全。"
+        },
+        "support": {
+          "title": "24/7 客户服务",
+          "desc": "可靠的客服团队全天候为您提供快速便捷的帮助，无论购买前、购买中还是购买后。"
+        },
+        "refund": {
+          "title": "全额退款保障",
+          "desc": "Valbri 提供最具竞争力的价格与高效发货。如商品未送达或无法使用，我们承诺 100% 退款。"
+        }
+      }
+    },
+    "closing": {
+      "title": "准备好开启你的 FC 26 旅程了吗？",
+      "subtitle": "选择套餐，完成支付，金币几分钟内即可到账。"
+    },
+    "badge": "FC26 套餐已上线 — Stripe & PayPal 已开放",
     "title": "FC26 Ultimate Team 金币 —",
     "titleHighlight": " 快速安全",
     "titleEnd": " 交付",
-    "description": "Valbri 是一个专注于 FC26 金币和精选游戏服务的游戏交易平台。结账和支付网关将在最终批准后启用。",
+    "description": "Valbri 是一个专注于 FC26 金币和精选游戏服务的游戏交易平台,支持 Stripe 与 PayPal 快速结算,金币几分钟内到账。",
     "viewPackages": "查看 FC26 套餐",
     "browseGames": "浏览游戏",
     "features": {
@@ -44,8 +142,8 @@
         "desc": "套餐 + 赠送礼物"
       },
       "gateway": {
-        "title": "网关即将上线",
-        "desc": "结算在最终步骤"
+        "title": "Stripe & PayPal",
+        "desc": "全球可信结算"
       }
     },
     "featuredTitle": "精选套餐",
@@ -58,7 +156,7 @@
     "addToCart": "加入购物车",
     "addedToCart": "已加入购物车！",
     "addToCartFailed": "加入失败",
-    "paymentNotice": "支付功能目前正在禁用中，支付网关正在最终确定。您仍可以从 FC26 页面提交订单详情。",
+    "paymentNotice": "支持 Stripe 与 PayPal 结算,金币几分钟内即可到账。",
     "gamesTitle": "游戏",
     "gamesDesc": "我们目前专注于 FC26，同时也支持以下游戏。",
     "comingSoon": "页面和定价：即将推出"
