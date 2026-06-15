@@ -10,7 +10,7 @@
     "buyBtn": "Buy FC26 Coins",
     "accountLabel": "Player Account",
     "cart": "Cart",
-    "checkout": "My Orders",
+    "checkout": "Purchase History",
     "back": "Back"
   },
   "footer": {
@@ -24,8 +24,8 @@
   },
   "home": {
     "eyebrow": "FC26 · Ultimate Team",
-    "heroLine1": "Focused on FC26",
-    "heroLine2": "Coin Trading.",
+    "heroLine1": "FC26 Coin Trading",
+    "heroLine2": "Simplified Just Right",
     "tagline": "Encrypted end to end. Delivered fast. Engineered to keep your account safe — from checkout to coins in hand, every step stays clear and rock-solid.",
     "pill": {
       "encrypted": "Encrypted",
@@ -60,17 +60,13 @@
       },
       "item2": {
         "title": "Minimum Coin Requirement",
-        "desc": "Please make sure you have at least 3,000 FC Coins in-game as starting capital. The more coins on the account, the faster and safer the delivery. If you don't have enough FC 26 Coins yet, try selling some unused player cards or playing a few matches to build up a balance."
+        "desc": "Please make sure you have at least 1,000 FC Coins in-game as starting capital. The more coins on the account, the faster and safer the delivery. If you don't have enough FC 26 Coins yet, try selling some unused player cards or playing a few matches to build up a balance."
       },
       "item3": {
         "title": "Avoid Cross-Platform Buying",
         "desc": "Within 24 hours before and 48 hours after a Valbri transaction, please avoid buying FC 26 Coins from other platforms to reduce the risk of being banned."
       },
       "item4": {
-        "title": "Don't Log In During Delivery",
-        "desc": "Please don't sign in to FC 26 (game, Web App, or Mobile App) while a delivery is in progress, so the process stays smooth."
-      },
-      "item5": {
         "title": "Post-Trade Security",
         "desc": "After a successful trade, please change your account password immediately and remove any unrecognized trusted devices to harden your account."
       }
@@ -393,7 +389,7 @@
     "maxPack": "Max Pack"
   },
   "orders": {
-    "title": "My Orders",
+    "title": "Purchase History",
     "subtitle": "View your purchase history and order status.",
     "loading": "Loading...",
     "empty": "No orders yet. ",

@@ -96,7 +96,7 @@ export default function Checkout() {
         endPayment();
       }
     } catch (err) {
-      const msg = err.msg || err.message || "";
+      const msg = err?.response?.data?.msg || err?.message || "";
       if (isPaymentNotConfiguredMessage(msg)) {
         setError(t("payment.notConfigured"));
       } else {
@@ -124,7 +124,7 @@ export default function Checkout() {
         endPayment();
       }
     } catch (err) {
-      const msg = err.msg || err.message || "";
+      const msg = err?.response?.data?.msg || err?.message || "";
       if (isPaymentNotConfiguredMessage(msg)) {
         setError(t("payment.notConfigured"));
       } else {

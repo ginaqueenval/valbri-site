@@ -184,9 +184,10 @@ export default function Orders() {
   const [loadingAccountOrderId, setLoadingAccountOrderId] = useState(null);
   const pageSize = 10;
   const requestIdRef = useRef(0);
+  const abortControllerRef = useRef(null);
 
   const loadOrders = useCallback(
-    async ({ silent = false } = {}) => {
+    async ({ silent = false, signal } = {}) => {
       const currentId = ++requestIdRef.current;
       if (!silent) {
         setLoading(true);
@@ -196,7 +197,7 @@ export default function Orders() {
         params.playerStatus = activeTab;
       }
       try {
-        const res = await getOrderList(params);
+        const res = await getOrderList(params, { signal });
         if (requestIdRef.current !== currentId) return;
         const rows = res.rows || [];
         const nextRows = rows.filter((order) =>
@@ -204,7 +205,8 @@ export default function Orders() {
         );
         setOrders(nextRows);
         setTotal(res.total || 0);
-      } catch {
+      } catch (err) {
+        if (err?.name === "CanceledError" || err?.name === "AbortError") return;
         if (requestIdRef.current !== currentId) return;
         if (!silent) {
           setOrders([]);
@@ -220,7 +222,12 @@ export default function Orders() {
   );
 
   useEffect(() => {
-    loadOrders();
+    // Cancel any in-flight request from previous render
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    loadOrders({ signal: controller.signal });
+    return () => { controller.abort(); };
   }, [loadOrders]);
 
   const handleSseStatusChange = useCallback(

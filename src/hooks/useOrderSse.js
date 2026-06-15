@@ -19,7 +19,12 @@ export default function useOrderSse(onStatusChange) {
   const suspendedRef = useRef(false);
   const connectGenerationRef = useRef(0);
   const onStatusChangeRef = useRef(onStatusChange);
-  onStatusChangeRef.current = onStatusChange;
+  const connectRef = useRef(null);
+
+  // Keep refs in sync with latest values (outside render via effect)
+  useEffect(() => {
+    onStatusChangeRef.current = onStatusChange;
+  }, [onStatusChange]);
 
   const stopFallbackPolling = useCallback(() => {
     if (fallbackTimerRef.current) {
@@ -47,12 +52,12 @@ export default function useOrderSse(onStatusChange) {
     }, FALLBACK_POLL_INTERVAL_MS);
   }, []);
 
-  const scheduleRetry = useCallback((connectFn) => {
+  const scheduleRetry = useCallback(() => {
     const retries = retryCountRef.current;
     if (retries < MAX_RETRIES) {
       retryCountRef.current = retries + 1;
       const delayMs = 1000 * Math.pow(2, retries);
-      retryTimerRef.current = setTimeout(connectFn, delayMs);
+      retryTimerRef.current = setTimeout(() => connectRef.current?.(), delayMs);
     } else {
       startFallbackPolling();
     }
@@ -73,11 +78,11 @@ export default function useOrderSse(onStatusChange) {
       streamToken = res?.data?.streamToken;
     } catch {
       if (generation !== connectGenerationRef.current) return;
-      scheduleRetry(connect);
+      scheduleRetry();
       return;
     }
     if (!streamToken) {
-      scheduleRetry(connect);
+      scheduleRetry();
       return;
     }
 
@@ -105,9 +110,14 @@ export default function useOrderSse(onStatusChange) {
         sourceRef.current.close();
         sourceRef.current = null;
       }
-      scheduleRetry(connect);
+      scheduleRetry();
     };
   }, [close, scheduleRetry, stopFallbackPolling]);
+
+  // Keep connectRef in sync with latest connect
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   const clearHiddenTimer = useCallback(() => {
     if (hiddenTimerRef.current) {

@@ -65,20 +65,29 @@ export default function PaymentSuccess() {
     fetchOnceRef.current = fetchStatus;
 
     const pollStatus = async () => {
-      const result = await fetchStatus();
-      if (cancelled || result.settled) return;
-      attempts += 1;
-      if (attempts >= maxAttempts) {
-        if (result.error) {
-          setViewState("error");
-          setError(result.error.message || t("payment.confirmFailed"));
-        } else {
-          setViewState("pending");
+      try {
+        const result = await fetchStatus();
+        if (cancelled || result.settled) return;
+        attempts += 1;
+        if (attempts >= maxAttempts) {
+          if (result.error) {
+            setViewState("error");
+            setError(result.error.message || t("payment.confirmFailed"));
+          } else {
+            setViewState("pending");
+          }
+          settledRef.current = true;
+          return;
         }
-        settledRef.current = true;
-        return;
+        timer = window.setTimeout(pollStatus, intervalMs);
+      } catch {
+        // Unexpected error in pollStatus itself — treat as terminal failure
+        if (!cancelled) {
+          setViewState("error");
+          setError(t("payment.confirmFailed"));
+          settledRef.current = true;
+        }
       }
-      timer = window.setTimeout(pollStatus, intervalMs);
     };
 
     setOrder(null);

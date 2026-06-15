@@ -455,57 +455,63 @@ export default function AppHeader({ isLoggedIn, playerDisplayName, onRequestLogo
           <div
             className="relative order-2 md:order-4"
             ref={menuRef}
-            onMouseEnter={() => setDesktopMenuOpen(true)}
-            onMouseLeave={() => setDesktopMenuOpen(false)}
+            onMouseEnter={() => isLoggedIn && setDesktopMenuOpen(true)}
+            onMouseLeave={() => isLoggedIn && setDesktopMenuOpen(false)}
           >
-            <button
-              type="button"
-              className={`hidden md:flex items-center justify-center rounded-xl border bg-white/5 p-2 text-[#9AA7BD] transition-colors ${
-                isLoggedIn
-                  ? "border-[#00FF9A]/22 text-[#C9F9E0] hover:border-[#00FF9A]/38 hover:text-[#E7EDF7]"
-                  : "border-white/10 hover:border-[#00FF9A]/30 hover:text-[#E7EDF7]"
-              }`}
-              aria-haspopup="menu"
-              aria-expanded={desktopMenuOpen}
-            >
-              <ProfileMenuIcon open={desktopMenuOpen} loggedIn={isLoggedIn} />
-            </button>
-            <button
-              onClick={toggleMenu}
-              className={`relative flex md:hidden items-center justify-center rounded-xl border bg-white/5 p-2 transition-all ${
-                isLoggedIn
-                  ? "border-[#00FF9A]/22 text-[#C9F9E0] hover:border-[#00FF9A]/38 hover:text-[#E7EDF7]"
-                  : "border-white/10 text-[#9AA7BD] hover:border-[#00FF9A]/30 hover:text-[#E7EDF7]"
-              } ${
-                cartPulseActive && isLoggedIn
-                  ? "scale-[1.05] border-[#00FF9A]/38 shadow-[0_0_24px_rgba(0,255,154,0.16)]"
-                  : ""
-              }`}
-            >
-              <ProfileMenuIcon open={menuOpen} loggedIn={isLoggedIn} />
-              {cartCount > 0 && (
-                <span
-                  className={`absolute -right-1.5 -top-1.5 min-w-[18px] rounded-full border border-[#00FF9A]/35 bg-[#00FF9A] px-1.5 py-0.5 text-center text-[10px] font-bold leading-none text-[#070A0F] shadow-[0_0_14px_rgba(0,255,154,0.35)] transition-transform duration-300 ${
-                    cartPulseActive ? "scale-110" : ""
-                  }`}
+            {isLoggedIn ? (
+              <>
+                <button
+                  type="button"
+                  className="hidden md:flex items-center justify-center rounded-full border border-[#00FF9A]/22 bg-white/[0.04] p-2 text-[#C9F9E0] transition-colors hover:border-[#00FF9A]/38 hover:text-[#E7EDF7]"
+                  aria-haspopup="menu"
+                  aria-expanded={desktopMenuOpen}
                 >
-                  {cartCount}
-                </span>
-              )}
-            </button>
-            {desktopMenuOpen && (
-              <div className="absolute right-0 top-full z-50 hidden pt-2 md:block">
-                <div className="w-56 overflow-hidden rounded-[24px] border border-white/10 bg-[#0B1220] shadow-lg shadow-black/30 menu-panel menu-panel-open">
-                  {renderMenuContent(false)}
-                </div>
-              </div>
-            )}
-            {menuOpen && (
-              <div
-                className={`absolute right-0 mt-2 w-56 overflow-hidden rounded-[24px] border border-white/10 bg-[#0B1220] shadow-lg shadow-black/30 z-50 md:hidden ${menuPanelClass}`}
+                  <ProfileMenuIcon open={desktopMenuOpen} loggedIn={isLoggedIn} />
+                </button>
+                <button
+                  onClick={toggleMenu}
+                  className={`relative flex md:hidden items-center justify-center rounded-full border border-[#00FF9A]/22 bg-white/[0.04] p-2 text-[#C9F9E0] transition-all hover:border-[#00FF9A]/38 hover:text-[#E7EDF7] ${
+                    cartPulseActive
+                      ? "scale-[1.05] border-[#00FF9A]/38 shadow-[0_0_24px_rgba(0,255,154,0.16)]"
+                      : ""
+                  }`}
+                  aria-label="menu"
+                >
+                  <ProfileMenuIcon open={menuOpen} loggedIn={isLoggedIn} />
+                  {cartCount > 0 && (
+                    <span
+                      className={`absolute -right-1.5 -top-1.5 min-w-[18px] rounded-full border border-[#00FF9A]/35 bg-[#00FF9A] px-1.5 py-0.5 text-center text-[10px] font-bold leading-none text-[#070A0F] shadow-[0_0_14px_rgba(0,255,154,0.35)] transition-transform duration-300 ${
+                        cartPulseActive ? "scale-110" : ""
+                      }`}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+                {desktopMenuOpen && (
+                  <div className="absolute right-0 top-full z-50 hidden pt-2 md:block">
+                    <div className="w-56 overflow-hidden rounded-[24px] border border-white/10 bg-[#0B1220] shadow-lg shadow-black/30 menu-panel menu-panel-open">
+                      {renderMenuContent(false)}
+                    </div>
+                  </div>
+                )}
+                {menuOpen && (
+                  <div
+                    className={`absolute right-0 mt-2 w-56 overflow-hidden rounded-[24px] border border-white/10 bg-[#0B1220] shadow-lg shadow-black/30 z-50 md:hidden ${menuPanelClass}`}
+                  >
+                    <div className="md:hidden">{renderMenuContent(true)}</div>
+                  </div>
+                )}
+              </>
+            ) : (
+              // 未登录:直接渲染「Log in」描边胶囊,无下拉、无抽屉
+              <Link
+                to="/login"
+                className="inline-flex h-10 items-center rounded-full border border-[#00FF9A]/22 bg-[#00FF9A]/[0.04] px-3.5 text-sm font-semibold text-[#7BFFCA] transition-all hover:border-[#00FF9A]/38 hover:text-[#8DFFC9]"
+                aria-label={t("auth.login")}
               >
-                <div className="md:hidden">{renderMenuContent(true)}</div>
-              </div>
+                {t("auth.login")}
+              </Link>
             )}
           </div>
         </div>

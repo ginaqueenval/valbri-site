@@ -197,62 +197,6 @@ function HowToBuySection({ t }) {
   );
 }
 
-function PrecautionsSection({ t }) {
-  const itemCount = 5;
-  return (
-    <section className="relative mx-auto max-w-5xl scroll-mt-24 px-6 py-24 sm:py-32">
-      <SectionHeading
-        eyebrow={t("home.precautions.eyebrow")}
-        title={t("home.precautions.title")}
-        subtitle={t("home.precautions.subtitle")}
-      />
-      <div className="mx-auto grid max-w-3xl gap-3">
-        {Array.from({ length: itemCount }).map((_, idx) => (
-          <ScrollReveal
-            key={idx}
-            as="div"
-            delay={idx * 70}
-            className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(15,22,36,0.78),rgba(8,12,20,0.92))] p-6"
-          >
-            <div className="flex items-start gap-4">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-yellow-400/24 bg-yellow-400/[0.06] text-yellow-200">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                  className="h-5 w-5"
-                >
-                  <path
-                    d="M12 3l9 17H3L12 3z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M12 10v5"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="12" cy="17.5" r="0.9" fill="currentColor" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-base font-black tracking-normal text-[#E7EDF7] sm:text-lg">
-                  {t(`home.precautions.item${idx + 1}.title`)}
-                </h3>
-                <p className="mt-2 text-[14px] leading-7 text-[#9AA7BD] sm:text-[15px]">
-                  {t(`home.precautions.item${idx + 1}.desc`)}
-                </p>
-              </div>
-            </div>
-          </ScrollReveal>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function GuaranteeIcon({ kind }) {
   if (kind === "noFee") {
     return (
@@ -595,7 +539,6 @@ export default function Home() {
     <main>
       <HeroSection t={t} heroProgress={heroProgress} />
       <HowToBuySection t={t} />
-      <PrecautionsSection t={t} />
       <GuaranteeSection t={t} />
       <WhyUsSection t={t} />
       <ClosingCTA t={t} closingProgress={closingProgress} />

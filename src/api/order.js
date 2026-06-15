@@ -4,8 +4,8 @@ export function createOrder(data) {
   return request({ url: "/valbri/orders", method: "post", data });
 }
 
-export function getOrderList(params) {
-  return request({ url: "/valbri/orders", method: "get", params });
+export function getOrderList(params, { signal } = {}) {
+  return request({ url: "/valbri/orders", method: "get", params, signal });
 }
 
 export function getOrderDetail(id) {

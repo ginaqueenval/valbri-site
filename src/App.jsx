@@ -8,6 +8,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import CustomerService from "./components/CustomerService.jsx";
 import AppHeader from "./components/AppHeader.jsx";
@@ -82,97 +83,99 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#070A0F] text-[#E7EDF7]">
-      <AppHeader
-        isLoggedIn={isLoggedIn}
-        playerDisplayName={playerDisplayName}
-        onRequestLogout={() => setShowLogoutConfirm(true)}
-      />
-
-      <div className="w-full max-w-[100vw] overflow-x-hidden pt-[76px] sm:pt-[82px]">
-
-      {showLogoutConfirm && (
-        <LogoutConfirmModal
-          onConfirm={handleLogout}
-          onCancel={() => setShowLogoutConfirm(false)}
+    <ErrorBoundary>
+      <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#070A0F] text-[#E7EDF7]">
+        <AppHeader
+          isLoggedIn={isLoggedIn}
+          playerDisplayName={playerDisplayName}
+          onRequestLogout={() => setShowLogoutConfirm(true)}
         />
-      )}
 
-      {showSessionExpired && (
-        <SessionExpiredModal
-          onDismiss={() => setShowSessionExpired(false)}
-        />
-      )}
+        <div className="w-full max-w-[100vw] overflow-x-hidden pt-[76px] sm:pt-[82px]">
 
-      <ScrollToTop />
+        {showLogoutConfirm && (
+          <LogoutConfirmModal
+            onConfirm={handleLogout}
+            onCancel={() => setShowLogoutConfirm(false)}
+          />
+        )}
 
-      {location.pathname !== "/home" && (
-        <div className="mx-auto max-w-6xl px-4 pt-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-[#9AA7BD] hover:border-[#00FF9A]/30 hover:text-[#E7EDF7] transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4"
+        {showSessionExpired && (
+          <SessionExpiredModal
+            onDismiss={() => setShowSessionExpired(false)}
+          />
+        )}
+
+        <ScrollToTop />
+
+        {location.pathname !== "/home" && (
+          <div className="mx-auto max-w-6xl px-4 pt-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-[#9AA7BD] hover:border-[#00FF9A]/30 hover:text-[#E7EDF7] transition-colors"
             >
-              <path
-                fillRule="evenodd"
-                d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {t("header.back")}
-          </button>
-        </div>
-      )}
-
-      <Suspense
-        fallback={
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#00FF9A] border-t-transparent" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-4 w-4"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {t("header.back")}
+            </button>
           </div>
-        }
-      >
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/fc26-coins" element={<Fc26 />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/payment/success" element={<PaymentSuccess />} />
-            <Route path="/payment/cancel" element={<PaymentCancel />} />
-            <Route path="/mock-payment/:provider" element={<MockPayment />} />
-          </Route>
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
-      </Suspense>
+        )}
 
-      <footer className="border-t border-white/5">
-        <div className="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-[#9AA7BD]">
-          <div>{t("footer.copyright", { year: new Date().getFullYear() })}</div>
-          <div className="flex gap-4">
-            <Link to="/terms" className="hover:text-[#E7EDF7]">
-              {t("footer.terms")}
-            </Link>
-            <Link to="/privacy" className="hover:text-[#E7EDF7]">
-              {t("footer.privacy")}
-            </Link>
+        <Suspense
+          fallback={
+            <div className="flex min-h-[40vh] items-center justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#00FF9A] border-t-transparent" />
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/fc26-coins" element={<Fc26 />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/cancel" element={<PaymentCancel />} />
+              <Route path="/mock-payment/:provider" element={<MockPayment />} />
+            </Route>
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </Suspense>
+
+        <footer className="border-t border-white/5">
+          <div className="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-[#9AA7BD]">
+            <div>{t("footer.copyright", { year: new Date().getFullYear() })}</div>
+            <div className="flex gap-4">
+              <Link to="/terms" className="hover:text-[#E7EDF7]">
+                {t("footer.terms")}
+              </Link>
+              <Link to="/privacy" className="hover:text-[#E7EDF7]">
+                {t("footer.privacy")}
+              </Link>
+            </div>
           </div>
+        </footer>
+        <CustomerService />
         </div>
-      </footer>
-      <CustomerService />
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }

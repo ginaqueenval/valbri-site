@@ -4,6 +4,8 @@ import {
   getStoredPlayerToken,
 } from "./playerAuth.js";
 
+let sessionClearing = false;
+
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
   timeout: 15000,
@@ -34,11 +36,14 @@ request.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status } = error.response;
-      if (status === 401 && getStoredPlayerToken()) {
+      if (status === 401 && !sessionClearing && getStoredPlayerToken()) {
+        sessionClearing = true;
         clearStoredPlayerSession({
           reason: "expired",
           notifySessionExpired: error.config?.skipSessionExpiredPrompt !== true,
         });
+        // Reset after a tick so future logins can trigger 401 handling again
+        queueMicrotask(() => { sessionClearing = false; });
       }
     }
     return Promise.reject(error);
