@@ -204,7 +204,13 @@
         "title": "隐私保护",
         "desc": "您的个人信息和交易数据受到严格保护，绝不向第三方泄露。"
       }
-    }
+    },
+    "selectProductType": "商品类型",
+    "productTypeCoins": "金币套餐",
+    "productTypeSbc": "SBC套餐",
+    "noSbcPackages": "该平台暂无可用SBC套餐。",
+    "referenceCost": "参考成本",
+    "sbcCheckoutPending": "SBC套餐购买链路将在下一阶段接入"
   },
   "checkout": {
     "title": "结算",
@@ -232,7 +238,9 @@
     "quantity": "数量",
     "createOrderFailed": "创建订单失败",
     "accessDenied": "无权访问",
-    "accessDeniedDesc": "该订单不存在或您无权访问。"
+    "accessDeniedDesc": "该订单不存在或您无权访问。",
+    "paymentMethods": "支付方式",
+    "referenceCost": "参考成本"
   },
   "cart": {
     "title": "购物车",
@@ -251,7 +259,13 @@
     "bonusIncluded": "含赠送加成",
     "eta": "预计时间",
     "checkout": "去结算",
-    "remove": "移除"
+    "remove": "移除",
+    "itemRemoved": "已删除",
+    "undo": "撤销",
+    "referenceCost": "参考成本",
+    "sbcPackage": "SBC套餐",
+    "perItem": "件",
+    "flowHint": "任选一项点击「立即结算」即可下单"
   },
   "about": {
     "title": "关于 Valbri",
@@ -386,7 +400,14 @@
     "fastDelivery": "快速交付",
     "highVolume": "大额",
     "vip": "VIP",
-    "maxPack": "最大套餐"
+    "maxPack": "最大套餐",
+    "hot": "火爆",
+    "champion": "销冠",
+    "deal": "钜惠",
+    "flash": "闪送",
+    "bulk": "大额",
+    "crown": "尊享",
+    "rocket": "至尊"
   },
   "orders": {
     "title": "购买记录",
@@ -459,7 +480,8 @@
       "bannerCount_one": "您有 {{count}} 个已付款订单需要填写账号信息",
       "bannerCount_other": "您有 {{count}} 个已付款订单需要填写账号信息",
       "bannerGuide": "请点击订单中的「待填写账号信息」按钮进行填写。"
-    }
+    },
+    "referenceCost": "参考成本"
   },
   "payment": {
     "stripePay": "Stripe 支付",

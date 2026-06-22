@@ -204,7 +204,13 @@
         "title": "Privacy Protection",
         "desc": "Your personal information and transaction data are strictly protected and never shared with third parties."
       }
-    }
+    },
+    "selectProductType": "Product Type",
+    "productTypeCoins": "Coin Packages",
+    "productTypeSbc": "SBC Packages",
+    "noSbcPackages": "No SBC packages available for this platform.",
+    "referenceCost": "Reference Cost",
+    "sbcCheckoutPending": "SBC checkout will be connected in the next phase"
   },
   "checkout": {
     "title": "Checkout",
@@ -232,7 +238,9 @@
     "quantity": "Quantity",
     "createOrderFailed": "Failed to create order",
     "accessDenied": "Access Denied",
-    "accessDeniedDesc": "This order does not exist or you do not have permission to access it."
+    "accessDeniedDesc": "This order does not exist or you do not have permission to access it.",
+    "paymentMethods": "Payment Methods",
+    "referenceCost": "Reference Cost"
   },
   "cart": {
     "title": "Cart",
@@ -251,7 +259,13 @@
     "bonusIncluded": "Bonus included",
     "eta": "ETA",
     "checkout": "Checkout",
-    "remove": "Remove"
+    "remove": "Remove",
+    "itemRemoved": "Removed",
+    "undo": "Undo",
+    "referenceCost": "Reference Cost",
+    "sbcPackage": "SBC Package",
+    "perItem": "ea",
+    "flowHint": "Tap Checkout on any row to place that order"
   },
   "about": {
     "title": "About Valbri",
@@ -386,7 +400,14 @@
     "fastDelivery": "Fast Delivery",
     "highVolume": "High Volume",
     "vip": "VIP",
-    "maxPack": "Max Pack"
+    "maxPack": "Max Pack",
+    "hot": "Hot",
+    "champion": "Best",
+    "deal": "Deal",
+    "flash": "Flash",
+    "bulk": "Bulk",
+    "crown": "Crown",
+    "rocket": "Top"
   },
   "orders": {
     "title": "Purchase History",
@@ -459,7 +480,8 @@
       "bannerCount_one": "You have {{count}} paid order awaiting account info.",
       "bannerCount_other": "You have {{count}} paid orders awaiting account info.",
       "bannerGuide": "Click the \"Account Info Required\" button on each order to fill in."
-    }
+    },
+    "referenceCost": "Reference Cost"
   },
   "payment": {
     "stripePay": "Stripe Payment",

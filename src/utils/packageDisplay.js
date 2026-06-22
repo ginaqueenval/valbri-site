@@ -5,9 +5,35 @@ export const sortPackages = (list) =>
       (b.sortOrder ?? Number.MAX_SAFE_INTEGER),
   );
 
-export const noteLabel = (tag, t) => {
+const NOTE_TAG_ALIAS = {
+  popular: "hot",
+  bestSeller: "champion",
+  bestValue: "deal",
+  fastDelivery: "flash",
+  highVolume: "bulk",
+  vip: "crown",
+  maxPack: "rocket",
+};
+
+export const CANONICAL_NOTE_TAGS = [
+  "hot",
+  "champion",
+  "deal",
+  "flash",
+  "bulk",
+  "crown",
+  "rocket",
+];
+
+export const resolveNoteTag = (tag) => {
   if (!tag) return null;
-  const key = `notes.${tag}`;
+  return NOTE_TAG_ALIAS[tag] || tag;
+};
+
+export const noteLabel = (tag, t) => {
+  const canonical = resolveNoteTag(tag);
+  if (!canonical) return null;
+  const key = `notes.${canonical}`;
   const translated = t(key);
-  return translated === key ? tag : translated;
+  return translated === key ? canonical : translated;
 };

@@ -17,11 +17,14 @@ const PLATFORM_SHORT = {
   PlayStation: "PS",
   Xbox: "XBOX",
   PC: "PC",
+  "PS/Xbox": "PS/XBOX",
 };
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
 
 const buildCartItemDeleteUrl = (item) =>
   `${API_BASE_URL}/valbri/cart/items/${encodeURIComponent(item.id)}`;
+
+const isSbcItem = (item) => String(item?.productType || "").toLowerCase() === "sbc";
 
 function TrashIcon() {
   return (
@@ -74,6 +77,7 @@ function CartRow({
   const unitPrice = formatPrice(item.price, item.currency);
   const subtotalText = formatPrice(subtotal, item.currency);
   const platformLabel = PLATFORM_SHORT[item.platform] || item.platform;
+  const sbcItem = isSbcItem(item);
   return (
     <article className="package-card relative overflow-hidden rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(15,22,36,0.82),rgba(8,12,20,0.94))] p-5 transition-all duration-500 hover:border-[#00FF9A]/22 hover:shadow-[0_22px_44px_rgba(0,0,0,0.28),0_0_24px_rgba(0,255,154,0.08)] sm:p-6">
       <span className="pkg-card-glow" aria-hidden="true" />
@@ -104,13 +108,22 @@ function CartRow({
           </div>
 
           <div className="mt-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-2">
-            <span className="pkg-coins-gradient text-[1.95rem] font-black leading-[0.88] tracking-[-0.05em] sm:text-[2.25rem]">
-              {formatCoinsK(item.coins)}
-            </span>
-            {item.giftCoins > 0 && (
-              <span className="pkg-bonus-pill inline-flex items-center self-center rounded-full px-2.5 py-1 text-[13px] font-black tracking-[0.01em] text-[#7BFFCA]">
-                +{formatCoinsK(item.giftCoins)} {t("cart.gift")}
+            {item.packageName && (
+              <span className="line-clamp-2 text-[1.05rem] font-black leading-tight text-[#E7EDF7]">
+                {item.packageName}
               </span>
+            )}
+            {!sbcItem && (
+              <>
+                <span className="pkg-coins-gradient text-[1.95rem] font-black leading-[0.88] tracking-normal sm:text-[2.25rem]">
+                  {formatCoinsK(item.coins)}
+                </span>
+                {item.giftCoins > 0 && (
+                  <span className="pkg-bonus-pill inline-flex items-center self-center rounded-full px-2.5 py-1 text-[13px] font-black tracking-[0.01em] text-[#7BFFCA]">
+                    +{formatCoinsK(item.giftCoins)} {t("cart.gift")}
+                  </span>
+                )}
+              </>
             )}
           </div>
           <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6E7B92] sm:hidden">
@@ -120,7 +133,7 @@ function CartRow({
 
         {/* 总价 */}
         <div className="shrink-0 text-right">
-          <div className="pkg-price-gradient text-[1.5rem] font-black leading-none tracking-[-0.04em] sm:text-[1.75rem]">
+          <div className="pkg-price-gradient text-[1.5rem] font-black leading-none tracking-normal sm:text-[1.75rem]">
             {subtotalText}
           </div>
           <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.22em] text-[#6E7B92]">
@@ -133,27 +146,33 @@ function CartRow({
 
       {/* 操作行 */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center rounded-full border border-white/10 bg-white/[0.04] px-1 py-0.5 text-[#9AA7BD] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-          <button
-            onClick={() => onQty(quantity - 1)}
-            disabled={updating}
-            aria-label="-"
-            className="grid h-8 w-8 place-items-center rounded-full text-base transition hover:bg-white/8 hover:text-[#E7EDF7] disabled:opacity-40"
-          >
-            −
-          </button>
-          <span className="min-w-[24px] text-center text-sm font-bold text-[#E7EDF7]">
-            {quantity}
+        {sbcItem ? (
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-bold text-[#9AA7BD]">
+            {t("cart.sbcPackage")}
           </span>
-          <button
-            onClick={() => onQty(quantity + 1)}
-            disabled={updating}
-            aria-label="+"
-            className="grid h-8 w-8 place-items-center rounded-full text-base transition hover:bg-white/8 hover:text-[#E7EDF7] disabled:opacity-40"
-          >
-            +
-          </button>
-        </div>
+        ) : (
+          <div className="flex items-center rounded-full border border-white/10 bg-white/[0.04] px-1 py-0.5 text-[#9AA7BD] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <button
+              onClick={() => onQty(quantity - 1)}
+              disabled={updating}
+              aria-label="-"
+              className="grid h-8 w-8 place-items-center rounded-full text-base transition hover:bg-white/8 hover:text-[#E7EDF7] disabled:opacity-40"
+            >
+              −
+            </button>
+            <span className="min-w-[24px] text-center text-sm font-bold text-[#E7EDF7]">
+              {quantity}
+            </span>
+            <button
+              onClick={() => onQty(quantity + 1)}
+              disabled={updating}
+              aria-label="+"
+              className="grid h-8 w-8 place-items-center rounded-full text-base transition hover:bg-white/8 hover:text-[#E7EDF7] disabled:opacity-40"
+            >
+              +
+            </button>
+          </div>
+        )}
 
         <div className="flex items-center gap-2">
           <button
@@ -379,7 +398,7 @@ export default function Cart() {
   return (
     <main className="mx-auto max-w-3xl px-4 pb-20 pt-10 sm:pt-14">
       <header>
-        <h1 className="text-[2rem] font-black leading-[1.05] tracking-[-0.035em] sm:text-[2.5rem]">
+        <h1 className="text-[2rem] font-black leading-[1.05] tracking-normal sm:text-[2.5rem]">
           {t("cart.title")}
         </h1>
         {!loading && items.length > 0 && (

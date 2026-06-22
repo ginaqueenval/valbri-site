@@ -19,6 +19,8 @@ const isPaymentNotConfiguredMessage = (message) => {
 const paymentButtonBaseClass =
   "inline-flex min-h-[52px] min-w-[190px] items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap";
 
+const isSbcItem = (item) => String(item?.productType || "").toLowerCase() === "sbc";
+
 export default function Checkout() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -86,6 +88,7 @@ export default function Checkout() {
     try {
       const res = await createStripeSession({
         cartItemId: cartItem.id,
+        productType: cartItem.productType,
         packageId: cartItem.packageId,
         platform: cartItem.platform,
         quantity: cartItem.quantity || 1,
@@ -114,6 +117,7 @@ export default function Checkout() {
     try {
       const res = await createPayPalOrder({
         cartItemId: cartItem.id,
+        productType: cartItem.productType,
         packageId: cartItem.packageId,
         platform: cartItem.platform,
         quantity: cartItem.quantity || 1,
@@ -152,6 +156,8 @@ export default function Checkout() {
       endPayment();
     }
   };
+
+  const sbcItem = isSbcItem(cartItem);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
@@ -202,28 +208,32 @@ export default function Checkout() {
                 <span className="font-semibold">×{cartItem.quantity}</span>
               </div>
             )}
-            <div className="flex justify-between text-sm">
-              <span className="text-[#9AA7BD]">{t("checkout.coins")}:</span>
-              <span className="font-semibold">
-                {formatCoinsK(cartItem.coins)}
-                {(cartItem.quantity || 1) > 1 && (
-                  <span className="text-[#9AA7BD] font-normal">
-                    {" "}× {cartItem.quantity}
-                  </span>
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-[#9AA7BD]">{t("checkout.gift")}:</span>
-              <span className="font-semibold text-[#00FF9A]">
-                +{formatCoinsK(cartItem.giftCoins)}
-                {(cartItem.quantity || 1) > 1 && (
-                  <span className="text-[#9AA7BD] font-normal">
-                    {" "}× {cartItem.quantity}
-                  </span>
-                )}
-              </span>
-            </div>
+            {!sbcItem && (
+              <div className="flex justify-between text-sm">
+                <span className="text-[#9AA7BD]">{t("checkout.coins")}:</span>
+                <span className="font-semibold">
+                  {formatCoinsK(cartItem.coins)}
+                  {(cartItem.quantity || 1) > 1 && (
+                    <span className="text-[#9AA7BD] font-normal">
+                      {" "}× {cartItem.quantity}
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+            {!sbcItem && cartItem.giftCoins > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-[#9AA7BD]">{t("checkout.gift")}:</span>
+                <span className="font-semibold text-[#00FF9A]">
+                  +{formatCoinsK(cartItem.giftCoins)}
+                  {(cartItem.quantity || 1) > 1 && (
+                    <span className="text-[#9AA7BD] font-normal">
+                      {" "}× {cartItem.quantity}
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-[#9AA7BD]">{t("checkout.eta")}:</span>
               <span className="font-semibold">{cartItem.eta}</span>

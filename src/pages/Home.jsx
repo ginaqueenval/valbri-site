@@ -97,7 +97,7 @@ function HeroSection({ t, heroProgress }) {
         <div className="reveal-up delay-400 mt-10">
           <Link
             to="/fc26-coins"
-            className="cta-primary px-8 py-4 text-base"
+            className="cta-primary home-cta-flash px-8 py-4 text-base"
             style={ctaStyle}
           >
             <span>{t("home.cta")}</span>
@@ -462,7 +462,7 @@ function ClosingCTA({ t, closingProgress }) {
         <div className="mt-8">
           <Link
             to="/fc26-coins"
-            className="cta-primary px-8 py-4 text-base"
+            className="cta-primary home-cta-flash px-8 py-4 text-base"
             style={ctaStyle}
           >
             {t("home.cta")}

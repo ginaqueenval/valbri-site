@@ -10,6 +10,8 @@ import {
   shouldShowDeliveryStatus,
 } from "../utils/orderDisplay";
 
+const isSbcOrder = (order) => String(order?.productType || "").toLowerCase() === "sbc";
+
 export default function PaymentCancel() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -57,6 +59,7 @@ export default function PaymentCancel() {
   }, [hasOrderNo, orderNo, requestKey, t]);
 
   const effectiveError = hasOrderNo ? error : t("payment.confirmMissing");
+  const sbcOrder = isSbcOrder(order);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-20 text-center">
@@ -115,7 +118,7 @@ export default function PaymentCancel() {
               <span className="font-semibold text-[#E7EDF7]">{order.platform}</span>
             </div>
           ) : null}
-          {order?.coins ? (
+          {!sbcOrder && order?.coins ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("checkout.coins")}</span>
               <span className="font-semibold text-[#E7EDF7]">
@@ -124,7 +127,7 @@ export default function PaymentCancel() {
               </span>
             </div>
           ) : null}
-          {order?.giftCoins > 0 ? (
+          {!sbcOrder && order?.giftCoins > 0 ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("checkout.gift")}</span>
               <span className="font-semibold text-[#00FF9A]">+{formatCoinsK(order.giftCoins)}</span>

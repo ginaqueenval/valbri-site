@@ -28,6 +28,8 @@ const ORDER_TABS = [
   { value: "closed", label: "closed" },
 ];
 
+const isSbcOrder = (order) => String(order?.productType || "").toLowerCase() === "sbc";
+
 const PROGRESS_TONE_CLASS = {
   warning: {
     badge: "bg-yellow-500/10 text-yellow-300",
@@ -385,6 +387,7 @@ export default function Orders() {
           orders.map((o) => {
             const accountMissing = isAccountInfoMissing(o);
             const accountSubmitted = isAccountInfoSubmitted(o);
+            const sbcOrder = isSbcOrder(o);
             return (
               <div
                 key={o.id}
@@ -461,16 +464,18 @@ export default function Orders() {
                       )}
                     </div>
 
-                    <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-base text-[#9AA7BD]">
-                      <span>
-                        {formatCoinsK(o.coins)} {t("orders.coins")}
-                      </span>
-                      {o.giftCoins > 0 && (
-                        <span className="font-extrabold text-[#00FF9A]">
-                          +{formatCoinsK(o.giftCoins)} {t("orders.gift")}
+                    {!sbcOrder && (
+                      <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-base text-[#9AA7BD]">
+                        <span>
+                          {formatCoinsK(o.coins)} {t("orders.coins")}
                         </span>
-                      )}
-                    </div>
+                        {o.giftCoins > 0 && (
+                          <span className="font-extrabold text-[#00FF9A]">
+                            +{formatCoinsK(o.giftCoins)} {t("orders.gift")}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     <OrderProgress order={o} />
                   </div>

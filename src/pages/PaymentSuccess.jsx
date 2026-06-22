@@ -14,6 +14,8 @@ import {
 } from "../utils/orderDisplay";
 import { isAccountInfoMissing } from "../utils/orderProgress";
 
+const isSbcOrder = (order) => String(order?.productType || "").toLowerCase() === "sbc";
+
 export default function PaymentSuccess() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -90,6 +92,7 @@ export default function PaymentSuccess() {
       }
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOrder(null);
     setViewState("checking");
     setError("");
@@ -128,6 +131,7 @@ export default function PaymentSuccess() {
     isAccountInfoMissing(order) &&
     accountInfoCompletedKey !== requestKey &&
     accountInfoDismissedKey !== requestKey;
+  const sbcOrder = isSbcOrder(order);
 
   const titleKey =
     effectiveViewState === "paid"
@@ -288,7 +292,7 @@ export default function PaymentSuccess() {
               <span className="font-semibold text-[#E7EDF7]">{order.platform}</span>
             </div>
           ) : null}
-          {order?.coins ? (
+          {!sbcOrder && order?.coins ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("checkout.coins")}</span>
               <span className="font-semibold text-[#E7EDF7]">
@@ -297,7 +301,7 @@ export default function PaymentSuccess() {
               </span>
             </div>
           ) : null}
-          {order?.giftCoins > 0 ? (
+          {!sbcOrder && order?.giftCoins > 0 ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("checkout.gift")}</span>
               <span className="font-semibold text-[#00FF9A]">+{formatCoinsK(order.giftCoins)}</span>
