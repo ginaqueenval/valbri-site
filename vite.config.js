@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-
+//连接地址配置
 export default defineConfig({
   base: "/",
   plugins: [react()],
