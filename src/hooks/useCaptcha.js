@@ -28,7 +28,10 @@ export default function useCaptcha() {
   }, []);
 
   useEffect(() => {
-    loadCaptcha();
+    const timer = window.setTimeout(() => {
+      loadCaptcha();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [loadCaptcha]);
 
   return {

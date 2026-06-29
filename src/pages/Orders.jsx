@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getOrderAccountInfo, getOrderList } from "../api/order";
+import { getReviewByOrder } from "../api/review";
 import OrderAccountInfoModal from "../components/OrderAccountInfoModal";
+import ReviewSubmitModal from "../components/ReviewSubmitModal";
 import useOrderSse from "../hooks/useOrderSse";
 import {
   getPlayerOrderProgress,
@@ -29,6 +31,15 @@ const ORDER_TABS = [
 ];
 
 const isSbcOrder = (order) => String(order?.productType || "").toLowerCase() === "sbc";
+
+const isCompletedOrder = (order) =>
+  isPaidPaymentStatus(order?.payStatus) && String(order?.deliveryStatus) === "2";
+
+function isReviewEditExpired(review) {
+  if (!review?.editableUntil) return false;
+  const until = new Date(String(review.editableUntil).replace(" ", "T"));
+  return !Number.isNaN(until.getTime()) && until.getTime() < Date.now();
+}
 
 const PROGRESS_TONE_CLASS = {
   warning: {
@@ -184,9 +195,16 @@ export default function Orders() {
   const [page, setPage] = useState(1);
   const [activeAccountOrder, setActiveAccountOrder] = useState(null);
   const [loadingAccountOrderId, setLoadingAccountOrderId] = useState(null);
+  const [reviewModal, setReviewModal] = useState({
+    open: false,
+    order: null,
+    existing: null,
+  });
+  const [reviewMap, setReviewMap] = useState({});
   const pageSize = 10;
   const requestIdRef = useRef(0);
   const abortControllerRef = useRef(null);
+  const reviewFetchedRef = useRef(new Set());
 
   const loadOrders = useCallback(
     async ({ silent = false, signal } = {}) => {
@@ -264,6 +282,80 @@ export default function Orders() {
 
   const totalPages = Math.ceil(total / pageSize);
 
+  useEffect(() => {
+    const toFetch = orders.filter(
+      (order) => isCompletedOrder(order) && !reviewFetchedRef.current.has(order.id),
+    );
+    if (toFetch.length === 0) return;
+
+    toFetch.forEach((order) => reviewFetchedRef.current.add(order.id));
+    setReviewMap((prev) => {
+      const next = { ...prev };
+      toFetch.forEach((order) => {
+        next[order.id] = "loading";
+      });
+      return next;
+    });
+
+    toFetch.forEach((order) => {
+      getReviewByOrder(order.id)
+        .then((res) => {
+          setReviewMap((prev) => ({
+            ...prev,
+            [order.id]: res?.data
+              ? { state: "reviewed", review: res.data }
+              : { state: "none" },
+          }));
+        })
+        .catch(() => {
+          setReviewMap((prev) => ({ ...prev, [order.id]: { state: "none" } }));
+        });
+    });
+  }, [orders]);
+
+  const openReview = async (order) => {
+    const entry = reviewMap[order.id];
+    if (entry && typeof entry === "object") {
+      setReviewModal({ open: true, order, existing: entry.review || null });
+      return;
+    }
+
+    setReviewModal({ open: true, order, existing: null });
+    if (entry === undefined || entry === "loading") {
+      try {
+        const res = await getReviewByOrder(order.id);
+        const next = res?.data
+          ? { state: "reviewed", review: res.data }
+          : { state: "none" };
+        reviewFetchedRef.current.add(order.id);
+        setReviewMap((prev) => ({ ...prev, [order.id]: next }));
+        if (next.review) {
+          setReviewModal((prev) =>
+            prev.open && prev.order?.id === order.id
+              ? { ...prev, existing: next.review }
+              : prev,
+          );
+        }
+      } catch {
+        setReviewMap((prev) => ({ ...prev, [order.id]: { state: "none" } }));
+      }
+    }
+  };
+
+  const closeReview = () => {
+    setReviewModal({ open: false, order: null, existing: null });
+  };
+
+  const handleReviewSaved = (saved) => {
+    const orderId = reviewModal.order?.id;
+    if (orderId && saved) {
+      setReviewMap((prev) => ({
+        ...prev,
+        [orderId]: { state: "reviewed", review: saved },
+      }));
+    }
+  };
+
   const openAccountInfo = async (order) => {
     if (loadingAccountOrderId === order.id) {
       return;
@@ -312,6 +404,13 @@ export default function Orders() {
           }
         `}
       </style>
+      <ReviewSubmitModal
+        open={reviewModal.open}
+        order={reviewModal.order}
+        existing={reviewModal.existing}
+        onClose={closeReview}
+        onSaved={handleReviewSaved}
+      />
       <OrderAccountInfoModal
         order={activeAccountOrder}
         open={Boolean(activeAccountOrder)}
@@ -388,6 +487,15 @@ export default function Orders() {
             const accountMissing = isAccountInfoMissing(o);
             const accountSubmitted = isAccountInfoSubmitted(o);
             const sbcOrder = isSbcOrder(o);
+            const reviewEntry = reviewMap[o.id];
+            const reviewObj =
+              reviewEntry && typeof reviewEntry === "object"
+                ? reviewEntry.review
+                : null;
+            const completed = isCompletedOrder(o);
+            const reviewed = completed && Boolean(reviewObj);
+            const auditStatus = reviewObj?.auditStatus;
+            const editableExpired = isReviewEditExpired(reviewObj);
             return (
               <div
                 key={o.id}
@@ -446,6 +554,46 @@ export default function Orders() {
                               ? t("orders.accountInfo.viewAction")
                               : t("orders.accountInfo.fillAction")}
                           </span>
+                        </button>
+                      )}
+                      {completed && reviewed && auditStatus === "0" && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[11px] font-bold text-amber-200">
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-300" />
+                          {t("reviews.statusPending")}
+                        </span>
+                      )}
+                      {completed && reviewed && auditStatus === "2" && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-red-400/30 bg-red-500/10 px-2.5 py-1 text-[11px] font-bold text-red-300">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                          {t("reviews.statusRejected")}
+                        </span>
+                      )}
+                      {completed && (
+                        <button
+                          type="button"
+                          onClick={() => openReview(o)}
+                          className={
+                            "inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-sm font-bold transition-colors " +
+                            (reviewed
+                              ? editableExpired
+                                ? "border-white/15 bg-white/[0.04] text-[#9AA7BD] hover:border-white/25 hover:text-[#E7EDF7]"
+                                : "border-[#00FF9A]/25 bg-[#00FF9A]/10 text-[#7BFFCA] hover:border-[#00FF9A]/45"
+                              : "border-[#FFC233]/30 bg-[#FFC233]/10 text-[#FFE08A] hover:border-[#FFC233]/55 hover:text-[#FFC233]")
+                          }
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="h-3.5 w-3.5"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27Z" />
+                          </svg>
+                          {!reviewed
+                            ? t("reviews.actionReview")
+                            : editableExpired
+                              ? t("reviews.actionView")
+                              : t("reviews.actionEditReview")}
                         </button>
                       )}
                     </div>

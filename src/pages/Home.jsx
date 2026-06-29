@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ScrollReveal } from "../components/motion.jsx";
+import HomeReviewsSection from "../components/HomeReviewsSection.jsx";
 
 // 双向 scroll-driven progress 体系:
 //   heroProgress    — 用户离开 Hero 区的进度(0 → 1)
@@ -539,6 +540,7 @@ export default function Home() {
     <main>
       <HeroSection t={t} heroProgress={heroProgress} />
       <HowToBuySection t={t} />
+      <HomeReviewsSection />
       <GuaranteeSection t={t} />
       <WhyUsSection t={t} />
       <ClosingCTA t={t} closingProgress={closingProgress} />

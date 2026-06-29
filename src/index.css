@@ -1428,3 +1428,105 @@ body {
     gap: 8px;
   }
 }
+
+@keyframes review-success-bounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes review-success-draw {
+  from {
+    stroke-dashoffset: 22;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.review-success-circle {
+  animation: review-success-bounce 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.review-success-check {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  animation: review-success-draw 0.38s cubic-bezier(0.32, 0.72, 0, 1) 0.18s
+    forwards;
+}
+
+@keyframes sheet-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0.85;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-sheet {
+  max-height: 90vh;
+  animation: sheet-slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+  overscroll-behavior: contain;
+}
+
+@supports (max-height: 100dvh) {
+  .modal-sheet {
+    max-height: 90dvh;
+  }
+}
+
+@media (min-width: 640px) {
+  .modal-sheet {
+    max-height: 92vh;
+    animation: reveal-scale 0.7s var(--ease-apple-out) both;
+  }
+
+  @supports (max-height: 100dvh) {
+    .modal-sheet {
+      max-height: 92dvh;
+    }
+  }
+}
+
+@keyframes reviews-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(142, 160, 185, 0.32) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(142, 160, 185, 0.36);
+  border: none;
+  border-radius: 999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 154, 0.5);
+}

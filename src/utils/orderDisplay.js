@@ -28,6 +28,16 @@ export const isPendingPaymentStatus = (value) =>
 
 export const formatCoinsK = (value) => {
   if (!value) return "0";
+  if (value >= 1_000_000) {
+    const m = value / 1_000_000;
+    const rounded = Math.round(m * 10) / 10;
+    return (
+      rounded.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      }) + "M"
+    );
+  }
   if (value < 1000) return String(value);
   const k = Math.round(value / 1000);
   return k.toLocaleString("en-US") + "K";
@@ -38,6 +48,22 @@ export const formatPrice = (value, currency) =>
     style: "currency",
     currency: currency || "USD",
   }).format(value || 0);
+
+export const formatPlatform = (platform) => {
+  const value = String(platform || "").trim();
+  const normalized = value.toLowerCase();
+  if (!value) return "-";
+  if (
+    normalized === "playstation" ||
+    normalized === "xbox" ||
+    normalized === "ps" ||
+    normalized === "ps_xbox" ||
+    normalized === "ps/xbox"
+  ) {
+    return "PS/Xbox";
+  }
+  return normalized === "pc" ? "PC" : value;
+};
 
 export const shouldShowDeliveryStatus = (order) => {
   const deliveryStatus = order?.deliveryStatus;

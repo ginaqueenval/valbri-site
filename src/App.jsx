@@ -26,6 +26,7 @@ const Privacy = lazy(() => import("./pages/Privacy.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const Register = lazy(() => import("./pages/Register.jsx"));
 const Orders = lazy(() => import("./pages/Orders.jsx"));
+const Reviews = lazy(() => import("./pages/Reviews.jsx"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess.jsx"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel.jsx"));
 const MockPayment = lazy(() => import("./pages/MockPayment.jsx"));
@@ -142,6 +143,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/home" element={<Home />} />
             <Route path="/fc26-coins" element={<Fc26 />} />
+            <Route path="/reviews" element={<Reviews />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
@@ -164,6 +166,9 @@ export default function App() {
           <div className="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-[#9AA7BD]">
             <div>{t("footer.copyright", { year: new Date().getFullYear() })}</div>
             <div className="flex gap-4">
+              <Link to="/reviews" className="hover:text-[#E7EDF7]">
+                {t("reviews.pageTitle")}
+              </Link>
               <Link to="/terms" className="hover:text-[#E7EDF7]">
                 {t("footer.terms")}
               </Link>
