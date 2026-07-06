@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import StarRating from "./StarRating.jsx";
 import { markReviewHelpful } from "../api/review.js";
 import { formatCoinsK, formatPlatform } from "../utils/orderDisplay.js";
+import { safeGetItem, safeSetItem } from "../utils/safeStorage.js";
 
 const TAG_LABELS = {
   fast: "reviews.tags.fast",
@@ -24,7 +25,7 @@ const HELPFUL_VOTED_KEY = "valbri_helpful_voted";
 
 function loadVotedSet() {
   try {
-    const raw = window.localStorage.getItem(HELPFUL_VOTED_KEY);
+    const raw = safeGetItem(HELPFUL_VOTED_KEY);
     if (!raw) return new Set();
     const arr = JSON.parse(raw);
     return new Set(Array.isArray(arr) ? arr.map(String) : []);
@@ -39,7 +40,7 @@ function persistVoted(reviewId) {
     set.add(String(reviewId));
     // 上限保护:仅保留最近 500 条,防止 localStorage 无限增长
     const arr = Array.from(set).slice(-500);
-    window.localStorage.setItem(HELPFUL_VOTED_KEY, JSON.stringify(arr));
+    safeSetItem(HELPFUL_VOTED_KEY, JSON.stringify(arr));
   } catch {
     // 静默 — localStorage 不可用不致命
   }

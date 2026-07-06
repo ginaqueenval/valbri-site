@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { playerRegister } from "../api/auth";
 import PlayerAuthLayout from "../components/PlayerAuthLayout.jsx";
 import useCaptcha from "../hooks/useCaptcha.js";
@@ -17,6 +17,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -38,6 +39,10 @@ export default function Register() {
     }
     if (captchaEnabled && !captchaCode.trim()) {
       setError(t("auth.captchaRequired"));
+      return;
+    }
+    if (!acceptTerms) {
+      setError(t("auth.acceptTermsRequired"));
       return;
     }
 
@@ -196,9 +201,31 @@ export default function Register() {
             </div>
           ) : null}
 
+          <label className="player-auth-terms">
+            <input
+              type="checkbox"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              aria-label={t("auth.acceptTermsAria")}
+            />
+            <span>
+              <Trans
+                i18nKey="auth.acceptTerms"
+                components={{
+                  terms: (
+                    <Link to="/terms" target="_blank" rel="noopener noreferrer" />
+                  ),
+                  privacy: (
+                    <Link to="/privacy" target="_blank" rel="noopener noreferrer" />
+                  ),
+                }}
+              />
+            </span>
+          </label>
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !acceptTerms}
             className="player-auth-submit"
           >
             {loading ? t("auth.creatingAccount") : t("auth.createAccount")}

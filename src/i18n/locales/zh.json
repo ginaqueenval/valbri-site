@@ -362,7 +362,10 @@
     "login": "登录",
     "sessionExpiredTitle": "登录已过期",
     "sessionExpiredDesc": "您的登录状态已超时，请重新登录以继续操作。",
-    "reLogin": "重新登录"
+    "reLogin": "重新登录",
+    "acceptTerms": "我已阅读并同意 <terms>《服务条款》</terms> 与 <privacy>《隐私政策》</privacy>",
+    "acceptTermsAria": "同意服务条款与隐私政策",
+    "acceptTermsRequired": "请先阅读并同意《服务条款》与《隐私政策》"
   },
   "announcement": {
     "title": "公告"
@@ -534,7 +537,11 @@
     "cancelEdit": "取消修改",
     "showPassword": "显示完整密码",
     "hidePassword": "隐藏完整密码",
-    "close": "关闭账号信息弹窗"
+    "close": "关闭账号信息弹窗",
+    "backupCodesPlaceholder": "例如:\n123·567\n234·567\n567·456",
+    "howToGetBackupCodes": "如何获取?",
+    "submitSuccess": "EA 信息已提交,等待发货",
+    "editSuccess": "EA 信息已更新"
   },
   "mockPayment": {
     "sandbox": "模拟支付环境",
@@ -644,5 +651,27 @@
     "loading": "加载中...",
     "empty": "暂无数据",
     "retry": "重试"
+  },
+  "guide": {
+    "backupCodes": {
+      "eyebrow": "Backup Codes",
+      "title": "如何获取 FC 26 备份代码",
+      "subtitle": "为了保证交付过程顺利，您需要先在 EA 帐户中心获取备份代码。",
+      "linkPrefix": "前往 EA 帐户中心：",
+      "step1": "登录 EA 帐户中心，在左侧菜单中点击「Security and Privacy（安全与隐私）」。",
+      "step2": "向下滚动至「Security and privacy」页面，查看密码与广告设置区域。",
+      "step3": "找到「Two-factor authentication（双重验证）」部分。",
+      "step4": "点击该区块右侧的 > 按钮进入详情页。",
+      "step5": "在详情页点击「View backup codes（查看备份代码）」。",
+      "step6": "点击「Create new code（创建新代码）」生成全新的备份代码。",
+      "step7": "复制全部备份代码并保存到安全的地方，提交订单时将用到。",
+      "footnote": "在 Valbri 进行 FC 26 金币交易是手动操作的，以确保 100% 安全。",
+      "shot1": "进入「Security and Privacy」并向下滚动",
+      "shot2": "找到「Two-factor authentication」并点击 >",
+      "shot3": "在详情页点击「View backup codes」",
+      "shot4": "点击「Create new code」并复制全部代码",
+      "closeHint": "看完后回到原标签页继续填写 EA 账户信息即可。",
+      "closeWindow": "关闭此窗口"
+    }
   }
 }

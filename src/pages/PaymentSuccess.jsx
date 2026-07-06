@@ -6,6 +6,7 @@ import OrderAccountInfoModal from "../components/OrderAccountInfoModal";
 import useOrderSse from "../hooks/useOrderSse";
 import {
   formatCoinsK,
+  formatPlatform,
   formatPrice,
   getDeliveryStatusLabel,
   getPaymentStatusLabel,
@@ -28,7 +29,7 @@ export default function PaymentSuccess() {
   const [accountInfoDismissedKey, setAccountInfoDismissedKey] = useState("");
   const requestKey = useMemo(() => searchParams.toString(), [searchParams]);
   const hasPaymentReference = Boolean(sessionId || orderNo);
-  const settledRef = useRef(false);
+  const paidRef = useRef(false);
   const fetchOnceRef = useRef(null);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function PaymentSuccess() {
     let attempts = 0;
     const maxAttempts = 10;
     const intervalMs = 1500;
-    settledRef.current = false;
+    paidRef.current = false;
 
     const fetchStatus = async () => {
       try {
@@ -54,7 +55,7 @@ export default function PaymentSuccess() {
         setOrder(nextOrder);
         if (isPaidPaymentStatus(nextOrder?.payStatus)) {
           setViewState("paid");
-          settledRef.current = true;
+          paidRef.current = true;
           return { settled: true };
         }
         return { settled: false };
@@ -78,7 +79,6 @@ export default function PaymentSuccess() {
           } else {
             setViewState("pending");
           }
-          settledRef.current = true;
           return;
         }
         timer = window.setTimeout(pollStatus, intervalMs);
@@ -87,7 +87,6 @@ export default function PaymentSuccess() {
         if (!cancelled) {
           setViewState("error");
           setError(t("payment.confirmFailed"));
-          settledRef.current = true;
         }
       }
     };
@@ -109,8 +108,11 @@ export default function PaymentSuccess() {
 
   const handleSseEvent = useCallback(
     (event) => {
-      if (settledRef.current || !fetchOnceRef.current) return;
-      if (event.fallback) return;
+      if (paidRef.current || !fetchOnceRef.current) return;
+      if (event.fallback) {
+        fetchOnceRef.current();
+        return;
+      }
       if (event.bulk) {
         const targetSet = Array.isArray(event.orderNos) ? new Set(event.orderNos) : null;
         if (orderNo && targetSet && !targetSet.has(orderNo)) return;
@@ -289,7 +291,7 @@ export default function PaymentSuccess() {
           {order?.platform ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("checkout.platform")}</span>
-              <span className="font-semibold text-[#E7EDF7]">{order.platform}</span>
+              <span className="font-semibold text-[#E7EDF7]">{formatPlatform(order.platform)}</span>
             </div>
           ) : null}
           {!sbcOrder && order?.coins ? (

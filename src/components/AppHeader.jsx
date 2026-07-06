@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "../utils/languages.js";
 import { getCartCount } from "../api/cart";
 import { getStoredPlayerToken } from "../utils/playerAuth.js";
+import { safeSetItem } from "../utils/safeStorage.js";
 
 const NAV_LINKS = [
   { to: "/fc26-coins", key: "header.nav.fc26" },
@@ -110,7 +111,7 @@ export default function AppHeader({ isLoggedIn, playerDisplayName, onRequestLogo
   const changeLanguage = useCallback(
     (langCode, closeAfterChange = false) => {
       i18n.changeLanguage(langCode);
-      localStorage.setItem("language", langCode);
+      safeSetItem("language", langCode);
       if (closeAfterChange) {
         closeMenu();
       }

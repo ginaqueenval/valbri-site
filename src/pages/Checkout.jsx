@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { checkoutCartItem, getCartItem } from "../api/cart";
 import { createStripeSession, createPayPalOrder } from "../api/payment";
-import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import { formatCoinsK, formatPlatform, formatPrice } from "../utils/orderDisplay";
 import { getSafePaymentRedirectUrl } from "../utils/paymentRedirect";
 
 const isPaymentNotConfiguredMessage = (message) => {
@@ -198,7 +198,7 @@ export default function Checkout() {
             )}
             <div className="flex justify-between text-sm">
               <span className="text-[#9AA7BD]">{t("checkout.platform")}:</span>
-              <span className="font-semibold">{cartItem.platform}</span>
+              <span className="font-semibold">{formatPlatform(cartItem.platform)}</span>
             </div>
             {(cartItem.quantity || 1) > 1 && (
               <div className="flex justify-between text-sm">

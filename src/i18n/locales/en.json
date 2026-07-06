@@ -362,7 +362,10 @@
     "login": "Login",
     "sessionExpiredTitle": "Session Expired",
     "sessionExpiredDesc": "Your session has timed out. Please sign in again to continue.",
-    "reLogin": "Sign In Again"
+    "reLogin": "Sign In Again",
+    "acceptTerms": "I have read and agree to the <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
+    "acceptTermsAria": "Agree to Terms of Service and Privacy Policy",
+    "acceptTermsRequired": "Please read and accept the Terms of Service and Privacy Policy first"
   },
   "announcement": {
     "title": "Announcements"
@@ -534,7 +537,11 @@
     "cancelEdit": "Cancel Edit",
     "showPassword": "Show full password",
     "hidePassword": "Hide full password",
-    "close": "Close account info prompt"
+    "close": "Close account info prompt",
+    "backupCodesPlaceholder": "e.g.\n123·567\n234·567\n567·456",
+    "howToGetBackupCodes": "How to get it?",
+    "submitSuccess": "EA info submitted, awaiting delivery",
+    "editSuccess": "EA info updated"
   },
   "mockPayment": {
     "sandbox": "Mock payment environment",
@@ -644,5 +651,27 @@
     "loading": "Loading...",
     "empty": "No data",
     "retry": "Retry"
+  },
+  "guide": {
+    "backupCodes": {
+      "eyebrow": "Backup Codes",
+      "title": "How to get FC 26 backup codes",
+      "subtitle": "To ensure smooth delivery, please fetch your backup codes from the EA Account Center.",
+      "linkPrefix": "Open EA Account Center:",
+      "step1": "Sign in to EA Account Center and click \"Security and Privacy\" on the left.",
+      "step2": "Scroll down on the Security and privacy page to see password and ad settings.",
+      "step3": "Find the \"Two-factor authentication\" section.",
+      "step4": "Click the > button on the right side of that section.",
+      "step5": "Click \"View backup codes\" on the detail page.",
+      "step6": "Click \"Create new code\" to generate a fresh set of backup codes.",
+      "step7": "Copy all the backup codes and keep them somewhere safe — you'll need them when placing your order.",
+      "footnote": "Every FC 26 coin trade on Valbri is performed manually to ensure 100% safety.",
+      "shot1": "Open \"Security and Privacy\", then scroll down",
+      "shot2": "Find \"Two-factor authentication\" and click >",
+      "shot3": "On the detail page click \"View backup codes\"",
+      "shot4": "Click \"Create new code\" and copy them all",
+      "closeHint": "When you're done, go back to the previous tab to finish entering your EA account info.",
+      "closeWindow": "Close this window"
+    }
   }
 }

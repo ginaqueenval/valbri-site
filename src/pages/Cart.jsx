@@ -11,13 +11,13 @@ import {
   clampCartQuantity,
   updateCartItemsQuantity,
 } from "./cartState.js";
-import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import { formatCoinsK, formatPlatform, formatPrice } from "../utils/orderDisplay";
 
 const PLATFORM_SHORT = {
-  PlayStation: "PS",
-  Xbox: "XBOX",
+  PlayStation: "PS/Xbox",
+  Xbox: "PS/Xbox",
   PC: "PC",
-  "PS/Xbox": "PS/XBOX",
+  "PS/Xbox": "PS/Xbox",
 };
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
 
@@ -76,7 +76,7 @@ function CartRow({
   const subtotal = Number(item.price || 0) * quantity;
   const unitPrice = formatPrice(item.price, item.currency);
   const subtotalText = formatPrice(subtotal, item.currency);
-  const platformLabel = PLATFORM_SHORT[item.platform] || item.platform;
+  const platformLabel = PLATFORM_SHORT[item.platform] || formatPlatform(item.platform);
   const sbcItem = isSbcItem(item);
   return (
     <article className="package-card relative overflow-hidden rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(15,22,36,0.82),rgba(8,12,20,0.94))] p-5 transition-all duration-500 hover:border-[#00FF9A]/22 hover:shadow-[0_22px_44px_rgba(0,0,0,0.28),0_0_24px_rgba(0,255,154,0.08)] sm:p-6">

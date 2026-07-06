@@ -1,4 +1,5 @@
 import request from "../utils/request";
+import { safeGetItem, safeSetItem } from "../utils/safeStorage.js";
 
 // 提交评价(需登录)
 export function submitReview(data) {
@@ -62,16 +63,12 @@ export function markReviewHelpful(id) {
 const VISITOR_TOKEN_STORAGE_KEY = "valbri_voter_token";
 
 function getVisitorToken() {
-  try {
-    let token = window.localStorage.getItem(VISITOR_TOKEN_STORAGE_KEY);
-    if (!token || !/^[A-Za-z0-9_-]{8,64}$/.test(token)) {
-      token = generateVisitorToken();
-      window.localStorage.setItem(VISITOR_TOKEN_STORAGE_KEY, token);
-    }
-    return token;
-  } catch {
-    return generateVisitorToken();
+  let token = safeGetItem(VISITOR_TOKEN_STORAGE_KEY);
+  if (!token || !/^[A-Za-z0-9_-]{8,64}$/.test(token)) {
+    token = generateVisitorToken();
+    safeSetItem(VISITOR_TOKEN_STORAGE_KEY, token);
   }
+  return token;
 }
 
 function generateVisitorToken() {

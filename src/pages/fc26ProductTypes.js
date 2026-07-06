@@ -4,7 +4,7 @@ export const SBC_PRODUCT_TYPE = "sbc";
 export const PRODUCT_TYPES = [COIN_PRODUCT_TYPE, SBC_PRODUCT_TYPE];
 
 const PRODUCT_PLATFORMS = {
-  [COIN_PRODUCT_TYPE]: ["PlayStation", "Xbox", "PC"],
+  [COIN_PRODUCT_TYPE]: ["PS/Xbox", "PC"],
   [SBC_PRODUCT_TYPE]: ["PS/Xbox", "PC"],
 };
 
@@ -51,10 +51,17 @@ export function getProductTypeDisplayMeta(productType) {
 }
 
 export function getPlatformDisplayMeta(platform) {
+  const normalizedPlatform =
+    platform === "PlayStation" ||
+    platform === "Xbox" ||
+    platform === "PS" ||
+    platform === "ps_xbox"
+      ? "PS/Xbox"
+      : platform;
   return (
-    PLATFORM_DISPLAY_META[platform] || {
+    PLATFORM_DISPLAY_META[normalizedPlatform] || {
       icon: "console",
-      shortLabel: platform || "",
+      shortLabel: normalizedPlatform || "",
     }
   );
 }

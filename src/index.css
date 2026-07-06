@@ -1530,3 +1530,88 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 154, 0.5);
 }
+
+.scroll-zoom-img {
+  transform-origin: center center;
+  transform: scale(0.94);
+  transition: transform 180ms linear;
+}
+
+@supports (animation-timeline: view()) {
+  .scroll-zoom-img {
+    animation: scroll-zoom-grow linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 72%;
+    transform: scale(1);
+  }
+}
+
+@keyframes scroll-zoom-grow {
+  from {
+    transform: scale(0.94);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-zoom-img {
+    animation: none !important;
+    transform: scale(1) !important;
+    transition: none !important;
+  }
+}
+
+.player-auth-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #9AA7BD;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.player-auth-terms input[type="checkbox"] {
+  appearance: none;
+  position: relative;
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.player-auth-terms input[type="checkbox"]:checked {
+  border-color: rgba(0, 255, 154, 0.7);
+  background: #00FF9A;
+}
+
+.player-auth-terms input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid #070A0F;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.player-auth-terms a {
+  color: #7BFFCA;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 255, 154, 0.35);
+  text-underline-offset: 3px;
+}
+
+.player-auth-terms a:hover {
+  color: #00FF9A;
+}

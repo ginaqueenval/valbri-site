@@ -31,10 +31,10 @@ import PurchaseNotesSection from "../components/PurchaseNotesSection.jsx";
 const CROSSFADE_MS = 520;
 
 const PLATFORM_SHORT = {
-  PlayStation: "PS",
-  Xbox: "XBOX",
+  PlayStation: "PS/Xbox",
+  Xbox: "PS/Xbox",
   PC: "PC",
-  "PS/Xbox": "PS/XBOX",
+  "PS/Xbox": "PS/Xbox",
 };
 
 function CoinIcon({ className = "" }) {

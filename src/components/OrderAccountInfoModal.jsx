@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getOrderAccountInfo, saveOrderAccountInfo } from "../api/order";
 import { formatTime, isAccountInfoSubmitted } from "../utils/orderDisplay";
 import { validateOrderAccountForm } from "../utils/orderAccountValidation";
+import useBodyScrollLock from "../utils/useBodyScrollLock.js";
 
 const emptyForm = {
   gameAccount: "",
@@ -128,6 +129,8 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
       cancelled = true;
     };
   }, [open, order, submitted, t]);
+
+  useBodyScrollLock(open && !!order);
 
   if (!open || !order) {
     return null;
@@ -267,14 +270,39 @@ export default function OrderAccountInfoModal({ order, open, onSaved, onClose })
               />
             </label>
             <label className="grid gap-2 text-sm">
-              <span className="font-semibold">{t("orderAccount.backupCodes")}</span>
-              <input
+              <span className="flex items-center justify-between gap-2">
+                <span className="font-semibold">{t("orderAccount.backupCodes")}</span>
+                <a
+                  href="#/guide/backup-codes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#7BFFCA] underline decoration-[#00FF9A]/40 decoration-dotted underline-offset-4 transition-colors hover:text-[#00FF9A]"
+                >
+                  {t("orderAccount.howToGetBackupCodes")}
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                    className="h-3 w-3"
+                  >
+                    <path
+                      d="M14 4h6v6M20 4L10 14M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </a>
+              </span>
+              <textarea
                 value={form.backupCodes}
                 onChange={(event) => updateField("backupCodes", event.target.value)}
-                inputMode="numeric"
-                pattern="[0-9]*"
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm outline-none focus:border-[#00FF9A]/50"
+                rows={4}
+                placeholder={t("orderAccount.backupCodesPlaceholder")}
                 autoComplete="off"
+                spellCheck={false}
+                className="min-h-[120px] resize-y rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 outline-none focus:border-[#00FF9A]/50"
               />
             </label>
             {error && (

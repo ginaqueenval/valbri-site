@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { getPaymentStatus } from "../api/payment";
 import {
   formatCoinsK,
+  formatPlatform,
   formatPrice,
   getDeliveryStatusLabel,
   getPaymentStatusLabel,
@@ -115,7 +116,7 @@ export default function PaymentCancel() {
           {order?.platform ? (
             <div className="flex items-center justify-between gap-3">
               <span className="text-[#9AA7BD]">{t("checkout.platform")}</span>
-              <span className="font-semibold text-[#E7EDF7]">{order.platform}</span>
+              <span className="font-semibold text-[#E7EDF7]">{formatPlatform(order.platform)}</span>
             </div>
           ) : null}
           {!sbcOrder && order?.coins ? (

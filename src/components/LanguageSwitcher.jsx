@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "../utils/languages.js";
+import { safeSetItem } from "../utils/safeStorage.js";
 
 export default function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
@@ -9,7 +10,7 @@ export default function LanguageSwitcher() {
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
-    localStorage.setItem("language", lng);
+    safeSetItem("language", lng);
     setOpen(false);
   };
 

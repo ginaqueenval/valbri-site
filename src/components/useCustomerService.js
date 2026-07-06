@@ -28,6 +28,11 @@ import {
 } from "../utils/customerServiceFloating.js";
 import { encodeToken, decodeToken } from "../utils/storageCodec.js";
 import {
+  safeGetItem,
+  safeSetItem,
+  safeRemoveItem,
+} from "../utils/safeStorage.js";
+import {
   VISITOR_TOKEN_KEY,
   DESKTOP_PANEL_WIDTH,
   MAX_MESSAGE_LENGTH,
@@ -55,7 +60,7 @@ export default function useCustomerService() {
   const [input, setInput] = useState("");
   const [session, setSession] = useState(null);
   const [visitorToken, setVisitorToken] = useState(() =>
-    normalizeVisitorToken(decodeToken(localStorage.getItem(VISITOR_TOKEN_KEY))),
+    normalizeVisitorToken(decodeToken(safeGetItem(VISITOR_TOKEN_KEY))),
   );
   const [unread, setUnread] = useState(0);
   const [notice, setNotice] = useState("");
@@ -217,14 +222,14 @@ export default function useCustomerService() {
 
   useEffect(() => {
     if (visitorToken) {
-      localStorage.setItem(VISITOR_TOKEN_KEY, encodeToken(visitorToken));
+      safeSetItem(VISITOR_TOKEN_KEY, encodeToken(visitorToken));
       return;
     }
-    localStorage.removeItem(VISITOR_TOKEN_KEY);
+    safeRemoveItem(VISITOR_TOKEN_KEY);
   }, [visitorToken]);
 
   useEffect(() => {
-    localStorage.setItem(
+    safeSetItem(
       CUSTOMER_SERVICE_FLOATING_STORAGE_KEY,
       JSON.stringify(launcherPosition),
     );

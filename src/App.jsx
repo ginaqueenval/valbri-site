@@ -30,6 +30,7 @@ const Reviews = lazy(() => import("./pages/Reviews.jsx"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess.jsx"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel.jsx"));
 const MockPayment = lazy(() => import("./pages/MockPayment.jsx"));
+const BackupCodesGuide = lazy(() => import("./pages/BackupCodesGuide.jsx"));
 import { getPlayerDisplayName } from "./utils/playerProfile.js";
 import {
   clearStoredPlayerSession,
@@ -55,6 +56,7 @@ export default function App() {
   const [authSession, setAuthSession] = useState(() => getStoredPlayerSession());
   const isLoggedIn = !!authSession.token;
   const playerDisplayName = getPlayerDisplayName(authSession.player);
+  const isChromelessRoute = location.pathname.startsWith("/guide");
 
   const handleLogout = () => {
     clearStoredPlayerSession({ reason: "logout" });
@@ -86,13 +88,19 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#070A0F] text-[#E7EDF7]">
-        <AppHeader
-          isLoggedIn={isLoggedIn}
-          playerDisplayName={playerDisplayName}
-          onRequestLogout={() => setShowLogoutConfirm(true)}
-        />
+        {!isChromelessRoute && (
+          <AppHeader
+            isLoggedIn={isLoggedIn}
+            playerDisplayName={playerDisplayName}
+            onRequestLogout={() => setShowLogoutConfirm(true)}
+          />
+        )}
 
-        <div className="w-full max-w-[100vw] overflow-x-hidden pt-[76px] sm:pt-[82px]">
+        <div
+          className={`w-full max-w-[100vw] overflow-x-hidden ${
+            isChromelessRoute ? "" : "pt-[76px] sm:pt-[82px]"
+          }`}
+        >
 
         {showLogoutConfirm && (
           <LogoutConfirmModal
@@ -109,7 +117,7 @@ export default function App() {
 
         <ScrollToTop />
 
-        {location.pathname !== "/home" && (
+        {location.pathname !== "/home" && !isChromelessRoute && (
           <div className="mx-auto max-w-6xl px-4 pt-4">
             <button
               onClick={() => navigate(-1)}
@@ -158,10 +166,12 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/guide/backup-codes" element={<BackupCodesGuide />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </Suspense>
 
+        {!isChromelessRoute && (
         <footer className="border-t border-white/5">
           <div className="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row justify-between gap-4 text-sm text-[#9AA7BD]">
             <div>{t("footer.copyright", { year: new Date().getFullYear() })}</div>
@@ -178,7 +188,8 @@ export default function App() {
             </div>
           </div>
         </footer>
-        <CustomerService />
+        )}
+        {!isChromelessRoute && <CustomerService />}
         </div>
       </div>
     </ErrorBoundary>

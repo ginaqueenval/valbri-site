@@ -42,7 +42,7 @@ export default function Login() {
       });
       setStoredPlayerSession(
         { token: res.token, player: res.player },
-        { reason: "login" },
+        { reason: "login", remember: rememberMe },
       );
       navigate(location.state?.redirectTo || "/home");
     } catch (err) {

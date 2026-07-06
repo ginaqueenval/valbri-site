@@ -6,6 +6,7 @@ import {
   parseStoredFloatingPosition,
 } from "./customerServiceFloating.js";
 import { upsertCustomerMessage } from "./customerServiceState";
+import { safeGetItem } from "./safeStorage.js";
 
 export const VISITOR_TOKEN_KEY = "cs_visitor_token";
 export const DESKTOP_BUTTON_SIZE = 60;
@@ -42,7 +43,7 @@ export function getInitialLauncherPosition() {
     return getDefaultFloatingPosition(viewport, config);
   }
   const stored = parseStoredFloatingPosition(
-    window.localStorage.getItem(CUSTOMER_SERVICE_FLOATING_STORAGE_KEY),
+    safeGetItem(CUSTOMER_SERVICE_FLOATING_STORAGE_KEY),
   );
   return normalizeFloatingPosition(stored, viewport, config);
 }
