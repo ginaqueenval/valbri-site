@@ -300,12 +300,16 @@
     },
     "lastUpdated": "Last updated: {{date}}"
   },
-  "privacy": {
-    "title": "Privacy Policy",
-    "intro": "In this section, we provide you with essential information about our line of work and our Privacy Policy. A privacy policy is a legal document that explains how your website collects, uses, and protects visitors’ personal data, ensuring transparency and compliance with privacy laws.
-Here, at the first step, you will receive necessary data about how do we collect and use your personal data to give you efficient services. In order to have accurate knowledge about your legal rights and choices associated with your personal data, we recommend you to read our Privacy Policy section precisely.
-Note that valbri.net reserves the right to update, modify or amend the website Privacy Policy at any time. Any changes will become effective upon posting the revised version on this website. So, do not forget to review this Policy periodically to stay informed of any updates.
-",
+"privacy": {
+  "title": "Privacy Policy",
+  "intro": "In this section, we provide you with essential information about our line of work and our Privacy Policy. A privacy policy is a legal document that explains how your website collects and uses personal data.",
+  "content": "Here, at the first step, you will receive necessary data about how do we collect and use your personal data to give you efficient services. In order to have accurate knowledge about your legal rights and choices associated with your personal data, we recommend you to read this policy carefully. Note that valbri.net reserves the right to update, modify or amend the website Privacy Policy at any time. Any changes will become effective upon posting the revised version on this website. So, do not forget to review this Policy periodically to stay informed of any updates.",
+  "collect": {
+    "title": "Information We Collect",
+    "content": "During the MVP phase, we may collect basic contact information such as name and email address when users submit an order or inquiry."
+  },
+  ...
+}
     "collect": {
       "title": "Information We Collect",
       "content": "During the MVP phase, we may collect basic contact information such as name and email address when users submit an order or inquiry."
