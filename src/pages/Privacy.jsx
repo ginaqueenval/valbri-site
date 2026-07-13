@@ -5,7 +5,11 @@ export default function Privacy() {
 
       <p className="mt-4 max-w-3xl text-sm leading-7 text-[#9AA7BD]">
         Valbri respects your privacy and is committed to protecting your personal
-        information.
+        information.In this section, we provide you with essential information about our line of work and our Privacy Policy. A privacy policy is a legal document that explains how your website collects, uses, and protects visitors’ personal data, ensuring transparency and compliance with privacy laws.
+
+Here, at the first step, you will receive necessary data about how do we collect and use your personal data to give you efficient services. In order to have accurate knowledge about your legal rights and choices associated with your personal data, we recommend you to read our Privacy Policy section precisely.
+
+Note that valbri.net reserves the right to update, modify or amend the website Privacy Policy at any time. Any changes will become effective upon posting the revised version on this website. So, do not forget to review this Policy periodically to stay informed of any updates.
       </p>
 
       <h2 className="mt-8 text-lg font-bold">Information We Collect</h2>
