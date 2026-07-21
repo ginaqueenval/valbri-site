@@ -3,20 +3,244 @@
     "brand": "valbri",
     "brandSubtitle": "Gaming Marketplace",
     "nav": {
-      "fc26": "FC26 Coins",
-      "about": "About",
-      "contact": "Contact"
+    "fc26": "FC26 Coins",
+    "about": "About",
+    "contact": "Contact"
     },
     "buyBtn": "Buy FC26 Coins",
     "accountLabel": "Player Account",
     "cart": "Cart",
     "checkout": "Purchase History",
+    "privacyCenter": "Privacy Center",
     "back": "Back"
   },
   "footer": {
-    "copyright": "© {{year}} valbri",
+    "tradingName": "Valbri is a trading name of Guardian Angel Group Ltd.",
+    "copyright": "© 2026 Guardian Angel Group Ltd.",
     "terms": "Terms",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "refundPolicy": "Refund Policy",
+    "privacyRequests": "Privacy Requests",
+    "refundRequests": "Refund Requests",
+    "unauthorizedRefund": "Report an Unauthorized Charge",
+    "cookies": "Cookies"
+  },
+  "refunds": {
+    "eyebrow": "Refund support",
+    "title": "Refund Requests",
+    "description": "Track full-refund requests, review decisions, and securely add supporting evidence.",
+    "backToOrders": "Back to orders",
+    "empty": "You have not submitted any refund requests.",
+    "viewDetail": "View details",
+    "viewPolicy": "View Refund Policy",
+    "amount": "Refund amount",
+    "createdAt": "Submitted",
+    "reason": "Reason",
+    "settlement": "Settlement",
+    "settlementEstimate": "Estimated 3 to 10 business days after provider confirmation",
+    "submitting": "Submitting...",
+    "submit": "Submit refund request",
+    "submitted": "Refund request submitted.",
+    "orderAction": {
+      "request": "Request refund",
+      "review": "Request after-delivery review",
+      "view": "View refund status"
+    },
+    "dialog": {
+      "incompleteTitle": "Request a full refund",
+      "incompleteDescription": "This paid order is not complete. Your full refund request is approved automatically and cannot be rejected by an administrator.",
+      "completedTitle": "Request after-delivery review",
+      "completedDescription": "Completed-order claims submitted within 14 calendar days after payment are reviewed under the Refund Policy.",
+      "reason": "Review reason",
+      "details": "What happened?",
+      "originalMethod": "Approved refunds are issued in full to the original payment method."
+    },
+    "reasons": {
+      "PRE_COMPLETION": "Order not completed",
+      "FULFILMENT_DEADLINE": "72-hour fulfilment deadline",
+      "DEFECTIVE": "Defective product or service",
+      "NOT_AS_DESCRIBED": "Service not delivered as described",
+      "UNAUTHORIZED": "Unauthorized or fraudulent charge"
+    },
+    "statuses": {
+      "UNDER_REVIEW": "Under review",
+      "APPROVED": "Approved",
+      "REFUND_PROCESSING": "Refund processing",
+      "REFUND_INITIATED": "Refund initiated",
+      "MANUAL_INTERVENTION": "Manual intervention",
+      "REFUNDED": "Refunded",
+      "REJECTED": "Rejected"
+    },
+    "evidence": {
+      "title": "Supporting evidence",
+      "help": "Up to 5 PNG, JPEG, or PDF files; 5 MB each.",
+      "add": "Add evidence",
+      "addOptional": "Add optional evidence",
+      "selected": "{{count}} file(s) selected",
+      "uploading": "Scanning and uploading...",
+      "download": "Download",
+      "maxFiles": "A claim may contain at most 5 evidence files.",
+      "invalidFile": "Use a PNG, JPEG, or PDF file no larger than 5 MB.",
+      "uploadFailed": "Evidence could not be securely uploaded.",
+      "downloadFailed": "Evidence could not be downloaded."
+    },
+    "public": {
+      "eyebrow": "Payment protection",
+      "title": "Report an Unauthorized Charge",
+      "description": "Verify your email before providing minimal transaction details. The result remains neutral whether or not an order can be matched.",
+      "steps": { "email": "Verify email", "code": "Enter code", "claim": "Claim details" },
+      "email": "Email address",
+      "sendCode": "Send verification code",
+      "codeSent": "Enter the 6-digit code sent to your email. It expires in 10 minutes.",
+      "code": "Verification code",
+      "verify": "Verify email",
+      "orderNo": "Order number (if known)",
+      "transactionDate": "Transaction date",
+      "amount": "Transaction amount",
+      "currency": "Currency",
+      "cardLastFour": "Card last four digits (optional)",
+      "details": "Describe the unauthorized charge",
+      "submit": "Submit claim",
+      "doneTitle": "Claim received",
+      "doneMessage": "If the information can be verified, the claim will be reviewed and we will contact you by email.",
+      "returnHome": "Return home",
+      "errors": { "challenge": "The verification request could not be started.", "verify": "The code could not be verified.", "submit": "The claim could not be submitted." }
+    },
+    "errors": {
+      "descriptionRequired": "Describe what happened before submitting.",
+      "submitFailed": "The refund request could not be submitted.",
+      "loadFailed": "Refund requests could not be loaded."
+    }
+  },
+  "marketingUnsubscribe": {
+    "eyebrow": "Email preferences",
+    "title": "Unsubscribe from marketing email",
+    "description": "This stops optional marketing email. Service, security, payment, and order messages are unaffected.",
+    "privacyNotice": "For privacy, this page does not disclose whether an address is subscribed. Confirm below to process the request.",
+    "checking": "Preparing your request...",
+    "confirm": "Unsubscribe",
+    "submitting": "Processing...",
+    "completed": "Your request has been processed. If the address was subscribed, marketing email is now disabled.",
+    "completedButton": "Request processed",
+    "networkError": "The service could not be reached. Try again without changing this link.",
+    "returnHome": "Return home"
+  },
+  "privacyRequests": {
+    "eyebrow": "Privacy rights",
+    "title": "Privacy Requests",
+    "description": "Submit and track requests to access, export, rectify, delete, restrict, or object to processing of your personal data.",
+    "newRequest": "New request",
+    "type": "Request type",
+    "types": {
+      "access": "Access",
+      "export": "Export",
+      "rectify": "Rectification",
+      "delete": "Erasure",
+      "restrict": "Restriction",
+      "object": "Objection"
+    },
+    "details": "Request details",
+    "currentPassword": "Current password",
+    "passwordHint": "Used only for in-memory identity verification; it is not stored.",
+    "submitting": "Submitting...",
+    "submit": "Submit request",
+    "history": "Your requests",
+    "deadlineNote": "Target response deadline: 28 days after identity verification.",
+    "refresh": "Refresh",
+    "loadFailed": "Unable to load privacy requests.",
+    "activeExists": "An active request of this type already exists.",
+    "passwordRequired": "Enter your current password for this request type.",
+    "created": "Privacy request submitted.",
+    "passwordFailed": "Current password verification failed.",
+    "createFailed": "Unable to submit the privacy request.",
+    "cancelFailed": "Unable to cancel the privacy request.",
+    "empty": "You have not submitted any privacy requests.",
+    "createdAt": "Created",
+    "dueTime": "Target date",
+    "pendingVerification": "Pending identity verification",
+    "viewDetail": "View details",
+    "cancel": "Cancel request",
+    "status": "Status",
+    "verification": "Identity verification",
+    "statuses": {
+      "submitted": "Submitted",
+      "identity_verification": "Identity verification",
+      "in_review": "In review",
+      "action_required": "Action required",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    }
+  },
+  "accountPrivacy": {
+    "eyebrow": "Account privacy",
+    "title": "Privacy Center",
+    "description": "Review policy acceptance, synchronize browser choices across signed-in devices, and manage privacy requests from one place.",
+    "policy": "Current policy",
+    "privacyPolicy": "Privacy Policy",
+    "version": "Version",
+    "status": "Status",
+    "accepted": "Accepted",
+    "notAccepted": "Not accepted",
+    "reconsentRequired": "Review required",
+    "requiredGeneration": "Current generation",
+    "acceptedGeneration": "Accepted generation",
+    "viewPolicy": "View Privacy Policy",
+    "gpc": "Global Privacy Control",
+    "gpcOn": "Detected on this browser",
+    "gpcOff": "Not detected on this browser",
+    "gpcDescription": "GPC is applied after account and browser choices. Advertising and data sharing remain off and cannot be enabled.",
+    "advertisingUnavailable": "Advertising and data-sharing choices are unavailable and remain off.",
+    "choices": "Your choices",
+    "choicesDescription": "Signed-in choices are synchronized by category only. Valbri never uploads concrete localStorage or sessionStorage values.",
+    "preferences": "Preferences storage",
+    "preferencesDescription": "Remember language and interface choices on this browser.",
+    "functional": "Functional storage",
+    "functionalDescription": "Enable device-local review voting and related functions.",
+    "marketing": "Marketing email",
+    "marketingDescription": "Receive marketing email from Valbri. Service and security messages are unaffected.",
+    "advertising": "Advertising and data sharing",
+    "save": "Save privacy choices",
+    "saving": "Saving...",
+    "saved": "Privacy choices saved.",
+    "loadFailed": "Unable to load the privacy center.",
+    "saveFailed": "Unable to save privacy choices.",
+    "conflict": "These choices changed on another device. The newest server choices have been loaded; review them and explicitly confirm before saving again.",
+    "reconfirm": "I reviewed the updated choices",
+    "recentRequests": "Recent privacy requests",
+    "recentRequestsDescription": "The three most recent requests linked to this account.",
+    "viewAll": "View all",
+    "accountControl": "Account control",
+    "requestDeletion": "Request account deletion",
+    "deletionDescription": "Start an erasure request. Identity verification and administrator approval are required before any deletion is executed.",
+    "startDeletionRequest": "Open privacy requests"
+  },
+  "cookieConsent": {
+    "title": "Browser storage choices",
+    "description": "Necessary storage stays active. Preferences and functional storage are optional and off until you choose.",
+    "acceptOptional": "Accept optional",
+    "rejectOptional": "Reject optional",
+    "settings": "Settings",
+    "settingsTitle": "Browser storage settings",
+    "settingsDescription": "Choose the optional categories this browser may store. You can return here and withdraw them at any time.",
+    "necessary": "Strictly necessary",
+    "necessaryDescription": "Authentication, security, checkout and an active support session.",
+    "preferences": "Preferences",
+    "preferencesDescription": "Language and interface choices on this device.",
+    "functional": "Functional",
+    "functionalDescription": "Anonymous review voting and related device-local features.",
+    "analytics": "Analytics",
+    "analyticsDescription": "Valbri does not use analytics storage.",
+    "advertising": "Advertising",
+    "advertisingDescription": "Valbri does not use advertising or data-sharing storage.",
+    "unavailable": "Not used · unavailable",
+    "withdraw": "Withdraw optional",
+    "save": "Save settings",
+    "syncing": "Syncing...",
+    "syncFailed": "Browser choices were saved locally, but account synchronization failed.",
+    "syncConflict": "These choices changed on another device. The newest account choices were loaded; review and confirm before saving again.",
+    "reconfirm": "Review updated choices",
+    "manage": "Manage browser storage settings"
   },
   "language": {
     "english": "English",
@@ -24,8 +248,8 @@
   },
   "home": {
     "eyebrow": "FC26 · Ultimate Team",
-    "heroLine1": "FC26 Coin Trading",
-    "heroLine2": "Simplified Just Right",
+    "heroLine1": "Focused on FC26",
+    "heroLine2": "Coin Trading.",
     "tagline": "Encrypted end to end. Delivered fast. Engineered to keep your account safe — from checkout to coins in hand, every step stays clear and rock-solid.",
     "pill": {
       "encrypted": "Encrypted",
@@ -45,7 +269,7 @@
       "step1": "On the Valbri home page, choose your preferred language.",
       "step2": "Sign in to your Valbri account, or create a new one if you don't have it yet.",
       "step3": "Click \"Shop Packages\" on the home page to enter the FC 26 Coins page.",
-      "step4": "Pick your platform — PlayStation, Xbox, or PC.",
+      "step4": "Pick your platform — PS/Xbox or PC.",
       "step5": "Choose the FC coin bundle you want and adjust the quantity.",
       "step6": "Tap \"Checkout\", select your preferred payment method (Stripe / PayPal), and complete payment.",
       "step7": "Submit the required game account info and wait for our manual delivery."
@@ -66,7 +290,7 @@
         "title": "Avoid Cross-Platform Buying",
         "desc": "Within 24 hours before and 48 hours after a Valbri transaction, please avoid buying FC 26 Coins from other platforms to reduce the risk of being banned."
       },
-      "item4": {
+      "item5": {
         "title": "Post-Trade Security",
         "desc": "After a successful trade, please change your account password immediately and remove any unrecognized trusted devices to harden your account."
       }
@@ -85,12 +309,12 @@
           "desc": "Coins are sourced through manual in-game runs — the supply chain stays clean and reliable."
         },
         "afterSale": {
-          "title": "Stress-Free After-Sales",
-          "desc": "Within warranty: if coins get clawed back, we top them up; if you get banned, we refund in full."
+          "title": "After-Sales Review",
+          "desc": "Report a verified delivery issue to support. Eligible remedies are assessed under the refund terms that applied to your order."
         },
         "warranty7d": {
-          "title": "7-Day Warranty",
-          "desc": "Extended coverage — if your order triggers an in-game ban within 7 days of delivery, refunds and other remedies apply."
+          "title": "Delivery Issue Support",
+          "desc": "We review reported delivery issues using the order record, fulfilment evidence and the applicable refund policy."
         }
       }
     },
@@ -100,28 +324,28 @@
       "subtitle": "Every delivery is engineered with the care of a software craftsman.",
       "items": {
         "secure": {
-          "title": "100% Secure",
-          "desc": "Efficient, professional, and safe transactions with your data fully protected — 100% secure."
+          "title": "Protected Transactions",
+          "desc": "We use access controls, encrypted transport and established payment providers to reduce transaction and data risk."
         },
         "support": {
-          "title": "24/7 Support",
-          "desc": "Our reliable support team is on call around the clock — before, during, and after your purchase."
+          "title": "Customer Support",
+          "desc": "Contact our support team before, during or after a purchase. Response times vary with request volume and complexity."
         },
         "refund": {
-          "title": "Full Refund Guarantee",
-          "desc": "We offer the most competitive prices and efficient delivery. If your order doesn't arrive or can't be used, we promise a 100% refund."
+          "title": "Refund Eligibility Review",
+          "desc": "If an order is not delivered, is only partly delivered or cannot be used, contact support for review under the applicable refund terms."
         }
       }
     },
     "closing": {
       "title": "Ready to start your FC 26 journey?",
-      "subtitle": "Pick a pack, pay, and your coins land in minutes."
+      "subtitle": "Pick a package, complete payment, and follow the order's estimated delivery status."
     },
     "badge": "FC26 packages live — Stripe & PayPal available",
     "title": "FC26 Ultimate Team Coins —",
     "titleHighlight": " fast & secure",
     "titleEnd": " delivery",
-    "description": "Valbri is a gaming marketplace focused on FC26 coins and selected game services. Check out with Stripe or PayPal and get your coins in minutes.",
+    "description": "Valbri is a player-facing digital game fulfilment service focused on FC26 coins and selected game services. Checkout supports Stripe and PayPal, with delivery estimates shown for each order.",
     "viewPackages": "View FC26 Packages",
     "browseGames": "Browse Games",
     "features": {
@@ -152,31 +376,37 @@
     "addToCart": "Add to Cart",
     "addedToCart": "Added to cart!",
     "addToCartFailed": "Failed to add",
-    "paymentNotice": "Check out with Stripe or PayPal and get your coins delivered within minutes.",
+    "paymentNotice": "Check out with Stripe or PayPal and follow the estimated delivery status on your order.",
     "gamesTitle": "Games",
     "gamesDesc": "We currently focus on FC26, and also support the following games.",
     "comingSoon": "Page & pricing: coming soon"
   },
   "fc26": {
-    "title": "FC26 Ultimate Team Coins",
-    "description": "Select your platform and package. Click",
+    "title": "FC26 Ultimate Team",
+    "description": "Select product type, platform, and package. Click",
     "descriptionHighlight": "Buy",
     "descriptionEnd": "to checkout.",
     "payment": "Payment:",
     "paymentProvider": "Lava",
+    "selectProductType": "Product Type",
+    "productTypeCoins": "Coin Packages",
+    "productTypeSbc": "SBC Packages",
     "selectPlatform": "Select Platform",
     "packages": "Packages",
     "coins": "Coins",
     "gift": "Gift",
     "eta": "ETA: {{eta}}",
     "buy": "Buy",
-    "addToCart": "Add to Cart",
-    "checkoutNow": "Checkout Now",
+    "addToCart": "Add",
+    "checkoutNow": "Checkout",
     "total": "Total",
     "addedToCart": "Added to cart",
     "addToCartFailed": "Failed to add to cart",
     "widgetNotSet": "Widget not set",
     "noPackages": "No packages available for this platform.",
+    "noSbcPackages": "No SBC packages available for this platform.",
+    "referenceCost": "Reference Cost",
+    "sbcCheckoutPending": "SBC checkout will be connected in the next phase",
     "recentOrders": "Recent Orders",
     "noRecentOrders": "No order history yet",
     "viewAllOrders": "View All Orders →",
@@ -189,8 +419,8 @@
     "faqTitle": "Trust & Safety",
     "faq": {
       "security": {
-        "title": "72-Hour Guarantee",
-        "desc": "All orders are covered by a 72-hour after-delivery guarantee. Contact us anytime if issues arise."
+        "title": "After-Sales Review",
+        "desc": "Contact support if a delivery issue arises. Eligibility is reviewed under the refund terms that applied to the order."
       },
       "delivery": {
         "title": "Fast Delivery",
@@ -198,31 +428,27 @@
       },
       "payment": {
         "title": "Secure Payment",
-        "desc": "Powered by Stripe with full encryption. We accept major credit cards for a safe checkout experience."
+        "desc": "Stripe and PayPal process payment credentials through their hosted payment flows. Valbri does not store complete card numbers."
       },
       "privacy": {
         "title": "Privacy Protection",
-        "desc": "Your personal information and transaction data are strictly protected and never shared with third parties."
+        "desc": "We protect personal and transaction data and share it only with necessary processors or where law requires. We do not sell personal information."
       }
-    },
-    "selectProductType": "Product Type",
-    "productTypeCoins": "Coin Packages",
-    "productTypeSbc": "SBC Packages",
-    "noSbcPackages": "No SBC packages available for this platform.",
-    "referenceCost": "Reference Cost",
-    "sbcCheckoutPending": "SBC checkout will be connected in the next phase"
+    }
   },
   "checkout": {
     "title": "Checkout",
-    "description": "Payments are currently disabled in the MVP. A bank payment gateway will be integrated after the website is finalized and approved.",
+    "description": "Pay with Stripe or PayPal — your coins are delivered within minutes after payment is confirmed.",
     "loading": "Loading cart item...",
     "loadFailed": "Failed to load cart item",
     "status": "Status",
-    "bankGateway": "Bank gateway:",
-    "comingSoon": "Coming soon",
+    "bankGateway": "Payment provider:",
+    "comingSoon": "Stripe & PayPal",
     "orderSummary": "Order Summary",
+    "paymentMethods": "Payment Methods",
     "platform": "Platform",
     "coins": "Coins",
+    "referenceCost": "Reference Cost",
     "gift": "Gift",
     "eta": "ETA",
     "total": "Total",
@@ -239,8 +465,15 @@
     "createOrderFailed": "Failed to create order",
     "accessDenied": "Access Denied",
     "accessDeniedDesc": "This order does not exist or you do not have permission to access it.",
-    "paymentMethods": "Payment Methods",
-    "referenceCost": "Reference Cost"
+    "legalConfirmation": "Legal confirmation",
+    "policyLoading": "Loading the current legal terms...",
+    "policyUnavailable": "The current legal terms cannot be verified. Payment is temporarily unavailable.",
+    "policyChanged": "The legal terms changed. Please review and confirm them again.",
+    "refundPolicyNotice": "Refund eligibility and timing are governed only by the current Refund Policy.",
+    "generalPolicyConsent": "I accept the current English Terms, Privacy Policy, and Refund Policy, and request immediate digital performance for this order.",
+    "ageConfirmation": "I confirm that I am at least 18 years old.",
+    "consentRequired": "Review and confirm the current legal terms before payment.",
+    "generalConsentRequired": "Accept the current Terms, Privacy Policy, and Refund Policy and confirm that you are at least 18."
   },
   "cart": {
     "title": "Cart",
@@ -249,21 +482,21 @@
     "loadFailed": "Failed to load cart",
     "updateFailed": "Failed to update cart",
     "removeFailed": "Failed to remove item",
+    "itemRemoved": "Removed",
+    "undo": "Undo",
     "empty": "Your cart is empty. Pick an FC26 package to get started.",
     "goBuy": "Browse Packages",
     "summary": "Cart Summary",
     "summaryHint": "The cart only stores selections temporarily. Please checkout one package at a time; final price, coins, and platform availability are revalidated at checkout.",
     "totalItems": "Total quantity",
     "coins": "Coins",
+    "referenceCost": "Reference Cost",
+    "sbcPackage": "SBC Package",
     "gift": "Gift",
     "bonusIncluded": "Bonus included",
     "eta": "ETA",
     "checkout": "Checkout",
     "remove": "Remove",
-    "itemRemoved": "Removed",
-    "undo": "Undo",
-    "referenceCost": "Reference Cost",
-    "sbcPackage": "SBC Package",
     "perItem": "ea",
     "flowHint": "Tap Checkout on any row to place that order"
   },
@@ -347,6 +580,12 @@
     "captcha": "Captcha",
     "captchaPlaceholder": "Enter captcha",
     "captchaRequired": "Please enter the captcha",
+    "acceptTerms": "I have read and agree to the <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
+    "acceptTermsAria": "Agree to Terms of Service and Privacy Policy",
+    "acceptTermsRequired": "Please accept the Terms of Service and Privacy Policy and confirm that you are at least 18",
+    "ageConfirmation": "I confirm that I am at least 18 years old.",
+    "ageConfirmationAria": "Confirm that you are at least 18 years old",
+    "policyUnavailable": "The current legal policies could not be verified. Please try again.",
     "refreshCaptcha": "Refresh captcha",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
@@ -363,10 +602,7 @@
     "login": "Login",
     "sessionExpiredTitle": "Session Expired",
     "sessionExpiredDesc": "Your session has timed out. Please sign in again to continue.",
-    "reLogin": "Sign In Again",
-    "acceptTerms": "I have read and agree to the <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
-    "acceptTermsAria": "Agree to Terms of Service and Privacy Policy",
-    "acceptTermsRequired": "Please read and accept the Terms of Service and Privacy Policy first"
+    "reLogin": "Sign In Again"
   },
   "announcement": {
     "title": "Announcements"
@@ -398,28 +634,46 @@
     "imageTooLarge": "Image size cannot exceed 5MB"
   },
   "notes": {
-    "bestSeller": "Best Seller",
-    "popular": "Popular",
-    "bestValue": "Best Value",
-    "fastDelivery": "Fast Delivery",
-    "highVolume": "High Volume",
-    "vip": "VIP",
-    "maxPack": "Max Pack",
     "hot": "Hot",
     "champion": "Best",
     "deal": "Deal",
     "flash": "Flash",
     "bulk": "Bulk",
     "crown": "Crown",
-    "rocket": "Top"
+    "rocket": "Top",
+    "bestSeller": "Best",
+    "popular": "Hot",
+    "bestValue": "Deal",
+    "fastDelivery": "Flash",
+    "highVolume": "Bulk",
+    "vip": "Crown",
+    "maxPack": "Top"
   },
   "orders": {
     "title": "Purchase History",
     "subtitle": "View your purchase history and order status.",
     "loading": "Loading...",
-    "empty": "No orders yet. ",
-    "goBuy": "Go buy now",
+    "empty": {
+      "title": {
+        "all": "No purchase history yet",
+        "pendingPayment": "No pending payments",
+        "accountRequired": "No orders awaiting account info",
+        "processing": "No orders in progress",
+        "completed": "No completed orders yet",
+        "closed": "No cancelled or refunded orders"
+      },
+      "desc": {
+        "all": "Start your first FC 26 coin trade — it lands in minutes.",
+        "pendingPayment": "All orders are paid up. Browse new packages anytime.",
+        "accountRequired": "All paid orders have account info submitted.",
+        "processing": "Nothing in progress right now. New orders will show their delivery status here.",
+        "completed": "Completed orders will be archived here.",
+        "closed": "Cancelled and refunded orders will be archived here."
+      }
+    },
+    "goBuy": "Browse Packages",
     "coins": "Coins",
+    "referenceCost": "Reference Cost",
     "gift": "Gift",
     "tab": {
       "all": "All",
@@ -446,6 +700,7 @@
     },
     "progress": {
       "percent": "{{percent}}%",
+      "stepOf": "Step {{current}} of {{total}}",
       "steps": {
         "submitted": "Order Submitted",
         "paid": "Payment Complete",
@@ -475,17 +730,19 @@
     "accountInfo": {
       "missing": "Account Info Required",
       "submitted": "Account Info Submitted",
-      "fillAction": "Fill",
-      "viewAction": "View/Edit",
+      "fillAction": "Fill now",
+      "viewAction": "View EA Account",
+      "bannerTitle": "Account info required",
+      "bannerSubtitle": "Submit your transaction account so we can continue delivery.",
+      "bannerCta": "Fill now",
       "loadingAction": "Loading",
       "fillHint": "Click to enter transaction account info",
       "viewHint": "Click to view or edit transaction account info",
       "warning": "This order has no transaction account info yet. Please click Account Info Required to fill it in, otherwise the transaction cannot be completed.",
-      "bannerCount_one": "You have {{count}} paid order awaiting account info.",
-      "bannerCount_other": "You have {{count}} paid orders awaiting account info.",
-      "bannerGuide": "Click the \"Account Info Required\" button on each order to fill in."
-    },
-    "referenceCost": "Reference Cost"
+      "bannerCount_one": "You have {{count}} paid order awaiting EA account info.",
+      "bannerCount_other": "You have {{count}} paid orders awaiting EA account info.",
+      "bannerGuide": "Click the \"Fill now\" button on each order to fill it in."
+    }
   },
   "payment": {
     "stripePay": "Stripe Payment",
@@ -518,31 +775,53 @@
   "orderAccount": {
     "badge": "Delivery Info",
     "title": "Enter EA Account Info",
-    "viewTitle": "Transaction Account Info",
+    "viewTitle": "EA Account Info",
     "desc": "This order is paid. Please enter your EA account email, password, and backup code so we can continue delivery.",
-    "viewDesc": "You have submitted transaction account info for this order. You can view it or edit and resubmit.",
-    "encryptedNotice": "The EA account email, password, and backup code you enter are encrypted. You can fill them in with confidence.",
+    "viewDesc": "You have submitted the EA account info for this order. You can view it or edit and resubmit.",
+    "encryptedNotice": "Your account, password, and backup code are encrypted. You can fill them in with confidence.",
     "gameAccount": "Your EA Account Email",
     "gamePassword": "Your EA Account Password",
     "backupCodes": "Backup Code",
-    "submittedTime": "Submitted/Updated Time",
-    "required": "EA account email, password, and backup code are all required.",
-    "backupCodesNumeric": "Backup code can contain numbers only, not letters or symbols.",
-    "loadFailed": "Failed to load game account info. Please try again later.",
-    "saveFailed": "Failed to save game account info. Please try again later.",
-    "loading": "Loading account info...",
-    "saving": "Saving...",
-    "submit": "Submit Account Info",
-    "resubmit": "Resubmit",
-    "edit": "Edit Account Info",
-    "cancelEdit": "Cancel Edit",
-    "showPassword": "Show full password",
-    "hidePassword": "Hide full password",
-    "close": "Close account info prompt",
+    "backupCodesNumericOnly": "Backup code may only contain digits and symbols.",
     "backupCodesPlaceholder": "e.g.\n123·567\n234·567\n567·456",
     "howToGetBackupCodes": "How to get it?",
     "submitSuccess": "EA info submitted, awaiting delivery",
-    "editSuccess": "EA info updated"
+    "editSuccess": "EA info updated",
+    "submittedTime": "Submitted/Updated Time",
+    "required": "EA account email, password, and backup code are all required.",
+    "loadFailed": "Failed to load EA account info. Please try again later.",
+    "saveFailed": "Failed to save EA account info. Please try again later.",
+    "loading": "Loading EA account info...",
+    "saving": "Saving...",
+    "submit": "Submit EA Account Info",
+    "resubmit": "Resubmit",
+    "edit": "Edit EA Account Info",
+    "cancelEdit": "Cancel Edit",
+    "showPassword": "Show full password",
+    "hidePassword": "Hide full password",
+    "close": "Close EA account info modal"
+  },
+  "guide": {
+    "backupCodes": {
+      "eyebrow": "Backup Codes",
+      "title": "How to get FC 26 backup codes",
+      "subtitle": "To ensure smooth delivery, please fetch your backup codes from the EA Account Center.",
+      "linkPrefix": "Open EA Account Center:",
+      "step1": "Sign in to EA Account Center and click \"Security and Privacy\" on the left.",
+      "step2": "Scroll down on the Security and privacy page to see password and ad settings.",
+      "step3": "Find the \"Two-factor authentication\" section.",
+      "step4": "Click the > button on the right side of that section.",
+      "step5": "Click \"View backup codes\" on the detail page.",
+      "step6": "Click \"Create new code\" to generate a fresh set of backup codes.",
+      "step7": "Copy all the backup codes and keep them somewhere safe — you'll need them when placing your order.",
+      "footnote": "FC 26 coin delivery is performed manually to reduce operational and account risk.",
+      "shot1": "Open \"Security and Privacy\", then scroll down",
+      "shot2": "Find \"Two-factor authentication\" and click >",
+      "shot3": "On the detail page click \"View backup codes\"",
+      "shot4": "Click \"Create new code\" and copy them all",
+      "closeHint": "When you're done, go back to the previous tab to finish entering your EA account info.",
+      "closeWindow": "Close this window"
+    }
   },
   "mockPayment": {
     "sandbox": "Mock payment environment",
@@ -552,6 +831,15 @@
     "cancel": "Cancel Payment",
     "missingOrder": "Order number is missing, so the mock payment cannot continue.",
     "failed": "Failed to update mock payment status"
+  },
+  "common": {
+    "close": "Close",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "empty": "No data",
+    "retry": "Retry"
   },
   "reviews": {
     "pageTitle": "Player Reviews",
@@ -642,37 +930,6 @@
       "contentTooShort": "Review must be at least 5 characters",
       "contentTooLong": "Review must be under {{max}} characters",
       "submitFailed": "Submission failed, please try again later"
-    }
-  },
-  "common": {
-    "close": "Close",
-    "remove": "Remove",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "loading": "Loading...",
-    "empty": "No data",
-    "retry": "Retry"
-  },
-  "guide": {
-    "backupCodes": {
-      "eyebrow": "Backup Codes",
-      "title": "How to get FC 26 backup codes",
-      "subtitle": "To ensure smooth delivery, please fetch your backup codes from the EA Account Center.",
-      "linkPrefix": "Open EA Account Center:",
-      "step1": "Sign in to EA Account Center and click \"Security and Privacy\" on the left.",
-      "step2": "Scroll down on the Security and privacy page to see password and ad settings.",
-      "step3": "Find the \"Two-factor authentication\" section.",
-      "step4": "Click the > button on the right side of that section.",
-      "step5": "Click \"View backup codes\" on the detail page.",
-      "step6": "Click \"Create new code\" to generate a fresh set of backup codes.",
-      "step7": "Copy all the backup codes and keep them somewhere safe — you'll need them when placing your order.",
-      "footnote": "Every FC 26 coin trade on Valbri is performed manually to ensure 100% safety.",
-      "shot1": "Open \"Security and Privacy\", then scroll down",
-      "shot2": "Find \"Two-factor authentication\" and click >",
-      "shot3": "On the detail page click \"View backup codes\"",
-      "shot4": "Click \"Create new code\" and copy them all",
-      "closeHint": "When you're done, go back to the previous tab to finish entering your EA account info.",
-      "closeWindow": "Close this window"
     }
   }
 }

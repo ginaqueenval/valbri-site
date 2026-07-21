@@ -24,6 +24,6 @@ export function removeCartItem(id) {
   return request({ url: `/valbri/cart/items/${id}`, method: "delete" });
 }
 
-export function checkoutCartItem(id) {
-  return request({ url: `/valbri/cart/checkout/${id}`, method: "post" });
+export function checkoutCartItem(id, data = {}) {
+  return request({ url: `/valbri/cart/checkout/${id}`, method: "post", data });
 }

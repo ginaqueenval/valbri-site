@@ -28,10 +28,10 @@ export default function useCaptcha() {
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      loadCaptcha();
-    }, 0);
-    return () => window.clearTimeout(timer);
+    // Initial captcha load. setState happens inside loadCaptcha's async
+    // callback, not synchronously in the effect body.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadCaptcha();
   }, [loadCaptcha]);
 
   return {

@@ -23,6 +23,7 @@ import {
 import {
   CUSTOMER_SERVICE_FLOATING_GAP,
   CUSTOMER_SERVICE_FLOATING_STORAGE_KEY,
+  clampFloatingPosition,
   getDesktopPanelPosition,
   normalizeFloatingPosition,
 } from "../utils/customerServiceFloating.js";
@@ -49,6 +50,12 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
+// "智能贴边 · 单击直达" — 首次访问时按钮全显 3s 引导新用户,之后 localStorage
+// 记忆已展示,直接进入半藏态。CSS :hover 自动处理桌面收回(1.5s 延迟),JS 仅在
+// 拖拽/聊天打开/首次引导三种情况下通过 cs-launcher-active 类强制全显。
+const CS_WELCOME_STORAGE_KEY = "cs_welcome_shown";
+const PEEK_WELCOME_DURATION_MS = 3000;
+
 export default function useCustomerService() {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -60,6 +67,7 @@ export default function useCustomerService() {
   const [input, setInput] = useState("");
   const [session, setSession] = useState(null);
   const [visitorToken, setVisitorToken] = useState(() =>
+    // 防御:hook init 阶段,storage 抛错会让客服 hook 挂载失败 → 整页降级
     normalizeVisitorToken(decodeToken(safeGetItem(VISITOR_TOKEN_KEY))),
   );
   const [unread, setUnread] = useState(0);
@@ -74,6 +82,7 @@ export default function useCustomerService() {
   const [historyBefore, setHistoryBefore] = useState(null);
   const [hasMoreHistory, setHasMoreHistory] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [welcomeActive, setWelcomeActive] = useState(false);
 
   const streamRef = useRef(null);
   const pollingRef = useRef(null);
@@ -103,6 +112,14 @@ export default function useCustomerService() {
   const displayItems = buildCustomerDisplayItems(messages, i18n.language);
   const launcherConfig = getLauncherConfig(viewport.width);
   const launcherSize = launcherConfig.buttonSize;
+
+  // 贴边方向:按钮中心点偏向视口哪一边,半藏就贴哪边
+  const peekEdge =
+    launcherPosition.x + launcherSize / 2 < viewport.width / 2
+      ? "left"
+      : "right";
+  // 强制全显的三种情况:拖拽中 / 聊天打开 / 首次访问引导
+  const peekActive = dragging || open || welcomeActive;
   const isMobile = launcherConfig.mobile;
   const desktopPanelHeight = Math.min(Math.round(viewport.height * 0.78), 640);
   const desktopPanelPosition = !isMobile
@@ -129,7 +146,8 @@ export default function useCustomerService() {
       dragState.moved = true;
     }
     const nextViewport = viewportRef.current;
-    const nextPosition = normalizeFloatingPosition(
+    // 拖动中只夹回视口,允许自由水平/垂直移动
+    const nextPosition = clampFloatingPosition(
       {
         x: dragState.origin.x + deltaX,
         y: dragState.origin.y + deltaY,
@@ -146,6 +164,14 @@ export default function useCustomerService() {
       return;
     }
     if (dragState.moved) {
+      // 松手时吸附到最近的左/右边缘
+      const releaseViewport = viewportRef.current;
+      const snapped = normalizeFloatingPosition(
+        launcherPositionRef.current,
+        releaseViewport,
+        getLauncherConfig(releaseViewport.width),
+      );
+      setLauncherPosition(snapped);
       suppressToggleRef.current = true;
       ignoreNextLauncherClickRef.current = true;
       window.setTimeout(() => {
@@ -215,6 +241,12 @@ export default function useCustomerService() {
   useEffect(() => {
     openRef.current = open;
   }, [open]);
+
+  useEffect(() => {
+    if (!open && showAttachmentMenu) {
+      setShowAttachmentMenu(false);
+    }
+  }, [open, showAttachmentMenu]);
 
   useEffect(() => {
     mediaUrlsRef.current = mediaUrls;
@@ -723,6 +755,20 @@ export default function useCustomerService() {
     }
   }
 
+  // 首次访问 3s 全显引导,之后 localStorage 记忆,直接半藏
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    // 走 safeStorage:storage 不可用时视作"已展示过",避免重复打扰用户
+    const alreadyShown = !!safeGetItem(CS_WELCOME_STORAGE_KEY);
+    if (alreadyShown) return undefined;
+    setWelcomeActive(true);
+    const timer = window.setTimeout(() => {
+      setWelcomeActive(false);
+      safeSetItem(CS_WELCOME_STORAGE_KEY, "1");
+    }, PEEK_WELCOME_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return {
     t,
     open,
@@ -743,6 +789,8 @@ export default function useCustomerService() {
     setShowAttachmentMenu,
     launcherPosition,
     dragging,
+    peekEdge,
+    peekActive,
     hasMoreHistory,
     loadingHistory,
     displayItems,

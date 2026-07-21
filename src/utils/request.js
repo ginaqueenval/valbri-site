@@ -3,6 +3,7 @@ import {
   clearStoredPlayerSession,
   getStoredPlayerToken,
 } from "./playerAuth.js";
+import { createBusinessError } from "./requestError.js";
 
 let sessionClearing = false;
 
@@ -31,7 +32,7 @@ request.interceptors.response.use(
     if (data.code === 200) {
       return data;
     }
-    return Promise.reject(new Error(data.msg || "Request failed"));
+    return Promise.reject(createBusinessError(response));
   },
   (error) => {
     if (error.response) {

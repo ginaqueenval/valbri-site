@@ -5,7 +5,11 @@ export function getPackageQuantity(quantities, packageId) {
 }
 
 export function updatePackageQuantity(quantities, packageId, nextValue) {
-  const quantity = Math.max(1, Math.min(MAX_QTY, nextValue));
+  // 与 cartState 同源防御:非数字 / NaN / undefined / null 一律回落到 1,
+  // 防止后续 add-to-cart 把 NaN quantity 发往后端。
+  const parsed = Number(nextValue);
+  const safeValue = Number.isFinite(parsed) ? parsed : 1;
+  const quantity = Math.max(1, Math.min(MAX_QTY, safeValue));
   return {
     ...quantities,
     [packageId]: quantity,

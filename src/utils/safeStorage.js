@@ -1,3 +1,5 @@
+import { isStorageWriteAllowed } from "./consentStorage.js";
+
 /**
  * safeStorage — 防御性 localStorage 封装
  *
@@ -26,6 +28,7 @@ function resolveStorage(storage) {
 export function safeGetItem(key, fallback = null, storage) {
   const target = resolveStorage(storage);
   if (!target) return fallback;
+  if (!isStorageWriteAllowed(key, { storage: target })) return fallback;
   try {
     const value = target.getItem(key);
     return value === null || value === undefined ? fallback : value;
@@ -37,6 +40,7 @@ export function safeGetItem(key, fallback = null, storage) {
 export function safeSetItem(key, value, storage) {
   const target = resolveStorage(storage);
   if (!target) return false;
+  if (!isStorageWriteAllowed(key, { storage: target })) return false;
   try {
     target.setItem(key, value);
     return true;

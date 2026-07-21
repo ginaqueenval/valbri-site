@@ -33,6 +33,7 @@ export function getLauncherConfig(viewportWidth) {
     mobile,
     buttonSize: mobile ? MOBILE_BUTTON_SIZE : DESKTOP_BUTTON_SIZE,
     padding: mobile ? MOBILE_PADDING : DESKTOP_PADDING,
+    topPadding: mobile ? 92 : 100,
   };
 }
 
@@ -42,6 +43,7 @@ export function getInitialLauncherPosition() {
   if (typeof window === "undefined") {
     return getDefaultFloatingPosition(viewport, config);
   }
+  // 防御:hook init 路径,storage 抛错会让客服浮窗挂载失败 → 整页降级
   const stored = parseStoredFloatingPosition(
     safeGetItem(CUSTOMER_SERVICE_FLOATING_STORAGE_KEY),
   );

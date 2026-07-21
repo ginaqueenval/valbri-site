@@ -6,18 +6,6 @@ export default function PlayerAuthLayout({ children, footer, mode }) {
 
   return (
     <section className="player-auth-page">
-      <div className="player-auth-net" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-        <span />
-        <span />
-        <span />
-        <span />
-        <span />
-        <span />
-      </div>
-
       <div className="player-auth-layout">
         <aside className="player-auth-hero" aria-hidden="true">
           <div className="player-auth-kicker">{t("auth.heroKicker")}</div>

@@ -3,9 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!--
+      interactive-widget=resizes-content (iOS 16.4+ / Chrome 108+):
+      让虚拟键盘弹起时「真正缩小 viewport」而非覆盖,与 100dvh 协同 —
+      表单内元素不再因 Safari 自动滚动 + 联想词条高度跳变进入临界 z 闪烁。
+      旧浏览器降级回 overlay 行为,与现状一致。
+    -->
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <title>valbri-site</title>
   </head>

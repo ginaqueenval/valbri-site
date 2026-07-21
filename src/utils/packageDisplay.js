@@ -5,6 +5,9 @@ export const sortPackages = (list) =>
       (b.sortOrder ?? Number.MAX_SAFE_INTEGER),
   );
 
+// Backward-compat: legacy noteTag values from the existing backend data are
+// mapped to the new 7-badge taxonomy so older rows keep rendering during the
+// migration window. New rows should use the canonical keys on the right.
 const NOTE_TAG_ALIAS = {
   popular: "hot",
   bestSeller: "champion",

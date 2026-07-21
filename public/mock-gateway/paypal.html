@@ -140,8 +140,15 @@
         errorBox.style.display = "block";
       }
 
+      function getStoredPlayerToken() {
+        return (
+          localStorage.getItem("player_token") ||
+          sessionStorage.getItem("player_token")
+        );
+      }
+
       async function submitMockPayment(endpoint, targetPath) {
-        const token = localStorage.getItem("player_token");
+        const token = getStoredPlayerToken();
         if (!token) {
           showError("Login session is missing. Please return to the player site and sign in again.");
           return;

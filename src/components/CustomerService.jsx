@@ -119,6 +119,8 @@ export default function CustomerService() {
     setShowAttachmentMenu,
     launcherPosition,
     dragging,
+    peekEdge,
+    peekActive,
     hasMoreHistory,
     loadingHistory,
     displayItems,
@@ -258,7 +260,7 @@ export default function CustomerService() {
             placeholder={t("cs.placeholder")}
             rows={1}
             maxLength={MAX_MESSAGE_LENGTH}
-            className="customer-service-scrollbar h-[54px] max-h-[54px] flex-1 resize-none overflow-y-auto rounded-[18px] border border-white/10 bg-white/[0.04] px-4 py-4 text-sm leading-5 text-[#E7EDF7] outline-none transition-colors placeholder:text-[#75839A] focus:border-[#00FF9A]/30"
+            className="customer-service-scrollbar h-[54px] max-h-[54px] flex-1 resize-none overflow-y-auto rounded-[18px] border border-white/10 bg-white/[0.04] px-4 py-4 text-[16px] leading-5 text-[#E7EDF7] outline-none transition-colors placeholder:text-[#75839A] focus:border-[#00FF9A]/30 sm:text-sm"
           />
           <div className="flex shrink-0 items-center gap-2">
             <button
@@ -304,11 +306,22 @@ export default function CustomerService() {
     </>
   );
 
+  const launcherWrapperClass = [
+    "cs-launcher",
+    "fixed",
+    "z-40",
+    peekEdge === "left" ? "cs-launcher-peek-left" : "",
+    peekActive ? "cs-launcher-active" : "",
+    dragging ? "cs-launcher-dragging" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <>
       <div
         ref={launcherRef}
-        className="fixed z-40"
+        className={launcherWrapperClass}
         style={launcherStyle}
       >
         <button

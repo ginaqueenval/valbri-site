@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { playerRegister } from "../api/auth";
+import { getPublishedPolicies } from "../api/legal.js";
+import { resolvePublishedPolicy } from "../legal/policyClient.js";
 import PlayerAuthLayout from "../components/PlayerAuthLayout.jsx";
 import useCaptcha from "../hooks/useCaptcha.js";
+
+const policyReference = (policy) => ({
+  policyId: policy.id,
+  policyType: policy.policyType,
+  locale: policy.locale,
+  version: policy.version,
+  contentSha256: policy.contentSha256,
+});
 
 export default function Register() {
   const { t } = useTranslation();
@@ -18,8 +29,36 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [publishedPolicies, setPublishedPolicies] = useState(null);
+  const [policyLoading, setPolicyLoading] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const loadPublishedPolicies = useCallback(async () => {
+    setPolicyLoading(true);
+    try {
+      const response = await getPublishedPolicies();
+      const policies = Array.isArray(response.data) ? response.data : [];
+      const [termsPolicy, privacyPolicy] = await Promise.all([
+        resolvePublishedPolicy("terms", policies.find((policy) => policy.policyType === "terms")),
+        resolvePublishedPolicy("privacy", policies.find((policy) => policy.policyType === "privacy")),
+      ]);
+      if (!termsPolicy || !privacyPolicy) {
+        throw new Error(t("auth.policyUnavailable"));
+      }
+      setPublishedPolicies({ termsPolicy, privacyPolicy });
+    } catch (err) {
+      setPublishedPolicies(null);
+      setError(err?.response?.data?.msg || err?.message || t("auth.policyUnavailable"));
+    } finally {
+      setPolicyLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    loadPublishedPolicies();
+  }, [loadPublishedPolicies]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,8 +80,12 @@ export default function Register() {
       setError(t("auth.captchaRequired"));
       return;
     }
-    if (!acceptTerms) {
+    if (!acceptTerms || !ageConfirmed) {
       setError(t("auth.acceptTermsRequired"));
+      return;
+    }
+    if (!publishedPolicies) {
+      setError(t("auth.policyUnavailable"));
       return;
     }
 
@@ -53,11 +96,19 @@ export default function Register() {
         username,
         password,
         email,
+        ageConfirmed,
+        termsPolicy: policyReference(publishedPolicies.termsPolicy),
+        privacyPolicy: policyReference(publishedPolicies.privacyPolicy),
         code: captchaCode.trim(),
         uuid: captchaUuid,
       });
       navigate("/login", { state: { message: t("auth.registerSuccess") } });
     } catch (err) {
+      if (err?.response?.data?.errorKey === "POLICY_VERSION_STALE") {
+        setAcceptTerms(false);
+        setAgeConfirmed(false);
+        await loadPublishedPolicies();
+      }
       setError(
         err?.response?.data?.msg ||
           err?.response?.data?.message ||
@@ -223,9 +274,19 @@ export default function Register() {
             </span>
           </label>
 
+          <label className="player-auth-terms">
+            <input
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={(e) => setAgeConfirmed(e.target.checked)}
+              aria-label={t("auth.ageConfirmationAria")}
+            />
+            <span>{t("auth.ageConfirmation")}</span>
+          </label>
+
           <button
             type="submit"
-            disabled={loading || !acceptTerms}
+            disabled={loading || policyLoading || !acceptTerms || !ageConfirmed}
             className="player-auth-submit"
           >
             {loading ? t("auth.creatingAccount") : t("auth.createAccount")}

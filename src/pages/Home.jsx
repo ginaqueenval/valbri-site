@@ -33,7 +33,7 @@ function SectionHeading({ eyebrow, title, subtitle, align = "center" }) {
   return (
     <ScrollReveal as="div" className={`mb-14 max-w-3xl ${alignClass}`}>
       <SectionEyebrow>{eyebrow}</SectionEyebrow>
-      <h2 className="hero-headline mt-5 text-[2.1rem] font-black leading-[1.04] tracking-normal sm:text-[2.8rem] md:text-[3.4rem]">
+      <h2 className="hero-headline mt-5 text-[2.1rem] font-black leading-[1.04] tracking-[-0.04em] sm:text-[2.8rem] md:text-[3.4rem]">
         {title}
       </h2>
       {subtitle ? (
@@ -70,7 +70,7 @@ function HeroSection({ t, heroProgress }) {
           {t("home.eyebrow")}
         </div>
 
-        <h1 className="reveal-up delay-80 mt-7 text-[2.65rem] font-black leading-[0.98] tracking-normal sm:text-[3.6rem] md:text-[4.5rem] lg:text-[5.25rem]">
+        <h1 className="reveal-up delay-80 mt-7 text-[2.65rem] font-black leading-[0.98] tracking-[-0.045em] sm:text-[3.6rem] md:text-[4.5rem] lg:text-[5.25rem]">
           <span className="hero-headline">{t("home.heroLine1")}</span>
           <br />
           <span className="hero-accent">{t("home.heroLine2")}</span>
@@ -198,6 +198,9 @@ function HowToBuySection({ t }) {
   );
 }
 
+// 购买须知 section 已迁移至套餐列表下方(Fc26 → PurchaseNotesSection),
+// 决策动线更顺:看完套餐 → 阅须知 → 加购,减少首页信息密度。
+
 function GuaranteeIcon({ kind }) {
   if (kind === "noFee") {
     return (
@@ -299,7 +302,7 @@ function GuaranteeSection({ t }) {
                 <GuaranteeIcon kind={item.icon} />
               </div>
               <div className="min-w-0">
-                <h3 className="text-lg font-black tracking-normal text-[#E7EDF7] sm:text-xl">
+                <h3 className="text-lg font-black tracking-[-0.01em] text-[#E7EDF7] sm:text-xl">
                   {t(`home.guarantee.items.${item.key}.title`)}
                 </h3>
                 <p className="mt-2 text-[14px] leading-7 text-[#9AA7BD] sm:text-[15px]">
@@ -421,7 +424,7 @@ function WhyUsSection({ t }) {
             <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl border border-[#00FF9A]/22 bg-[#00FF9A]/[0.05] shadow-[inset_0_0_14px_rgba(0,255,154,0.1),0_0_18px_rgba(0,255,154,0.08)]">
               <WhyUsIcon kind={item.icon} />
             </div>
-            <h3 className="text-lg font-black tracking-normal text-[#E7EDF7] sm:text-xl">
+            <h3 className="text-lg font-black tracking-[-0.01em] text-[#E7EDF7] sm:text-xl">
               {t(`home.whyUs.items.${item.key}.title`)}
             </h3>
             <p className="mt-3 text-[14px] leading-7 text-[#9AA7BD] sm:text-[15px]">
@@ -454,7 +457,7 @@ function ClosingCTA({ t, closingProgress }) {
         className="relative overflow-hidden rounded-[32px] border border-[#00FF9A]/24 bg-[linear-gradient(180deg,rgba(0,255,154,0.08),rgba(8,12,20,0.96))] px-6 py-14 text-center sm:px-12 sm:py-20"
       >
         <span className="pkg-card-glow" aria-hidden="true" />
-        <h2 className="hero-headline mx-auto max-w-2xl text-[1.85rem] font-black leading-[1.04] tracking-normal sm:text-[2.5rem]">
+        <h2 className="hero-headline mx-auto max-w-2xl text-[1.85rem] font-black leading-[1.04] tracking-[-0.035em] sm:text-[2.5rem]">
           {t("home.closing.title")}
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-[15px] leading-7 text-[#9AA7BD]">

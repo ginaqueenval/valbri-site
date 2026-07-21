@@ -3,20 +3,244 @@
     "brand": "valbri",
     "brandSubtitle": "游戏交易平台",
     "nav": {
-      "fc26": "FC26 金币",
-      "about": "关于我们",
-      "contact": "联系我们"
+    "fc26": "FC26 金币",
+    "about": "关于我们",
+    "contact": "联系我们"
     },
     "buyBtn": "购买 FC26 金币",
     "accountLabel": "玩家账号",
     "cart": "购物车",
     "checkout": "购买记录",
+    "privacyCenter": "隐私中心",
     "back": "返回"
   },
   "footer": {
-    "copyright": "© {{year}} valbri",
+    "tradingName": "Valbri is a trading name of Guardian Angel Group Ltd.",
+    "copyright": "© 2026 Guardian Angel Group Ltd.",
     "terms": "服务条款",
-    "privacy": "隐私政策"
+    "privacy": "隐私政策",
+    "refundPolicy": "退款政策",
+    "privacyRequests": "隐私权请求",
+    "refundRequests": "退款申请",
+    "unauthorizedRefund": "报告未授权扣款",
+    "cookies": "Cookies 政策"
+  },
+  "refunds": {
+    "eyebrow": "退款支持",
+    "title": "退款申请",
+    "description": "跟踪全额退款申请、审核决定，并安全补充证明材料。",
+    "backToOrders": "返回订单",
+    "empty": "您尚未提交退款申请。",
+    "viewDetail": "查看详情",
+    "viewPolicy": "查看退款政策",
+    "amount": "退款金额",
+    "createdAt": "提交时间",
+    "reason": "申请原因",
+    "settlement": "到账时间",
+    "settlementEstimate": "支付机构确认后预计 3 至 10 个工作日",
+    "submitting": "正在提交...",
+    "submit": "提交退款申请",
+    "submitted": "退款申请已提交。",
+    "orderAction": {
+      "request": "申请退款",
+      "review": "申请售后退款审核",
+      "view": "查看退款状态"
+    },
+    "dialog": {
+      "incompleteTitle": "申请全额退款",
+      "incompleteDescription": "此已支付订单尚未完成。全额退款申请将自动获批，管理员不能拒绝。",
+      "completedTitle": "申请售后退款审核",
+      "completedDescription": "已完成订单可在支付后 14 个自然日内，依照退款政策提交审核。",
+      "reason": "审核原因",
+      "details": "请说明具体情况",
+      "originalMethod": "获批退款将全额退回原支付方式。"
+    },
+    "reasons": {
+      "PRE_COMPLETION": "订单尚未完成",
+      "FULFILMENT_DEADLINE": "72 小时履约期限",
+      "DEFECTIVE": "产品或服务存在缺陷",
+      "NOT_AS_DESCRIBED": "服务未按描述交付",
+      "UNAUTHORIZED": "未授权或欺诈扣款"
+    },
+    "statuses": {
+      "UNDER_REVIEW": "审核中",
+      "APPROVED": "已批准",
+      "REFUND_PROCESSING": "退款处理中",
+      "REFUND_INITIATED": "退款已发起",
+      "MANUAL_INTERVENTION": "人工处理中",
+      "REFUNDED": "已退款",
+      "REJECTED": "已拒绝"
+    },
+    "evidence": {
+      "title": "证明材料",
+      "help": "最多 5 个 PNG、JPEG 或 PDF 文件，每个不超过 5 MB。",
+      "add": "添加材料",
+      "addOptional": "添加可选材料",
+      "selected": "已选择 {{count}} 个文件",
+      "uploading": "正在安全扫描并上传...",
+      "download": "下载",
+      "maxFiles": "每个申请最多包含 5 个证明文件。",
+      "invalidFile": "仅支持不超过 5 MB 的 PNG、JPEG 或 PDF 文件。",
+      "uploadFailed": "证明材料未能安全上传。",
+      "downloadFailed": "证明材料无法下载。"
+    },
+    "public": {
+      "eyebrow": "支付保护",
+      "title": "报告未授权扣款",
+      "description": "先验证邮箱，再提供最少必要的交易信息。无论是否匹配到订单，页面均返回一致结果。",
+      "steps": { "email": "验证邮箱", "code": "输入验证码", "claim": "填写申诉" },
+      "email": "邮箱地址",
+      "sendCode": "发送验证码",
+      "codeSent": "请输入邮件中的 6 位验证码；验证码将在 10 分钟后失效。",
+      "code": "验证码",
+      "verify": "验证邮箱",
+      "orderNo": "订单号（如已知）",
+      "transactionDate": "交易日期",
+      "amount": "交易金额",
+      "currency": "币种",
+      "cardLastFour": "卡号后四位（可选）",
+      "details": "描述未授权扣款",
+      "submit": "提交申诉",
+      "doneTitle": "申诉已收到",
+      "doneMessage": "如果相关信息能够核实，我们将审核该申诉并通过邮件联系您。",
+      "returnHome": "返回首页",
+      "errors": { "challenge": "无法发起验证请求。", "verify": "验证码校验失败。", "submit": "申诉提交失败。" }
+    },
+    "errors": {
+      "descriptionRequired": "提交前请说明具体情况。",
+      "submitFailed": "退款申请提交失败。",
+      "loadFailed": "无法加载退款申请。"
+    }
+  },
+  "marketingUnsubscribe": {
+    "eyebrow": "邮件偏好",
+    "title": "退订营销邮件",
+    "description": "这会停止可选营销邮件，不影响服务、安全、支付和订单通知。",
+    "privacyNotice": "为保护隐私，本页面不会披露某个地址是否已订阅。请在下方确认处理请求。",
+    "checking": "正在准备请求...",
+    "confirm": "确认退订",
+    "submitting": "正在处理...",
+    "completed": "请求已处理。如果该地址此前已订阅，营销邮件现已关闭。",
+    "completedButton": "请求已处理",
+    "networkError": "暂时无法连接服务，请保留当前链接后重试。",
+    "returnHome": "返回首页"
+  },
+  "privacyRequests": {
+    "eyebrow": "隐私权利",
+    "title": "隐私权请求",
+    "description": "提交并跟踪个人数据访问、导出、更正、删除、限制处理或反对处理请求。",
+    "newRequest": "新建请求",
+    "type": "请求类型",
+    "types": {
+      "access": "访问",
+      "export": "导出",
+      "rectify": "更正",
+      "delete": "删除",
+      "restrict": "限制处理",
+      "object": "反对处理"
+    },
+    "details": "请求说明",
+    "currentPassword": "当前密码",
+    "passwordHint": "密码仅在内存中用于身份验证，不会被存储。",
+    "submitting": "正在提交...",
+    "submit": "提交请求",
+    "history": "我的请求",
+    "deadlineNote": "目标响应期限：身份验证完成后 28 天。",
+    "refresh": "刷新",
+    "loadFailed": "无法加载隐私权请求。",
+    "activeExists": "同类型的有效请求已存在。",
+    "passwordRequired": "此请求类型需要输入当前密码。",
+    "created": "隐私权请求已提交。",
+    "passwordFailed": "当前密码验证失败。",
+    "createFailed": "无法提交隐私权请求。",
+    "cancelFailed": "无法取消隐私权请求。",
+    "empty": "尚未提交任何隐私权请求。",
+    "createdAt": "创建时间",
+    "dueTime": "目标日期",
+    "pendingVerification": "等待身份验证",
+    "viewDetail": "查看详情",
+    "cancel": "取消请求",
+    "status": "状态",
+    "verification": "身份验证",
+    "statuses": {
+      "submitted": "已提交",
+      "identity_verification": "身份验证中",
+      "in_review": "审核中",
+      "action_required": "需要补充操作",
+      "completed": "已完成",
+      "rejected": "已拒绝",
+      "cancelled": "已取消"
+    }
+  },
+  "accountPrivacy": {
+    "eyebrow": "账户隐私",
+    "title": "隐私中心",
+    "description": "集中查看政策接受状态、同步登录设备的浏览器选择，并管理隐私权请求。",
+    "policy": "当前政策",
+    "privacyPolicy": "隐私政策",
+    "version": "版本",
+    "status": "状态",
+    "accepted": "已接受",
+    "notAccepted": "尚未接受",
+    "reconsentRequired": "需要重新确认",
+    "requiredGeneration": "当前 generation",
+    "acceptedGeneration": "已接受 generation",
+    "viewPolicy": "查看隐私政策",
+    "gpc": "Global Privacy Control",
+    "gpcOn": "此浏览器已启用",
+    "gpcOff": "此浏览器未检测到",
+    "gpcDescription": "GPC 会在账户与浏览器选择合并后生效；广告及数据共享始终关闭且不可启用。",
+    "advertisingUnavailable": "广告及数据共享选项不可用，并始终保持关闭。",
+    "choices": "您的选择",
+    "choicesDescription": "登录后仅按类别同步选择。Valbri 不会上传 localStorage 或 sessionStorage 中的具体值。",
+    "preferences": "偏好存储",
+    "preferencesDescription": "在此浏览器记住语言及界面选择。",
+    "functional": "功能存储",
+    "functionalDescription": "启用评价投票及相关设备本地功能。",
+    "marketing": "营销邮件",
+    "marketingDescription": "接收 Valbri 营销邮件；服务及安全通知不受影响。",
+    "advertising": "广告及数据共享",
+    "save": "保存隐私选择",
+    "saving": "正在保存...",
+    "saved": "隐私选择已保存。",
+    "loadFailed": "无法加载隐私中心。",
+    "saveFailed": "无法保存隐私选择。",
+    "conflict": "其他设备已修改这些选择。最新服务端选择已重新加载；请检查并明确确认后再保存。",
+    "reconfirm": "我已检查更新后的选择",
+    "recentRequests": "近期隐私权请求",
+    "recentRequestsDescription": "此账户最近提交的三条请求。",
+    "viewAll": "查看全部",
+    "accountControl": "账户控制",
+    "requestDeletion": "申请删除账户",
+    "deletionDescription": "发起删除请求。实际执行删除前，必须完成身份验证并取得管理员批准。",
+    "startDeletionRequest": "打开隐私权请求"
+  },
+  "cookieConsent": {
+    "title": "浏览器存储选择",
+    "description": "必要存储始终启用；偏好与功能存储在您选择前默认关闭。",
+    "acceptOptional": "接受可选存储",
+    "rejectOptional": "拒绝可选存储",
+    "settings": "设置",
+    "settingsTitle": "浏览器存储设置",
+    "settingsDescription": "选择此浏览器可以保存的可选类别。您可以随时返回此处撤回。",
+    "necessary": "严格必要",
+    "necessaryDescription": "用于身份认证、安全、结账和用户主动发起的客服会话。",
+    "preferences": "偏好",
+    "preferencesDescription": "记住此设备上的语言与界面选择。",
+    "functional": "功能",
+    "functionalDescription": "用于匿名评价投票及相关设备本地功能。",
+    "analytics": "分析",
+    "analyticsDescription": "Valbri 不使用分析存储。",
+    "advertising": "广告",
+    "advertisingDescription": "Valbri 不使用广告或数据共享存储。",
+    "unavailable": "未使用 · 不可启用",
+    "withdraw": "撤回可选存储",
+    "save": "保存设置",
+    "syncing": "正在同步...",
+    "syncFailed": "浏览器选择已在本地保存，但账户同步失败。",
+    "syncConflict": "其他设备已修改这些选择。最新账户选择已重新加载；请检查并确认后再保存。",
+    "reconfirm": "检查更新后的选择",
+    "manage": "管理浏览器存储设置"
   },
   "language": {
     "english": "English",
@@ -24,7 +248,7 @@
   },
   "home": {
     "eyebrow": "FC26 · Ultimate Team",
-    "heroLine1": "FC26 金币交易",
+    "heroLine1": "FC26金币交易",
     "heroLine2": "简化到刚刚好",
     "tagline": "全程信息加密，订单交付迅速，账号安全有保障。从下单到到账，每一步都清晰可见、稳如磐石。",
     "pill": {
@@ -45,7 +269,7 @@
       "step1": "在 Valbri 首页，选择您偏好的语言。",
       "step2": "登入您的 Valbri 帐户，或者如果您尚未拥有帐户，请创建一个帐户。",
       "step3": "在首页点击「选购套餐」进入 FC 26 金币页面。",
-      "step4": "选择您的平台（PlayStation、Xbox 或 PC）。",
+      "step4": "选择您的平台（PS/Xbox 或 PC）。",
       "step5": "选择您想购买的 FC 金币套装并调整数量。",
       "step6": "点击「立即结算」，选择您偏好的付款方式（Stripe / PayPal），然后完成付款。",
       "step7": "提交所需的游戏账户信息并等待我们手动交付。"
@@ -66,7 +290,7 @@
         "title": "避免跨平台购买",
         "desc": "在 Valbri 交易前 24 小时和后 48 小时内，请避免在其他平台购买 FC 26 金币，以降低被封禁的风险。"
       },
-      "item4": {
+      "item5": {
         "title": "交易后安全性",
         "desc": "在成功交易后，请立即更改您的帐户密码并移除受信设备中的未认可设备，以加强帐户安全性。"
       }
@@ -85,12 +309,12 @@
           "desc": "通过人工方式在游戏内正规打金，来源可控、安全可靠。"
         },
         "afterSale": {
-          "title": "售后无忧保障",
-          "desc": "质保有效期内，发生扣金我们将为您补发金币；邮件收信封号提供全额退款。"
+          "title": "售后资格审核",
+          "desc": "如发生可核实的交付问题，请联系客服。我们会按照该订单适用的退款条款审核可用补救方式。"
         },
         "warranty7d": {
-          "title": "7 天售后保障",
-          "desc": "超长质保时效，发货后 7 天内因订单导致游戏内封号等问题，支持退款等售后处理。"
+          "title": "交付问题支持",
+          "desc": "我们会结合订单记录、交付证据和适用退款政策审核用户报告的交付问题。"
         }
       }
     },
@@ -100,28 +324,28 @@
       "subtitle": "我们用一颗工程师的心打磨每一次金币交付。",
       "items": {
         "secure": {
-          "title": "100% 交易安全",
-          "desc": "我们保证高效、专业和安全的交易，全面保护您的数据 —— 100% 安全。"
+          "title": "交易保护措施",
+          "desc": "我们通过访问控制、传输加密和成熟支付服务商降低交易与数据风险。"
         },
         "support": {
-          "title": "24/7 客户服务",
-          "desc": "可靠的客服团队全天候为您提供快速便捷的帮助，无论购买前、购买中还是购买后。"
+          "title": "客户支持",
+          "desc": "购买前、购买中或购买后均可联系客服；响应时间会因请求数量和复杂程度而不同。"
         },
         "refund": {
-          "title": "全额退款保障",
-          "desc": "Valbri 提供最具竞争力的价格与高效发货。如商品未送达或无法使用，我们承诺 100% 退款。"
+          "title": "退款资格审核",
+          "desc": "如订单未交付、仅部分交付或无法使用，请联系客服按照适用退款条款进行审核。"
         }
       }
     },
     "closing": {
       "title": "准备好开启你的 FC 26 旅程了吗？",
-      "subtitle": "选择套餐，完成支付，金币几分钟内即可到账。"
+      "subtitle": "选择套餐并完成支付后，可按订单展示的预计进度跟踪交付。"
     },
     "badge": "FC26 套餐已上线 — Stripe & PayPal 已开放",
     "title": "FC26 Ultimate Team 金币 —",
     "titleHighlight": " 快速安全",
     "titleEnd": " 交付",
-    "description": "Valbri 是一个专注于 FC26 金币和精选游戏服务的游戏交易平台,支持 Stripe 与 PayPal 快速结算,金币几分钟内到账。",
+    "description": "Valbri 是一个面向玩家、专注于 FC26 金币和精选游戏服务的数字游戏交付平台，支持 Stripe 与 PayPal 结算，并为每笔订单展示预计交付进度。",
     "viewPackages": "查看 FC26 套餐",
     "browseGames": "浏览游戏",
     "features": {
@@ -152,18 +376,21 @@
     "addToCart": "加入购物车",
     "addedToCart": "已加入购物车！",
     "addToCartFailed": "加入失败",
-    "paymentNotice": "支持 Stripe 与 PayPal 结算,金币几分钟内即可到账。",
+    "paymentNotice": "支持 Stripe 与 PayPal 结算，支付后可在订单中跟踪预计交付进度。",
     "gamesTitle": "游戏",
     "gamesDesc": "我们目前专注于 FC26，同时也支持以下游戏。",
     "comingSoon": "页面和定价：即将推出"
   },
   "fc26": {
-    "title": "FC26 Ultimate Team 金币",
-    "description": "选择您的平台和套餐。点击",
+    "title": "FC26 Ultimate Team",
+    "description": "选择商品类型、平台和套餐。点击",
     "descriptionHighlight": "购买",
     "descriptionEnd": "进行结算。",
     "payment": "支付方式：",
     "paymentProvider": "Lava",
+    "selectProductType": "商品类型",
+    "productTypeCoins": "金币套餐",
+    "productTypeSbc": "SBC套餐",
     "selectPlatform": "选择平台",
     "packages": "套餐",
     "coins": "金币",
@@ -177,6 +404,9 @@
     "addToCartFailed": "加入购物车失败",
     "widgetNotSet": "小工具未设置",
     "noPackages": "该平台暂无可用套餐。",
+    "noSbcPackages": "该平台暂无可用SBC套餐。",
+    "referenceCost": "参考成本",
+    "sbcCheckoutPending": "SBC套餐购买链路将在下一阶段接入",
     "recentOrders": "最近订单",
     "noRecentOrders": "暂无订单记录",
     "viewAllOrders": "查看全部订单 →",
@@ -189,8 +419,8 @@
     "faqTitle": "安全保障",
     "faq": {
       "security": {
-        "title": "72小时保障",
-        "desc": "所有订单交付后享有72小时售后保障，如有问题随时联系我们处理。"
+        "title": "售后资格审核",
+        "desc": "如发生交付问题，请联系客服；我们会按照该订单适用的退款条款审核处理。"
       },
       "delivery": {
         "title": "快速交付",
@@ -198,31 +428,27 @@
       },
       "payment": {
         "title": "安全支付",
-        "desc": "采用 Stripe 国际支付网关，支持主流信用卡，全程加密保护您的支付安全。"
+        "desc": "Stripe 与 PayPal 通过其托管流程处理支付凭据，Valbri 不保存完整银行卡号。"
       },
       "privacy": {
         "title": "隐私保护",
-        "desc": "您的个人信息和交易数据受到严格保护，绝不向第三方泄露。"
+        "desc": "我们保护个人信息与交易数据，仅向必要服务商或依法有权的机关提供，不出售个人信息。"
       }
-    },
-    "selectProductType": "商品类型",
-    "productTypeCoins": "金币套餐",
-    "productTypeSbc": "SBC套餐",
-    "noSbcPackages": "该平台暂无可用SBC套餐。",
-    "referenceCost": "参考成本",
-    "sbcCheckoutPending": "SBC套餐购买链路将在下一阶段接入"
+    }
   },
   "checkout": {
     "title": "结算",
-    "description": "MVP 阶段目前禁用支付功能。银行支付网关将在网站最终确定和批准后集成。",
+    "description": "支持 Stripe 与 PayPal 结算,支付确认后金币将在几分钟内到账。",
     "loading": "正在加载购物车商品...",
     "loadFailed": "购物车商品加载失败",
     "status": "状态",
-    "bankGateway": "银行网关：",
-    "comingSoon": "即将推出",
+    "bankGateway": "支付方：",
+    "comingSoon": "Stripe & PayPal",
     "orderSummary": "订单摘要",
+    "paymentMethods": "支付方式",
     "platform": "平台",
     "coins": "金币",
+    "referenceCost": "参考成本",
     "gift": "礼物",
     "eta": "预计时间",
     "total": "总价",
@@ -239,8 +465,15 @@
     "createOrderFailed": "创建订单失败",
     "accessDenied": "无权访问",
     "accessDeniedDesc": "该订单不存在或您无权访问。",
-    "paymentMethods": "支付方式",
-    "referenceCost": "参考成本"
+    "legalConfirmation": "法律确认",
+    "policyLoading": "正在加载当前法律条款...",
+    "policyUnavailable": "当前法律条款无法验证，暂时不能支付。",
+    "policyChanged": "法律条款已更新，请重新阅读并确认。",
+    "refundPolicyNotice": "退款资格与时限仅以当前《退款政策》为准。",
+    "generalPolicyConsent": "我接受当前英文版《服务条款》《隐私政策》和《退款政策》，并请求立即开始本订单的数字服务履约。",
+    "ageConfirmation": "我确认自己已年满 18 周岁。",
+    "consentRequired": "支付前请阅读并确认当前法律条款。",
+    "generalConsentRequired": "请接受当前《服务条款》《隐私政策》和《退款政策》，并确认已年满 18 周岁。"
   },
   "cart": {
     "title": "购物车",
@@ -249,77 +482,36 @@
     "loadFailed": "购物车加载失败",
     "updateFailed": "更新购物车失败",
     "removeFailed": "移除购物车商品失败",
+    "itemRemoved": "已删除",
+    "undo": "撤销",
     "empty": "购物车还是空的，去挑选一个合适的 FC26 套餐吧。",
     "goBuy": "去选购",
     "summary": "购物车汇总",
     "summaryHint": "购物车仅用于暂存商品。请按单个套餐逐条结算；实际订单价格、金币数和平台可用性以下单时最新套餐数据为准。",
     "totalItems": "商品数量",
     "coins": "金币",
+    "referenceCost": "参考成本",
+    "sbcPackage": "SBC套餐",
     "gift": "赠送",
     "bonusIncluded": "含赠送加成",
     "eta": "预计时间",
-    "checkout": "去结算",
+    "checkout": "立即结算",
     "remove": "移除",
-    "itemRemoved": "已删除",
-    "undo": "撤销",
-    "referenceCost": "参考成本",
-    "sbcPackage": "SBC套餐",
     "perItem": "件",
     "flowHint": "任选一项点击「立即结算」即可下单"
   },
   "about": {
     "title": "关于 Valbri",
-    "description1": "Valbri 是一个专注于 FC26 Ultimate Team 金币和精选游戏服务的在线游戏交易平台。我们的目标是提供快速、可靠、用户友好的交付体验和透明的订单流程。",
-    "description2": "本网站目前处于 MVP 模式运行。支付功能已禁用，银行支付网关将在网站最终确定和批准后集成。",
-    "notice": "公司详情和法律信息将在最终上线阶段添加。"
+    "description1": "Valbri 是一个面向玩家、专注于 FC26 Ultimate Team 金币和精选游戏服务的数字游戏交付平台。我们的目标是提供快速、可靠、用户友好的交付体验和透明的订单流程。",
+    "description2": "支持 Stripe 与 PayPal 主流支付方式,结算流程快速安全,每笔订单状态全程可追踪、透明可见。",
+    "notice": "Valbri 由 GUARDIAN ANGEL GROUP. Ltd. 运营。",
+    "entityReview": "法律主体信息来自所提供的政策文档，仍待法务核验。"
   },
   "contact": {
     "title": "联系我们",
     "description": "如有业务咨询、支持或合作请求，请使用以下信息联系我们。",
     "email": "电子邮箱",
-    "responseTime": "支持响应时间：24小时内"
-  },
-  "terms": {
-    "title": "服务条款",
-    "intro": "欢迎使用 Valbri。访问或使用本网站即表示您同意受以下条款和条件的约束。",
-    "serviceScope": {
-      "title": "服务范围",
-      "content": "Valbri 作为游戏交易平台运营，专注于 FC26 Ultimate Team 金币和精选游戏相关服务。本网站目前处于 MVP 模式运行。"
-    },
-    "payments": {
-      "title": "支付",
-      "content": "目前支付功能已禁用。银行支付网关将在网站最终确定和批准后集成。"
-    },
-    "userResponsibilities": {
-      "title": "用户责任",
-      "content": "用户有责任在提交订单时提供准确的信息，并且不得分享不必要或敏感的账户详情。"
-    },
-    "changes": {
-      "title": "变更",
-      "content": "Valbri 保留随时更新或修改这些条款的权利。"
-    },
-    "lastUpdated": "最后更新：{{date}}"
-  },
-  "privacy": {
-    "title": "隐私政策",
-    "intro": "Valbri 尊重您的隐私，并致力于保护您的个人信息。",
-    "collect": {
-      "title": "我们收集的信息",
-      "content": "在 MVP 阶段，我们可能会在用户提交订单或咨询时收集基本的联系信息，如姓名和电子邮件地址。"
-    },
-    "use": {
-      "title": "信息使用",
-      "content": "收集的信息仅用于沟通、订单处理和服务改进目的。"
-    },
-    "security": {
-      "title": "支付与安全",
-      "content": "此阶段不收集支付信息。安全的银行支付处理将在批准后推出。"
-    },
-    "sharing": {
-      "title": "数据共享",
-      "content": "Valbri 不会向第三方出售或共享个人数据。"
-    },
-    "lastUpdated": "最后更新：{{date}}"
+    "responseTime": "响应时间会因请求数量和复杂程度而不同。"
   },
   "auth": {
     "loginTitle": "玩家登录",
@@ -346,6 +538,12 @@
     "captcha": "验证码",
     "captchaPlaceholder": "请输入验证码",
     "captchaRequired": "请输入验证码",
+    "acceptTerms": "我已阅读并同意 <terms>《服务条款》</terms> 与 <privacy>《隐私政策》</privacy>",
+    "acceptTermsAria": "同意服务条款与隐私政策",
+    "acceptTermsRequired": "请同意《服务条款》和《隐私政策》，并确认您已年满 18 周岁",
+    "ageConfirmation": "我确认自己已年满 18 周岁。",
+    "ageConfirmationAria": "确认已年满 18 周岁",
+    "policyUnavailable": "当前法律政策暂时无法验证，请稍后重试。",
     "refreshCaptcha": "点击刷新验证码",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
@@ -362,10 +560,7 @@
     "login": "登录",
     "sessionExpiredTitle": "登录已过期",
     "sessionExpiredDesc": "您的登录状态已超时，请重新登录以继续操作。",
-    "reLogin": "重新登录",
-    "acceptTerms": "我已阅读并同意 <terms>《服务条款》</terms> 与 <privacy>《隐私政策》</privacy>",
-    "acceptTermsAria": "同意服务条款与隐私政策",
-    "acceptTermsRequired": "请先阅读并同意《服务条款》与《隐私政策》"
+    "reLogin": "重新登录"
   },
   "announcement": {
     "title": "公告"
@@ -397,28 +592,46 @@
     "imageTooLarge": "图片大小不能超过 5MB"
   },
   "notes": {
-    "bestSeller": "热销",
-    "popular": "人气推荐",
-    "bestValue": "超值",
-    "fastDelivery": "快速交付",
-    "highVolume": "大额",
-    "vip": "VIP",
-    "maxPack": "最大套餐",
     "hot": "火爆",
     "champion": "销冠",
     "deal": "钜惠",
     "flash": "闪送",
     "bulk": "大额",
     "crown": "尊享",
-    "rocket": "至尊"
+    "rocket": "至尊",
+    "bestSeller": "销冠",
+    "popular": "火爆",
+    "bestValue": "钜惠",
+    "fastDelivery": "闪送",
+    "highVolume": "大额",
+    "vip": "尊享",
+    "maxPack": "至尊"
   },
   "orders": {
     "title": "购买记录",
     "subtitle": "查看您的购买记录和订单状态。",
     "loading": "加载中...",
-    "empty": "暂无订单。",
+    "empty": {
+      "title": {
+        "all": "暂无购买记录",
+        "pendingPayment": "没有待支付的订单",
+        "accountRequired": "没有待填资料的订单",
+        "processing": "没有处理中的订单",
+        "completed": "还没有完成的订单",
+        "closed": "没有取消或退款的订单"
+      },
+      "desc": {
+        "all": "开始你的第一笔 FC 26 金币交易，几分钟即可到账。",
+        "pendingPayment": "所有订单都已完成支付，可以继续选购新套餐。",
+        "accountRequired": "已支付的订单都已提交账号信息，无需处理。",
+        "processing": "暂时没有正在处理的订单，新下单后可在此追踪进度。",
+        "completed": "完成的订单将归档显示在这里。",
+        "closed": "已取消或退款的订单将归档显示在这里。"
+      }
+    },
     "goBuy": "去选购",
     "coins": "金币",
+    "referenceCost": "参考成本",
     "gift": "赠送",
     "tab": {
       "all": "全部",
@@ -445,6 +658,7 @@
     },
     "progress": {
       "percent": "{{percent}}%",
+      "stepOf": "Step {{current}} of {{total}}",
       "steps": {
         "submitted": "提交订单",
         "paid": "完成支付",
@@ -472,19 +686,21 @@
       }
     },
     "accountInfo": {
-      "missing": "待填写账号信息",
+      "missing": "待提交账号信息",
       "submitted": "账号信息已提交",
-      "fillAction": "填写",
-      "viewAction": "查看/修改",
+      "fillAction": "立即填写",
+      "viewAction": "查看EA账户",
+      "bannerTitle": "待提交账号信息",
+      "bannerSubtitle": "请提交交易账户信息以继续交付，否则交易无法成功。",
+      "bannerCta": "立即填写",
       "loadingAction": "读取中",
       "fillHint": "点击填写交易账户信息",
       "viewHint": "点击查看或修改交易账户信息",
       "warning": "当前订单暂未填写交易账户信息，请点击待填写账号信息按钮填写交易账户信息，否则交易无法成功",
-      "bannerCount_one": "您有 {{count}} 个已付款订单需要填写账号信息",
-      "bannerCount_other": "您有 {{count}} 个已付款订单需要填写账号信息",
-      "bannerGuide": "请点击订单中的「待填写账号信息」按钮进行填写。"
-    },
-    "referenceCost": "参考成本"
+      "bannerCount_one": "您有 {{count}} 个已付款订单需要填写 EA 账号信息",
+      "bannerCount_other": "您有 {{count}} 个已付款订单需要填写 EA 账号信息",
+      "bannerGuide": "请点击订单中的「立即填写」按钮进行填写。"
+    }
   },
   "payment": {
     "stripePay": "Stripe 支付",
@@ -516,32 +732,54 @@
   },
   "orderAccount": {
     "badge": "发货资料",
-    "title": "填写EA账户信息",
-    "viewTitle": "交易账户信息",
-    "desc": "该订单已支付。请填写您EA账户的电子邮件、密码和备份码，资料提交后我们才能继续为您发货。",
-    "viewDesc": "您已提交该订单的交易账户信息，可查看或修改后重新提交。",
-    "encryptedNotice": "所填写的EA账户电子邮件、密码和备份码均已加密，请放心填写。",
-    "gameAccount": "您EA账户的电子邮件",
-    "gamePassword": "您EA账户的密码",
+    "title": "填写 EA 账户信息",
+    "viewTitle": "EA 账户信息",
+    "desc": "该订单已支付。请填写您 EA 账户的电子邮件、密码和备份码，资料提交后我们才能继续为您发货。",
+    "viewDesc": "您已提交该订单的 EA 账户信息，可查看或修改后重新提交。",
+    "encryptedNotice": "所填写的账户、密码和备份码均已加密，请放心填写。",
+    "gameAccount": "您 EA 账户的电子邮件",
+    "gamePassword": "您 EA 账户的密码",
     "backupCodes": "备份码",
-    "submittedTime": "提交/更新时间",
-    "required": "EA账户电子邮件、密码和备份码都必须填写。",
-    "backupCodesNumeric": "备份码只能填写数字，不能包含文字或其他符号。",
-    "loadFailed": "读取游戏账号信息失败，请稍后再试。",
-    "saveFailed": "保存游戏账号信息失败，请稍后再试。",
-    "loading": "正在读取账号信息...",
-    "saving": "正在保存...",
-    "submit": "提交账号信息",
-    "resubmit": "重新提交",
-    "edit": "修改账号信息",
-    "cancelEdit": "取消修改",
-    "showPassword": "显示完整密码",
-    "hidePassword": "隐藏完整密码",
-    "close": "关闭账号信息弹窗",
+    "backupCodesNumericOnly": "备份码只能包含数字和符号。",
     "backupCodesPlaceholder": "例如:\n123·567\n234·567\n567·456",
     "howToGetBackupCodes": "如何获取?",
     "submitSuccess": "EA 信息已提交,等待发货",
-    "editSuccess": "EA 信息已更新"
+    "editSuccess": "EA 信息已更新",
+    "submittedTime": "提交/更新时间",
+    "required": "EA 账户的电子邮件、密码和备份码都必须填写。",
+    "loadFailed": "读取 EA 账户信息失败，请稍后再试。",
+    "saveFailed": "保存 EA 账户信息失败，请稍后再试。",
+    "loading": "正在读取 EA 账户信息...",
+    "saving": "正在保存...",
+    "submit": "提交 EA 账户信息",
+    "resubmit": "重新提交",
+    "edit": "修改 EA 账户信息",
+    "cancelEdit": "取消修改",
+    "showPassword": "显示完整密码",
+    "hidePassword": "隐藏完整密码",
+    "close": "关闭 EA 账户信息弹窗"
+  },
+  "guide": {
+    "backupCodes": {
+      "eyebrow": "Backup Codes",
+      "title": "如何获取 FC 26 备份代码",
+      "subtitle": "为了保证交付过程顺利，您需要先在 EA 帐户中心获取备份代码。",
+      "linkPrefix": "前往 EA 帐户中心：",
+      "step1": "登录 EA 帐户中心，在左侧菜单中点击「Security and Privacy（安全与隐私）」。",
+      "step2": "向下滚动至「Security and privacy」页面，查看密码与广告设置区域。",
+      "step3": "找到「Two-factor authentication（双重验证）」部分。",
+      "step4": "点击该区块右侧的 > 按钮进入详情页。",
+      "step5": "在详情页点击「View backup codes（查看备份代码）」。",
+      "step6": "点击「Create new code（创建新代码）」生成全新的备份代码。",
+      "step7": "复制全部备份代码并保存到安全的地方，提交订单时将用到。",
+      "footnote": "Valbri 采用人工方式完成 FC 26 金币交付，以降低操作与账号风险。",
+      "shot1": "进入「Security and Privacy」并向下滚动",
+      "shot2": "找到「Two-factor authentication」并点击 >",
+      "shot3": "在详情页点击「View backup codes」",
+      "shot4": "点击「Create new code」并复制全部代码",
+      "closeHint": "看完后回到原标签页继续填写 EA 账户信息即可。",
+      "closeWindow": "关闭此窗口"
+    }
   },
   "mockPayment": {
     "sandbox": "模拟支付环境",
@@ -551,6 +789,15 @@
     "cancel": "取消支付",
     "missingOrder": "缺少订单号，无法继续模拟支付。",
     "failed": "模拟支付状态更新失败"
+  },
+  "common": {
+    "close": "关闭",
+    "remove": "移除",
+    "cancel": "取消",
+    "confirm": "确认",
+    "loading": "加载中...",
+    "empty": "暂无数据",
+    "retry": "重试"
   },
   "reviews": {
     "pageTitle": "玩家评价",
@@ -641,37 +888,6 @@
       "contentTooShort": "评价内容至少 5 个字",
       "contentTooLong": "评价内容最多 {{max}} 个字",
       "submitFailed": "提交失败,请稍后重试"
-    }
-  },
-  "common": {
-    "close": "关闭",
-    "remove": "移除",
-    "cancel": "取消",
-    "confirm": "确认",
-    "loading": "加载中...",
-    "empty": "暂无数据",
-    "retry": "重试"
-  },
-  "guide": {
-    "backupCodes": {
-      "eyebrow": "Backup Codes",
-      "title": "如何获取 FC 26 备份代码",
-      "subtitle": "为了保证交付过程顺利，您需要先在 EA 帐户中心获取备份代码。",
-      "linkPrefix": "前往 EA 帐户中心：",
-      "step1": "登录 EA 帐户中心，在左侧菜单中点击「Security and Privacy（安全与隐私）」。",
-      "step2": "向下滚动至「Security and privacy」页面，查看密码与广告设置区域。",
-      "step3": "找到「Two-factor authentication（双重验证）」部分。",
-      "step4": "点击该区块右侧的 > 按钮进入详情页。",
-      "step5": "在详情页点击「View backup codes（查看备份代码）」。",
-      "step6": "点击「Create new code（创建新代码）」生成全新的备份代码。",
-      "step7": "复制全部备份代码并保存到安全的地方，提交订单时将用到。",
-      "footnote": "在 Valbri 进行 FC 26 金币交易是手动操作的，以确保 100% 安全。",
-      "shot1": "进入「Security and Privacy」并向下滚动",
-      "shot2": "找到「Two-factor authentication」并点击 >",
-      "shot3": "在详情页点击「View backup codes」",
-      "shot4": "点击「Create new code」并复制全部代码",
-      "closeHint": "看完后回到原标签页继续填写 EA 账户信息即可。",
-      "closeWindow": "关闭此窗口"
     }
   }
 }

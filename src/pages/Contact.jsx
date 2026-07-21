@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { LEGAL_ENTITY } from "../legal/policies.js";
 
 export default function Contact() {
   const { t } = useTranslation();
@@ -11,9 +12,11 @@ export default function Contact() {
         {t('contact.description')}
       </p>
 
-      <div className="mt-6 rounded-3xl border border-white/5 bg-[#0B1220]/60 p-6">
+      <div className="mt-6 rounded-lg border border-white/5 bg-[#0B1220]/60 p-6">
         <div className="text-sm font-semibold">{t('contact.email')}</div>
-        <div className="mt-1 text-sm text-[#00FF9A]">support@valbri.com</div>
+        <a className="mt-1 inline-block text-sm text-[#00FF9A]" href={`mailto:${LEGAL_ENTITY.supportEmail}`}>
+          {LEGAL_ENTITY.supportEmail}
+        </a>
 
         <div className="mt-4 text-xs text-[#9AA7BD]">
           {t('contact.responseTime')}

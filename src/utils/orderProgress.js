@@ -1,9 +1,3 @@
-import {
-  isPaidPaymentStatus,
-  normalizeDeliveryStatus,
-  normalizePaymentStatus,
-} from "./orderDisplay";
-
 export const ORDER_PROGRESS_STEPS = [
   "submitted",
   "paid",
@@ -12,13 +6,15 @@ export const ORDER_PROGRESS_STEPS = [
   "completed",
 ];
 
+const isPaid = (order) => String(order?.payStatus) === "1";
+
 export const isAccountInfoMissing = (order) =>
-  isPaidPaymentStatus(order?.payStatus) &&
+  isPaid(order) &&
   (Boolean(order?.requiresAccountInfo) || order?.accountInfoStatus === "missing");
 
 export const getPlayerOrderProgress = (order) => {
-  const payStatus = normalizePaymentStatus(order?.payStatus);
-  const deliveryStatus = normalizeDeliveryStatus(order?.deliveryStatus);
+  const payStatus = String(order?.payStatus ?? "0");
+  const deliveryStatus = String(order?.deliveryStatus ?? "");
 
   if (payStatus === "2") {
     return {

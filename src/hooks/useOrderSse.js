@@ -19,9 +19,6 @@ export default function useOrderSse(onStatusChange) {
   const suspendedRef = useRef(false);
   const connectGenerationRef = useRef(0);
   const onStatusChangeRef = useRef(onStatusChange);
-  const connectRef = useRef(null);
-
-  // Keep refs in sync with latest values (outside render via effect)
   useEffect(() => {
     onStatusChangeRef.current = onStatusChange;
   }, [onStatusChange]);
@@ -52,12 +49,16 @@ export default function useOrderSse(onStatusChange) {
     }, FALLBACK_POLL_INTERVAL_MS);
   }, []);
 
+  const connectRef = useRef(null);
+
   const scheduleRetry = useCallback(() => {
     const retries = retryCountRef.current;
     if (retries < MAX_RETRIES) {
       retryCountRef.current = retries + 1;
       const delayMs = 1000 * Math.pow(2, retries);
-      retryTimerRef.current = setTimeout(() => connectRef.current?.(), delayMs);
+      retryTimerRef.current = setTimeout(() => {
+        connectRef.current?.();
+      }, delayMs);
     } else {
       startFallbackPolling();
     }
@@ -114,7 +115,6 @@ export default function useOrderSse(onStatusChange) {
     };
   }, [close, scheduleRetry, stopFallbackPolling]);
 
-  // Keep connectRef in sync with latest connect
   useEffect(() => {
     connectRef.current = connect;
   }, [connect]);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getPackageList } from "../api/package";
 import { getSbcPackageList } from "../api/sbcPackage";
@@ -244,7 +244,7 @@ function PackageCard({
       {/* 主金币区 — 金币与赠送同行 */}
       <div className="relative mt-3">
         <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-2">
-          <span className="pkg-coins-gradient text-[2.4rem] font-black leading-[0.86] tracking-normal">
+          <span className="pkg-coins-gradient text-[2.4rem] font-black leading-[0.86] tracking-[-0.058em]">
             {formatCoinsK(pkg.coins)}
           </span>
           {pkg.giftCoins > 0 && (
@@ -261,7 +261,7 @@ function PackageCard({
       {/* 价格 + 数量步进 */}
       <div className="flex items-end justify-between gap-2">
         <div className="min-w-0">
-          <div className="pkg-price-gradient truncate text-[1.6rem] font-black leading-none tracking-normal">
+          <div className="pkg-price-gradient truncate text-[1.6rem] font-black leading-none tracking-[-0.04em]">
             {totalPrice}
           </div>
           <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-[#6E7B92]">
@@ -445,7 +445,7 @@ function SbcPackageCard({ pkg, t, feedback, actionLoadingKey, onAdd, onCheckout 
 
       <div className="mt-auto flex items-end justify-between gap-3 pt-1">
         <div className="min-w-0">
-          <div className="pkg-price-gradient truncate text-[1.65rem] font-black leading-none tracking-normal">
+          <div className="pkg-price-gradient truncate text-[1.65rem] font-black leading-none tracking-[-0.04em]">
             {formatPrice(pkg.price, pkg.currency)}
           </div>
           <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-[#6E7B92]">
@@ -776,7 +776,7 @@ export default function Fc26() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[#00FF9A]/22 bg-[#00FF9A]/[0.05] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7BFFCA]">
             FC26 · Ultimate Team
           </div>
-          <h1 className="mt-4 text-[2rem] font-black leading-[1.05] tracking-normal sm:text-[2.5rem]">
+          <h1 className="mt-4 text-[2rem] font-black leading-[1.05] tracking-[-0.035em] sm:text-[2.5rem]">
             {t("fc26.title")}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9AA7BD] sm:text-base">

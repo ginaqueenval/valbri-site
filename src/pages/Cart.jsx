@@ -11,7 +11,8 @@ import {
   clampCartQuantity,
   updateCartItemsQuantity,
 } from "./cartState.js";
-import { formatCoinsK, formatPlatform, formatPrice } from "../utils/orderDisplay";
+import { formatCoinsK, formatPrice } from "../utils/orderDisplay";
+import { EmptyState, ScrollReveal } from "../components/motion.jsx";
 
 const PLATFORM_SHORT = {
   PlayStation: "PS/Xbox",
@@ -76,7 +77,7 @@ function CartRow({
   const subtotal = Number(item.price || 0) * quantity;
   const unitPrice = formatPrice(item.price, item.currency);
   const subtotalText = formatPrice(subtotal, item.currency);
-  const platformLabel = PLATFORM_SHORT[item.platform] || formatPlatform(item.platform);
+  const platformLabel = PLATFORM_SHORT[item.platform] || item.platform;
   const sbcItem = isSbcItem(item);
   return (
     <article className="package-card relative overflow-hidden rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(15,22,36,0.82),rgba(8,12,20,0.94))] p-5 transition-all duration-500 hover:border-[#00FF9A]/22 hover:shadow-[0_22px_44px_rgba(0,0,0,0.28),0_0_24px_rgba(0,255,154,0.08)] sm:p-6">
@@ -107,25 +108,24 @@ function CartRow({
             </span>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-2">
-            {item.packageName && (
-              <span className="line-clamp-2 text-[1.05rem] font-black leading-tight text-[#E7EDF7]">
-                {item.packageName}
+          {item.packageName && (
+            <div className="mt-3 line-clamp-2 text-[1.05rem] font-black leading-tight text-[#E7EDF7]">
+              {item.packageName}
+            </div>
+          )}
+
+          {!sbcItem && (
+            <div className={`${item.packageName ? "mt-2" : "mt-3"} flex flex-wrap items-baseline gap-x-2.5 gap-y-2`}>
+              <span className="pkg-coins-gradient text-[1.95rem] font-black leading-[0.88] tracking-[-0.05em] sm:text-[2.25rem]">
+                {formatCoinsK(item.coins)}
               </span>
-            )}
-            {!sbcItem && (
-              <>
-                <span className="pkg-coins-gradient text-[1.95rem] font-black leading-[0.88] tracking-normal sm:text-[2.25rem]">
-                  {formatCoinsK(item.coins)}
+              {item.giftCoins > 0 && (
+                <span className="pkg-bonus-pill inline-flex items-center self-center rounded-full px-2.5 py-1 text-[13px] font-black tracking-[0.01em] text-[#7BFFCA]">
+                  +{formatCoinsK(item.giftCoins)} {t("cart.gift")}
                 </span>
-                {item.giftCoins > 0 && (
-                  <span className="pkg-bonus-pill inline-flex items-center self-center rounded-full px-2.5 py-1 text-[13px] font-black tracking-[0.01em] text-[#7BFFCA]">
-                    +{formatCoinsK(item.giftCoins)} {t("cart.gift")}
-                  </span>
-                )}
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          )}
           <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6E7B92] sm:hidden">
             {unitPrice} / {t("cart.perItem")}
           </div>
@@ -133,7 +133,7 @@ function CartRow({
 
         {/* 总价 */}
         <div className="shrink-0 text-right">
-          <div className="pkg-price-gradient text-[1.5rem] font-black leading-none tracking-normal sm:text-[1.75rem]">
+          <div className="pkg-price-gradient text-[1.5rem] font-black leading-none tracking-[-0.04em] sm:text-[1.75rem]">
             {subtotalText}
           </div>
           <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.22em] text-[#6E7B92]">
@@ -397,8 +397,8 @@ export default function Cart() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-20 pt-10 sm:pt-14">
-      <header>
-        <h1 className="text-[2rem] font-black leading-[1.05] tracking-normal sm:text-[2.5rem]">
+      <header className="reveal-up">
+        <h1 className="text-[2rem] font-black leading-[1.05] tracking-[-0.035em] sm:text-[2.5rem]">
           {t("cart.title")}
         </h1>
         {!loading && items.length > 0 && (
@@ -409,12 +409,14 @@ export default function Cart() {
               </span>
               <span>{t("cart.totalItems")}</span>
             </span>
+            <span className="text-[#6E7B92]">·</span>
+            <span>{t("cart.flowHint")}</span>
           </p>
         )}
       </header>
 
       {error && (
-        <div className="mt-6 rounded-2xl border border-red-500/22 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="reveal-fade mt-6 rounded-2xl border border-red-500/22 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -429,29 +431,33 @@ export default function Cart() {
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="mt-10 rounded-3xl border border-white/5 bg-[#0B1220]/60 py-16 text-center">
-          <div className="text-sm text-[#9AA7BD]">{t("cart.empty")}</div>
-          <Link
-            to="/fc26-coins"
-            className="mt-5 inline-flex rounded-xl bg-[#00FF9A] px-6 py-3 text-sm font-semibold text-[#070A0F] hover:bg-[#00D47E]"
-          >
-            {t("cart.goBuy")}
-          </Link>
+        <div className="mt-10">
+          <EmptyState
+            title={t("cart.empty")}
+            action={
+              <Link to="/fc26-coins" className="cta-primary px-6 py-3 text-sm">
+                {t("cart.goBuy")}
+              </Link>
+            }
+          />
         </div>
       ) : (
         <div className="mt-8 grid gap-3">
           {items.map((item, idx) => (
-            <CartRow
-              key={item.id}
-              item={item}
-              index={idx}
-              updating={updatingQuantityId === item.id}
-              removing={removingId === item.id}
-              onQty={(q) => handleQuantityChange(item, q)}
-              onRemove={() => handleRemove(item.id)}
-              onCheckout={() => navigate(`/checkout?cartItemId=${item.id}`)}
-              t={t}
-            />
+            <ScrollReveal key={item.id} delay={idx * 40} threshold={0.12}>
+              <CartRow
+                item={item}
+                index={idx}
+                updating={updatingQuantityId === item.id}
+                removing={removingId === item.id}
+                onQty={(q) => handleQuantityChange(item, q)}
+                onRemove={() => handleRemove(item.id)}
+                onCheckout={() =>
+                  navigate(`/checkout?cartItemId=${item.id}`)
+                }
+                t={t}
+              />
+            </ScrollReveal>
           ))}
         </div>
       )}
@@ -465,11 +471,13 @@ export default function Cart() {
 }
 
 function UndoToast({ onUndo, t }) {
+  // toast 卡片底部内嵌 3px 高横向进度条,#00FF9A 实色高对比,
+  // 视觉远比原撤销按钮内部的 fill 渐变明显。
   return (
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 z-[80] flex justify-center px-4"
+      className="cart-undo-toast pointer-events-none fixed inset-x-0 z-[80] flex justify-center px-4"
       style={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
     >
       <div className="pointer-events-auto relative overflow-hidden rounded-2xl border border-white/12 bg-[#0B1220]/95 shadow-[0_18px_44px_rgba(0,0,0,0.45)] backdrop-blur-xl">
@@ -488,22 +496,9 @@ function UndoToast({ onUndo, t }) {
             {t("cart.undo")}
           </button>
         </div>
-        {/* 5 秒倒计时进度条 */}
-        <span className="absolute bottom-0 left-0 h-[3px] w-full bg-[#00FF9A]/30">
-          <span
-            className="block h-full bg-[#00FF9A]"
-            style={{
-              animation: "cart-undo-shrink 5s linear forwards",
-            }}
-          />
-        </span>
+        {/* 5 秒倒计时进度条 — 整 toast 卡片底部贴底,3px 高,#00FF9A 实色 */}
+        <span className="cart-undo-progress" aria-hidden="true" />
       </div>
-      <style>{`
-        @keyframes cart-undo-shrink {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-      `}</style>
     </div>
   );
 }

@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
+import useBodyScrollLock from "../utils/useBodyScrollLock.js";
 
 export default function LogoutConfirmModal({ onConfirm, onCancel }) {
   const { t } = useTranslation();
+  // 父组件条件渲染:存在即打开
+  useBodyScrollLock(true);
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
